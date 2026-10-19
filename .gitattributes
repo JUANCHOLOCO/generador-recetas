@@ -1,0 +1,8 @@
+# Por defecto, git normaliza fines de línea
+* text=auto eol=lf
+*.ps1 text eol=crlf
+
+# Recetas de referencia: se guardan byte a byte (cp1252 + CRLF), sin conversión
+tests/golden/** -text
+*.sql -text
+*.SQL -text

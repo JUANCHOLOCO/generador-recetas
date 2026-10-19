@@ -1,0 +1,25 @@
+# Entorno virtual y cachés de Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Empaquetado
+build/
+dist/
+*.spec
+*.egg-info/
+
+# Datos locales del usuario (no se versionan)
+*.db
+backups/
+output/*
+!output/.gitkeep
+
+# Editor / SO
+.vscode/
+Thumbs.db
