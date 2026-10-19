@@ -53,7 +53,11 @@ class MainWindow(QMainWindow):
 
     @property
     def current_widget(self) -> QWidget:
-        return self._stack.currentWidget()
+        widget = self._stack.currentWidget()
+        if widget is None:
+            # No debería ocurrir: la bienvenida se agrega en __init__ y nunca se quita.
+            raise RuntimeError("La pila de pantallas está vacía.")
+        return widget
 
     def module_names(self) -> list[str]:
         return [self._menu.item(i).text() for i in range(self._menu.count())]
