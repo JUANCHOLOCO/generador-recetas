@@ -1,4 +1,4 @@
-# Generador de Recetas
+# Generador de Recetas 
 
 Aplicación de escritorio, local y portable, que genera los **instaladores SQL** (recetas) para
 desplegar cambios de catálogo en las bases de datos ACTIVATOR, SIEBEL y PROMOTIONS.
