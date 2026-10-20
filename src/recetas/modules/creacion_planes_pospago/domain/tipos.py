@@ -16,3 +16,9 @@ class ListaCambioPlan(StrEnum):
     NINTENDO = "NINTENDO"
     ATP = "ATP"
     CONTROL = "CONTROL"
+
+class TablaScoring(StrEnum):
+    """Tabla de ACTIVATOR a la que va cada ID de scoring."""
+
+    SCORING_PLAN = "SCORING_PLAN"
+    CPL_SCORING_PLAN = "CPL_SCORING_PLAN"

@@ -4,8 +4,11 @@ from sqlalchemy import String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from recetas.core.infrastructure.db.base import Base, ParametroMixin, enum_type
-from recetas.modules.creacion_planes_pospago.domain.tipos import ListaCambioPlan, TipoPaquete
-
+from recetas.modules.creacion_planes_pospago.domain.tipos import (
+    ListaCambioPlan,
+    TablaScoring,
+    TipoPaquete,
+)
 
 class CplPlanPlanModel(ParametroMixin, Base):
     """IDs con los que se cruza un plan nuevo en la matriz de cambios de plan."""
@@ -18,12 +21,12 @@ class CplPlanPlanModel(ParametroMixin, Base):
 
 
 class ScoringModel(ParametroMixin, Base):
-    """IDs para SCORING_PLAN (id_scor) y CPL_SCORING_PLAN (scoring_id)."""
+    """IDs de scoring: 23 van a SCORING_PLAN (col F) y 24 a CPL_SCORING_PLAN (col G)."""
 
     __tablename__ = "pospago_scoring"
-    __table_args__ = (UniqueConstraint("id_scor", "tipo_facturacion"),)
+    __table_args__ = (UniqueConstraint("tabla_destino", "scoring_id", "tipo_facturacion"),)
 
-    id_scor: Mapped[int]
+    tabla_destino: Mapped[TablaScoring] = mapped_column(enum_type(TablaScoring))
     scoring_id: Mapped[int]
 
 
