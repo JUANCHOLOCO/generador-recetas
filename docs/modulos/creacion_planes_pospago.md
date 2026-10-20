@@ -63,7 +63,8 @@ y `0.0.0.1 /deal <POID> 0`, nombres de paquete para promociones, IDENTIFY.
 
 ## 3. Tablas de parametrización
 
-Todas llevan `tipo_facturacion` (`CORRIENTE` | `ANTICIPADA` | `AMBAS`) y `activo`.
+Todas llevan `orden` (respeta el orden del Excel, que es el orden en que salen en los scripts),
+`tipo_facturacion` (`CORRIENTE` | `ANTICIPADA` | `AMBAS`) y `activo`.
 Se precargan desde `data/seeds/creacion_planes_pospago/` (extraídos de ambos Excel).
 
 | Tabla | Origen en Excel | Contenido | Por tipo |

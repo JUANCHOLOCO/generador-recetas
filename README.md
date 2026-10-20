@@ -36,12 +36,12 @@ Las razones de cada elección están en [docs/adr/](docs/adr/).
 ```
 generador-recetas/
 ├── docs/                 # arquitectura, ADRs, documentación por módulo, manual
-├── migrations/           # migraciones Alembic del esquema SQLite
 ├── data/seeds/           # datos iniciales de parametrización por módulo
 ├── scripts/              # utilidades de desarrollo y build portable
 ├── output/               # recetas generadas en desarrollo (ignorado por git)
 ├── src/recetas/
 │   ├── main.py           # punto de entrada
+│   ├── migrations/       # migraciones Alembic del esquema SQLite (viajan con el paquete)
 │   ├── config.py         # rutas (BD, output) relativas al ejecutable
 │   ├── core/             # contrato de módulos, registro, puertos, adaptadores comunes
 │   ├── shared/           # utilidades transversales
