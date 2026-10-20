@@ -1,7 +1,6 @@
 import pytest
 
-from recetas.core.domain.billing import BillingType
-from recetas.core.domain.billing import BillingScope
+from recetas.core.domain.billing import BillingScope, BillingType
 
 
 def test_se_construye_desde_texto() -> None:
@@ -27,6 +26,7 @@ def test_es_comparable_con_str() -> None:
 )
 def test_label_para_la_interfaz(tipo: BillingType, esperado: str) -> None:
     assert tipo.label == esperado
+
 
 @pytest.mark.parametrize(
     ("scope", "billing", "esperado"),

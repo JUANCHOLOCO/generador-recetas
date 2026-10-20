@@ -21,6 +21,7 @@ class BillingType(StrEnum):
             case _:
                 assert_never(self)
 
+
 class BillingScope(StrEnum):
     """A qué tipo de facturación aplica un dato de parametrización."""
 

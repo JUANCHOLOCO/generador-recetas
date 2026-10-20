@@ -28,7 +28,7 @@ TABLAS_POSPAGO = {
 def test_crea_las_tablas_de_parametrizacion(engine: Engine) -> None:
     tablas = set(sa.inspect(engine).get_table_names())
 
-    assert TABLAS_POSPAGO <= tablas
+    assert tablas >= TABLAS_POSPAGO
     assert "alembic_version" in tablas
 
 

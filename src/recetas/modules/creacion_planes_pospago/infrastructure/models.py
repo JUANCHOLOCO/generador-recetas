@@ -40,9 +40,7 @@ class CampoEstaticoModel(ParametroMixin, Base):
     """Valor fijo de una columna en PLANS, SERVICES o PLAN_SERVICE."""
 
     __tablename__ = "pospago_campo_estatico"
-    __table_args__ = (
-        UniqueConstraint("tabla", "tipo_paquete", "columna", "tipo_facturacion"),
-    )
+    __table_args__ = (UniqueConstraint("tabla", "tipo_paquete", "columna", "tipo_facturacion"),)
 
     tabla: Mapped[str] = mapped_column(String(30))
     tipo_paquete: Mapped[TipoPaquete] = mapped_column(enum_type(TipoPaquete))
