@@ -184,10 +184,19 @@ Un nombre de plan por línea, en el orden del formulario.
 
 ## 6. Validaciones de negocio
 
-- No se repiten Id_Plan, Part_num ni Svall dentro del formulario.
-- Aviso (no bloqueo) si un Id_Plan ya existe en la parametrización del mismo tipo.
-- Aviso si el tipo es Corriente y no hay filas `CORRIENTE` en la matriz de cambios de plan.
-- Aviso si el tipo es Corriente y un nombre no termina en ` FC`.
+**Errores (bloquean la generación).** Implementados con Pydantic en `domain/plan.py`:
+
+- Formato de cada campo según la tabla de la sección 2 (`PLCON####`, `SVALL####`, IDs y POIDs numéricos).
+- Valor sin IVA menor que el valor con IVA.
+- Al menos un plan.
+- No se repiten Id_Plan, Part_num ni Svall (de Datos y SMS juntos) dentro del formulario.
+
+**Advertencias (no bloquean; el usuario decide).** Implementadas en `domain/advertencias.py`:
+
+- Un Id_Plan del formulario ya existe en la matriz de cambios de plan del mismo tipo.
+- No hay planes Nintendo configurados para el tipo de facturación elegido.
+- Corriente: un nombre de plan o paquete no termina en ` FC`.
+- Anticipada: un nombre de plan o paquete termina en ` FC` (posible tipo de facturación equivocado).
 
 ---
 

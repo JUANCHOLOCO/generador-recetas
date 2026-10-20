@@ -63,6 +63,23 @@ pytest
 python -m recetas
 ```
 
+### Cobertura de código
+
+```powershell
+pytest tests\unit --cov=recetas --cov-report=term-missing
+```
+
+> **Limitación conocida:** con SQLAlchemy 2.1 + coverage 7.16 en Python 3.13, cualquier test que
+> ejecute sentencias SQL falla **solo cuando se mide cobertura**
+> (`TypeError: 'InternalTraversal' object is not callable` dentro de `sqlalchemy/sql/_cache_key_cy`).
+> El rastreador de coverage choca con la extensión compilada (Cython) de SQLAlchemy; ocurre tanto
+> con el motor por defecto como con `COVERAGE_CORE=sysmon`. No afecta a la
+> app ni a `pytest` sin `--cov`. Por eso la cobertura se mide con `tests\unit`; los tests de
+> integración se ejecutan sin cobertura. Revisar al actualizar SQLAlchemy o coverage.
+>
+> Lo mismo puede ocurrir al **depurar con breakpoints** código que toca la BD, porque el
+> depurador también instala un rastreador.
+
 ## Versión portable
 
 ```powershell
