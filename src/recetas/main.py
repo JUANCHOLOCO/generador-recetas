@@ -7,6 +7,7 @@ from PySide6.QtWidgets import QApplication
 from recetas.config import AppPaths
 from recetas.core.infrastructure.db.engine import create_session_factory, create_sqlite_engine
 from recetas.core.infrastructure.db.migrator import upgrade_database
+from recetas.core.infrastructure.sistema import RelojSistema, UsuarioSistemaOperativo
 from recetas.core.plugins import AppContext, ModuleRegistry
 from recetas.modules import installed_modules
 from recetas.ui.main_window import MainWindow
@@ -15,8 +16,12 @@ from recetas.ui.main_window import MainWindow
 def build_context(paths: AppPaths) -> AppContext:
     upgrade_database(paths.database)
     engine = create_sqlite_engine(paths.database)
-    return AppContext(paths=paths, session_factory=create_session_factory(engine))
-
+    return AppContext(
+        paths=paths,
+        session_factory=create_session_factory(engine),
+        reloj=RelojSistema(),
+        usuario=UsuarioSistemaOperativo(),
+    )
 
 def build_registry(context: AppContext) -> ModuleRegistry:
     registry = ModuleRegistry()
