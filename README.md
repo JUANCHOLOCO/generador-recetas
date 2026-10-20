@@ -36,8 +36,7 @@ Las razones de cada elección están en [docs/adr/](docs/adr/).
 ```
 generador-recetas/
 ├── docs/                 # arquitectura, ADRs, documentación por módulo, manual
-├── data/seeds/           # datos iniciales de parametrización por módulo
-├── scripts/              # utilidades de desarrollo y build portable
+├── scripts/              # utilidades de desarrollo (extracción de seeds) y build portable
 ├── output/               # recetas generadas en desarrollo (ignorado por git)
 ├── src/recetas/
 │   ├── main.py           # punto de entrada
@@ -46,7 +45,7 @@ generador-recetas/
 │   ├── core/             # contrato de módulos, registro, puertos, adaptadores comunes
 │   ├── shared/           # utilidades transversales
 │   ├── ui/               # ventana principal y widgets reutilizables
-│   └── modules/          # un paquete por módulo de negocio
+│   └── modules/          # un paquete por módulo de negocio (con sus seeds CSV)
 └── tests/                # unit, integration, golden (salida byte a byte)
 ```
 
