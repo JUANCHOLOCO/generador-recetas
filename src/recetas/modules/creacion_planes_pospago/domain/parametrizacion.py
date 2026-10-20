@@ -49,9 +49,7 @@ class Parametrizacion:
 
     def campos(self, tabla: str, tipo_paquete: TipoPaquete) -> tuple[CampoEstatico, ...]:
         return tuple(
-            c
-            for c in self.campos_estaticos
-            if c.tabla == tabla and c.tipo_paquete is tipo_paquete
+            c for c in self.campos_estaticos if c.tabla == tabla and c.tipo_paquete is tipo_paquete
         )
 
     def identify_de(self, tipo_paquete: TipoPaquete) -> str:

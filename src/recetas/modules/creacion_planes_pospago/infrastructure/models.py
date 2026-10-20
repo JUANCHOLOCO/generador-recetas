@@ -10,6 +10,7 @@ from recetas.modules.creacion_planes_pospago.domain.tipos import (
     TipoPaquete,
 )
 
+
 class CplPlanPlanModel(ParametroMixin, Base):
     """IDs con los que se cruza un plan nuevo en la matriz de cambios de plan."""
 

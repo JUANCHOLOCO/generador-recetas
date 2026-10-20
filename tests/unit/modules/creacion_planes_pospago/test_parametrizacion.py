@@ -26,9 +26,7 @@ def test_campos_filtra_por_tabla_y_tipo_de_paquete() -> None:
     tipo = CampoEstatico("PLANS", TipoPaquete.PLAN, "TYPE", "'CONTROL'")
     prioridad_data = CampoEstatico("SERVICES", TipoPaquete.DATA, "PRIORITY", "63")
     prioridad_sms = CampoEstatico("SERVICES", TipoPaquete.SMS, "PRIORITY", "63")
-    parametrizacion = crear_parametrizacion(
-        campos_estaticos=(tipo, prioridad_data, prioridad_sms)
-    )
+    parametrizacion = crear_parametrizacion(campos_estaticos=(tipo, prioridad_data, prioridad_sms))
 
     assert parametrizacion.campos("SERVICES", TipoPaquete.SMS) == (prioridad_sms,)
 

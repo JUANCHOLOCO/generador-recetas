@@ -17,6 +17,7 @@ class ListaCambioPlan(StrEnum):
     ATP = "ATP"
     CONTROL = "CONTROL"
 
+
 class TablaScoring(StrEnum):
     """Tabla de ACTIVATOR a la que va cada ID de scoring."""
 

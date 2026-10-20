@@ -36,4 +36,6 @@ SEEDS: tuple[tuple[type[Base], str], ...] = (
 def cargar_parametrizacion_inicial(session_factory: sessionmaker[Session]) -> dict[str, int]:
     """Carga cada CSV en su tabla si está vacía. Devuelve filas insertadas por archivo."""
     with session_factory.begin() as session:
-        return {archivo: seed_if_empty(session, model, SEEDS_DIR / archivo) for model, archivo in SEEDS}
+        return {
+            archivo: seed_if_empty(session, model, SEEDS_DIR / archivo) for model, archivo in SEEDS
+        }

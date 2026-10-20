@@ -30,9 +30,7 @@ from recetas.modules.creacion_planes_pospago.domain.tipos import (
 
 HOJA = "Reglas Aplicabilidad"
 PRIMERA_FILA = 3  # filas 1 y 2 son títulos
-DESTINO = (
-    Path(__file__).resolve().parents[1] / "src/recetas/modules/creacion_planes_pospago/seeds"
-)
+DESTINO = Path(__file__).resolve().parents[1] / "src/recetas/modules/creacion_planes_pospago/seeds"
 
 # La celda J14 dice "CONTROL", pero la columna real de PLANS es TYPE (su valor es 'CONTROL').
 CORRECCIONES_PLANS = {"CONTROL": "TYPE"}
@@ -67,9 +65,7 @@ def texto(valor: object) -> str:
 def columna(hoja: Worksheet, letra: str) -> list[str]:
     """Valores no vacíos de una columna, desde PRIMERA_FILA."""
     indice = column_index_from_string(letra)
-    filas = hoja.iter_rows(
-        min_row=PRIMERA_FILA, min_col=indice, max_col=indice, values_only=True
-    )
+    filas = hoja.iter_rows(min_row=PRIMERA_FILA, min_col=indice, max_col=indice, values_only=True)
     return [t for (valor,) in filas if (t := texto(valor))]
 
 
@@ -106,7 +102,9 @@ def extraer(hoja: Worksheet, omitidos: list[str]) -> dict[str, list[Fila]]:
         ("D", ListaCambioPlan.ATP),
         ("C", ListaCambioPlan.CONTROL),
     ):
-        cpl += [(id_plan, lista.value) for id_plan in solo_numericos(columna(hoja, letra), omitidos)]
+        cpl += [
+            (id_plan, lista.value) for id_plan in solo_numericos(columna(hoja, letra), omitidos)
+        ]
 
     scoring = [(TablaScoring.SCORING_PLAN.value, v) for v in columna(hoja, "F")]
     scoring += [(TablaScoring.CPL_SCORING_PLAN.value, v) for v in columna(hoja, "G")]
@@ -157,9 +155,7 @@ def combinar(anticipada: list[Fila], corriente: list[Fila]) -> list[tuple[Fila, 
     return resultado
 
 
-def escribir(
-    ruta: Path, columnas: Sequence[str], filas: list[tuple[Fila, BillingScope]]
-) -> None:
+def escribir(ruta: Path, columnas: Sequence[str], filas: list[tuple[Fila, BillingScope]]) -> None:
     with ruta.open("w", encoding="utf-8", newline="") as archivo:
         writer = csv.writer(archivo, lineterminator="\n")
         writer.writerow(["orden", *columnas, "tipo_facturacion"])
