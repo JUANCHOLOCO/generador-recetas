@@ -1,0 +1,17 @@
+orden,nombre,tipo_facturacion
+1,SUB_CM,AMBAS
+2,DISTRIBUIDORES,AMBAS
+3,Autoactivacion,AMBAS
+4,CM_Dealer,AMBAS
+5,Comunidad_GO,AMBAS
+6,Corporativo,AMBAS
+7,Fuerza_vd,AMBAS
+8,Institucional,AMBAS
+9,Pyme,AMBAS
+10,Retail,AMBAS
+11,Televentas,AMBAS
+12,Tiendas_propias,AMBAS
+13,Tienda_fvd,AMBAS
+14,ABASTECIMIENTO,AMBAS
+15,Ecommerce,AMBAS
+16,CANALES_ESPECIALES,AMBAS

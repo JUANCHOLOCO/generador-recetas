@@ -77,9 +77,11 @@ Formulario (View)
 ## 5. Persistencia
 
 - SQLite en un archivo `recetas.db` junto al ejecutable.
-- Esquema versionado con Alembic (`migrations/`).
+- Esquema versionado con Alembic (`src/recetas/migrations/`), aplicado automáticamente al iniciar la app.
 - Cada módulo es dueño de sus tablas, con prefijo del módulo (ej. `pospago_cpl_plan_plan`).
-- Los datos iniciales viven en `data/seeds/<modulo>/` y se cargan en la primera ejecución.
+- Los datos iniciales (seeds) son CSV dentro de cada módulo (`modules/<modulo>/seeds/`), viajan con
+  el paquete y se cargan en la primera ejecución mediante el hook `Module.initialize()`. Solo se
+  insertan en tablas vacías: nunca sobrescriben lo que el usuario haya modificado.
 - Copia de seguridad automática al iniciar: `backups/recetas_YYYYMMDD_HHMMSS.db`.
 
 ## 6. Pruebas

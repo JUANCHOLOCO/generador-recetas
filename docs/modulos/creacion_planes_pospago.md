@@ -63,13 +63,16 @@ y `0.0.0.1 /deal <POID> 0`, nombres de paquete para promociones, IDENTIFY.
 
 ## 3. Tablas de parametrización
 
-Todas llevan `tipo_facturacion` (`CORRIENTE` | `ANTICIPADA` | `AMBAS`) y `activo`.
-Se precargan desde `data/seeds/creacion_planes_pospago/` (extraídos de ambos Excel).
+Todas llevan `orden` (respeta el orden del Excel, que es el orden en que salen en los scripts),
+`tipo_facturacion` (`CORRIENTE` | `ANTICIPADA` | `AMBAS`) y `activo`.
+Se precargan desde `src/recetas/modules/creacion_planes_pospago/seeds/*.csv`, generados una sola vez
+con `scripts/extraer_seeds_pospago.py` a partir de ambos Excel. Un dato presente en los dos libros
+queda como `AMBAS`; presente solo en uno, con el tipo de ese libro.
 
 | Tabla | Origen en Excel | Contenido | Por tipo |
 |---|---|---|---|
 | `pospago_cpl_plan_plan` | Cols A–D | `id_plan`, `lista` (Nintendo, Prepago, CONTROL, ATP) | **Sí** |
-| `pospago_scoring` | Cols F–G | `id_scor` (SCORING_PLAN), `scoring_id` (CPL_SCORING_PLAN) — 23 filas | No |
+| `pospago_scoring` | Cols F y G | `tabla_destino` + `scoring_id`: 23 IDs para SCORING_PLAN (col F) y 24 para CPL_SCORING_PLAN (col G, incluye el 18) | No |
 | `pospago_canal` | Col H | Nombres de canal para el cursor `scoring_channel` — 16 filas | No |
 | `pospago_campo_estatico` | Cols J–W | `tabla`, `tipo_paquete` (PLAN/DATA/SMS), `columna`, `valor_sql`, `orden` | No* |
 | `pospago_cadena_pool` | Cols Y–AB | `part_num` (`LNALL0167`, `SMALL0103`, `PQCON0127`), `orden` | No |
@@ -196,3 +199,4 @@ Un nombre de plan por línea, en el orden del formulario.
 | Valores fijos en Siebel: `PROD_GLOBAL_UID='11042'`, `PROD_CLS_NUM='120'`, `UOM_CD='Por mes'`, `ATTRIB_04='120354'`, `target_high/low=300`, IDs `1,2,3` de `cx_add_ons_category` | Se tratarán como campos estáticos de parametrización; confirmar que no varían por plan |
 | Bloque `TBL_PROM_VARIABLES` (`plan_name='POSPAGO5'`, `cancelable_plan='NO'`) | Confirmar si son fijos o dependen del RQ |
 | "Es Retención" | Excluido del formulario por decisión del usuario |
+| Códigos no numéricos en la columna CONTROL (C01…C25, P02…P238) | No aparecen en los scripts; el extractor de seeds los omite. Confirmar que se pueden descartar |

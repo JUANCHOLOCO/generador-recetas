@@ -9,6 +9,8 @@ description = "Generador de instaladores SQL para cambios de catálogo"
 requires-python = ">=3.13"
 dependencies = [
     "PySide6>=6.8",
+    "SQLAlchemy>=2.0.36",
+    "alembic>=1.14",
 ]
 
 [project.optional-dependencies]
@@ -18,6 +20,7 @@ dev = [
     "pytest-qt>=4.4",
     "ruff>=0.6",
     "mypy>=1.11",
+    "openpyxl>=3.1",
 ]
 
 [project.gui-scripts]
@@ -27,7 +30,14 @@ generador-recetas = "recetas.main:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-recetas = ["**/*.j2", "**/*.qss"]
+recetas = [
+    "**/*.j2",
+    "**/*.qss",
+    "**/*.csv",
+    "migrations/*.py",
+    "migrations/*.mako",
+    "migrations/versions/*.py",
+]
 
 # ---------- pytest ----------
 [tool.pytest.ini_options]
@@ -36,6 +46,7 @@ addopts = "-ra --strict-markers"
 markers = [
     "golden: compara la salida generada con recetas reales",
     "ui: requiere widgets Qt",
+    "integration: usa base de datos o disco real",
 ]
 qt_api = "pyside6"
 
@@ -44,6 +55,7 @@ qt_api = "pyside6"
 line-length = 100
 target-version = "py313"
 src = ["src", "tests"]
+extend-exclude = ["src/recetas/migrations/versions"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "N", "SIM"]
@@ -54,3 +66,4 @@ python_version = "3.13"
 strict = true
 mypy_path = "src"
 packages = ["recetas"]
+exclude = ["src/recetas/migrations/"]
