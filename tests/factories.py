@@ -60,6 +60,7 @@ def crear_solicitud(
 ) -> SolicitudReceta:
     datos: dict[str, Any] = {
         "requerimiento": "TPFB-2753",
+        "autor": "Equipo Tecnico",
         "tipo": "CORRIENTE",
         "planes": list(planes) if planes is not None else [datos_plan()],
     }
