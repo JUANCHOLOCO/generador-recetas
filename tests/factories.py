@@ -1,9 +1,8 @@
 """Constructores de objetos de dominio con valores por defecto para los tests."""
 
+from collections.abc import Sequence
 from dataclasses import replace
 from typing import Any
-from collections.abc import Sequence
-
 
 from recetas.core.domain.billing import BillingType
 from recetas.modules.creacion_planes_pospago.domain.parametrizacion import Parametrizacion
@@ -25,6 +24,7 @@ def crear_parametrizacion(**cambios: Any) -> Parametrizacion:
         addons=(),
     )
     return replace(base, **cambios)
+
 
 def datos_plan(**cambios: Any) -> dict[str, Any]:
     """Datos del plan 'Pospago Conectados 5.1 FC' de TPFB-2753 (Corriente)."""

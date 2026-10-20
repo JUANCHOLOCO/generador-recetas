@@ -79,7 +79,9 @@ class AnticipadaStrategy(BillingStrategy):
     def advertencia_nombre(self, nombre: str) -> str | None:
         if not nombre.endswith(SUFIJO_FC):
             return None
-        return f"'{nombre}' termina en 'FC', propio de Corriente. ¿El tipo de facturación es correcto?"
+        return (
+            f"'{nombre}' termina en 'FC', propio de Corriente. ¿El tipo de facturación es correcto?"
+        )
 
 
 def estrategia_para(tipo: BillingType) -> BillingStrategy:
