@@ -43,5 +43,5 @@ class Module(ABC):
     def create_widget(self, parent: QWidget | None = None) -> QWidget:
         """Construye la pantalla principal del módulo."""
 
-def initialize(self) -> None:  # noqa: B027 (hook opcional: vacío a propósito)
+    def initialize(self) -> None:  # noqa: B027 (hook opcional: vacío a propósito)
         """Prepara el módulo al iniciar la app, por ejemplo cargando sus datos iniciales."""
