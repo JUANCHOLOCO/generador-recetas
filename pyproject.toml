@@ -20,6 +20,7 @@ dev = [
     "pytest-qt>=4.4",
     "ruff>=0.6",
     "mypy>=1.11",
+    "openpyxl>=3.1",
 ]
 
 [project.gui-scripts]
@@ -32,6 +33,7 @@ where = ["src"]
 recetas = [
     "**/*.j2",
     "**/*.qss",
+    "**/*.csv",
     "migrations/*.py",
     "migrations/*.mako",
     "migrations/versions/*.py",
