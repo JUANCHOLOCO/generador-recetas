@@ -92,7 +92,9 @@ class BaseSqlGenerator(ABC):
 
         bundle.add(f"{base}/aplica-cambio.sql", self.wrapper_aplica(ctx))
         bundle.add(f"{base}/rollback-cambio.sql", self.wrapper_rollback(ctx))
-        bundle.add(f"{base}/SQL/{self.nombre_script(ctx.rq)}", self.contenido_script(ctx, cab_aplica))
+        bundle.add(
+            f"{base}/SQL/{self.nombre_script(ctx.rq)}", self.contenido_script(ctx, cab_aplica)
+        )
         bundle.add(
             f"{base}/ROLLBACK/{self.nombre_rollback(ctx.rq)}",
             self.contenido_rollback(ctx, cab_rollback),

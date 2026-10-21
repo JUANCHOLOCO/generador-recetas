@@ -23,6 +23,7 @@ def build_context(paths: AppPaths) -> AppContext:
         usuario=UsuarioSistemaOperativo(),
     )
 
+
 def build_registry(context: AppContext) -> ModuleRegistry:
     registry = ModuleRegistry()
     for module in installed_modules(context):
