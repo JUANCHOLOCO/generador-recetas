@@ -1,7 +1,8 @@
 import pytest
 from jinja2 import UndefinedError
 
-from recetas.core.infrastructure.templating.jinja import JinjaRenderer, sql_literal
+from recetas.core.infrastructure.templating.jinja import JinjaRenderer
+from recetas.core.domain.sql import sql_literal
 
 
 @pytest.mark.parametrize(

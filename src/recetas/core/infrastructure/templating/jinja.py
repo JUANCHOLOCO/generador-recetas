@@ -1,13 +1,7 @@
 """Adaptador TemplateRenderer sobre Jinja2."""
 
 from jinja2 import ChoiceLoader, Environment, PackageLoader, StrictUndefined
-
-
-def sql_literal(valor: object) -> str:
-    """Literal SQL seguro: comillas simples escapadas; None se convierte en NULL."""
-    if valor is None:
-        return "NULL"
-    return "'" + str(valor).replace("'", "''") + "'"
+from recetas.core.domain.sql import sql_literal
 
 
 class JinjaRenderer:
