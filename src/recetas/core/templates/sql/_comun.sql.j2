@@ -1,0 +1,10 @@
+{% macro cabecera(cab) -%}
+-------------------------------------------------------------------------------
+-- REQUERIMIENTO : {{ cab.requerimiento }}
+-- OBJETIVO      : {{ cab.objetivo }}
+-- BASE DE DATOS : {{ cab.base_datos }}
+-- AUTOR         : {{ cab.autor }}
+-- FECHA         : {{ cab.fecha_texto }}
+-- GENERADO POR  : Generador de Recetas {{ cab.version }}
+-------------------------------------------------------------------------------
+{%- endmacro %}

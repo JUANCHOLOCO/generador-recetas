@@ -95,3 +95,10 @@ def test_svall_de_datos_igual_al_de_sms_es_repetido() -> None:
 
     with pytest.raises(ValidationError, match="Svall repetido: SVALL2632"):
         crear_solicitud(planes=[plan])
+
+
+def test_autor_es_obligatorio() -> None:
+    with pytest.raises(ValidationError) as error:
+        crear_solicitud(autor="  ")
+
+    assert {e["loc"] for e in error.value.errors()} == {("autor",)}

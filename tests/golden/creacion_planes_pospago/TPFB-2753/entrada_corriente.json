@@ -1,0 +1,167 @@
+{
+  "requerimiento": "TPFB-2753",
+  "tipo": "CORRIENTE",
+  "autor": "Equipo Tecnico",
+  "planes": [
+    {
+      "id_plan": "7751",
+      "part_num": "PLCON0454",
+      "nombre": "Pospago Conectados 5.1 FC",
+      "tarif_group": "120617",
+      "valor_con_iva": 19900,
+      "valor_sin_iva": 16723,
+      "codigo_pcrf": "Conectados_51_FC",
+      "es_53": false,
+      "datos": {
+        "nombre": "Paquete Conectados Datos 5.1 FC",
+        "svall": "SVALL2632",
+        "poid": "990000885"
+      },
+      "sms": {
+        "nombre": "Paquete Conectados SMS 5.1 FC",
+        "svall": "SVALL2640",
+        "poid": "990001008"
+      }
+    },
+    {
+      "id_plan": "7761",
+      "part_num": "PLCON0455",
+      "nombre": "Pospago Conectados 5.2 FC",
+      "tarif_group": "120618",
+      "valor_con_iva": 24900,
+      "valor_sin_iva": 20924,
+      "codigo_pcrf": "Conectados_52_FC",
+      "es_53": false,
+      "datos": {
+        "nombre": "Paquete Conectados Datos 5.2 FC",
+        "svall": "SVALL2633",
+        "poid": "990001010"
+      },
+      "sms": {
+        "nombre": "Paquete Conectados SMS 5.2 FC",
+        "svall": "SVALL2641",
+        "poid": "990001011"
+      }
+    },
+    {
+      "id_plan": "7771",
+      "part_num": "PLCON0456",
+      "nombre": "Pospago Conectados 5.3 FC",
+      "tarif_group": "120619",
+      "valor_con_iva": 29900,
+      "valor_sin_iva": 25126,
+      "codigo_pcrf": "Conectados_53_FC",
+      "es_53": false,
+      "datos": {
+        "nombre": "Paquete Conectados Datos 5.3 FC",
+        "svall": "SVALL2634",
+        "poid": "990001012"
+      },
+      "sms": {
+        "nombre": "Paquete Conectados SMS 5.3 FC",
+        "svall": "SVALL2642",
+        "poid": "990001030"
+      }
+    },
+    {
+      "id_plan": "7781",
+      "part_num": "PLCON0457",
+      "nombre": "Pospago Conectados 5.4 FC",
+      "tarif_group": "120620",
+      "valor_con_iva": 34900,
+      "valor_sin_iva": 29328,
+      "codigo_pcrf": "Conectados_54_FC",
+      "es_53": false,
+      "datos": {
+        "nombre": "Paquete Conectados Datos 5.4 FC",
+        "svall": "SVALL2635",
+        "poid": "990001014"
+      },
+      "sms": {
+        "nombre": "Paquete Conectados SMS 5.4 FC",
+        "svall": "SVALL2643",
+        "poid": "990001015"
+      }
+    },
+    {
+      "id_plan": "7791",
+      "part_num": "PLCON0458",
+      "nombre": "Pospago Conectados 5.5 FC",
+      "tarif_group": "120621",
+      "valor_con_iva": 39900,
+      "valor_sin_iva": 33529,
+      "codigo_pcrf": "Conectados_55_FC",
+      "es_53": false,
+      "datos": {
+        "nombre": "Paquete Conectados Datos 5.5 FC",
+        "svall": "SVALL2636",
+        "poid": "990001031"
+      },
+      "sms": {
+        "nombre": "Paquete Conectados SMS 5.5 FC",
+        "svall": "SVALL2644",
+        "poid": "990001032"
+      }
+    },
+    {
+      "id_plan": "7801",
+      "part_num": "PLCON0459",
+      "nombre": "Pospago Conectados 5.6 FC",
+      "tarif_group": "120622",
+      "valor_con_iva": 43900,
+      "valor_sin_iva": 36891,
+      "codigo_pcrf": "Conectados_56_FC",
+      "es_53": false,
+      "datos": {
+        "nombre": "Paquete Conectados Datos 5.6 FC",
+        "svall": "SVALL2637",
+        "poid": "990001018"
+      },
+      "sms": {
+        "nombre": "Paquete Conectados SMS 5.6 FC",
+        "svall": "SVALL2645",
+        "poid": "990001019"
+      }
+    },
+    {
+      "id_plan": "7811",
+      "part_num": "PLCON0460",
+      "nombre": "Pospago Conectados 5.7 FC",
+      "tarif_group": "120623",
+      "valor_con_iva": 47900,
+      "valor_sin_iva": 40252,
+      "codigo_pcrf": "Conectados_57_FC",
+      "es_53": false,
+      "datos": {
+        "nombre": "Paquete Conectados Datos 5.7 FC",
+        "svall": "SVALL2638",
+        "poid": "990001033"
+      },
+      "sms": {
+        "nombre": "Paquete Conectados SMS 5.7 FC",
+        "svall": "SVALL2646",
+        "poid": "990001021"
+      }
+    },
+    {
+      "id_plan": "7821",
+      "part_num": "PLCON0461",
+      "nombre": "Pospago Conectados 5.8 FC",
+      "tarif_group": "120624",
+      "valor_con_iva": 53900,
+      "valor_sin_iva": 45294,
+      "codigo_pcrf": "Conectados_58_FC",
+      "es_53": false,
+      "datos": {
+        "nombre": "Paquete Conectados Datos 5.8 FC",
+        "svall": "SVALL2639",
+        "poid": "990001029"
+      },
+      "sms": {
+        "nombre": "Paquete Conectados SMS 5.8 FC",
+        "svall": "SVALL2647",
+        "poid": "990001023"
+      }
+    }
+  ]
+}

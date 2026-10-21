@@ -12,6 +12,7 @@ dependencies = [
     "SQLAlchemy>=2.0.36",
     "alembic>=1.14",
     "pydantic>=2.9",
+    "Jinja2>=3.1",
 ]
 
 [project.optional-dependencies]

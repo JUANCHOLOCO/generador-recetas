@@ -69,6 +69,7 @@ def _al_menos_un_plan(planes: tuple[PlanNuevo, ...]) -> tuple[PlanNuevo, ...]:
 
 class SolicitudReceta(_Inmutable):
     requerimiento: Requerimiento
+    autor: TextoObligatorio
     tipo: BillingType
     planes: Annotated[tuple[PlanNuevo, ...], AfterValidator(_al_menos_un_plan)]
 
