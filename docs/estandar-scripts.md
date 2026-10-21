@@ -82,7 +82,7 @@ SELECT TO_CHAR(SYSDATE, 'DD/MM/YYYY HH24:MI:SS') HORA_FIN FROM DUAL;
 
 - Palabras clave en mayúsculas (`INSERT INTO`, `VALUES`, `UPDATE`, `WHERE`).
 - Tablas siempre calificadas con su esquema (`ACTIVATOR.PLANS`, `SIEBEL.S_PROD_INT_X`).
-- Lista de columnas explícita en todo `INSERT` cuyo esquema se conoce.
+- Lista de columnas en todo `INSERT` cuyo ejemplo la trae (ver sección 8, E).
 - Literales de texto generados con el filtro `sql`: comillas simples escapadas (`'` → `''`) y
   `NULL` para valores ausentes (`None`). Nunca se concatenan valores del usuario a mano.
 - `/` solo después de un bloque PL/SQL (`BEGIN ... END;`), nunca después de una sentencia que ya
@@ -100,15 +100,16 @@ SELECT TO_CHAR(SYSDATE, 'DD/MM/YYYY HH24:MI:SS') HORA_FIN FROM DUAL;
 | 6 | Corriente: en Siebel el `/product` del plan va desfasado en 1 respecto del tarif group | `/product` y `/deal` del plan = tarif group (como en Anticipados y en Promotions) |
 | 7 | `UPDATE cx_add_ons_category` sin esquema en el rollback de Siebel | Siempre `SIEBEL.CX_ADD_ONS_CATEGORY` |
 
-## 8. Pendientes de confirmar (cambian el comportamiento)
+## 8. Decisiones de comportamiento (confirmadas el 2026-10-20)
 
-| # | Observación en los ejemplos | Propuesta |
+| # | Observación en los ejemplos | Decisión |
 |---|---|---|
-| A | El rollback de SIEBEL repite los mismos `UPDATE` del aplica (no revierte nada) y deja `cancela_cp_planes` **con** los planes nuevos | Rollback que deja `cancela_cp_planes` **sin** los planes nuevos; definir qué valores restaurar en `S_PROD_INT`/`S_PROD_INT_X` |
-| B | El rollback de PROMOTIONS no borra la fila `PLAN_TYPE` (`POSPAGO5`) que inserta el aplica | Borrarla también, o no insertarla si ya existe |
-| C | PROMOTIONS inserta `POID = '99999'` y luego lo actualiza con el real | Insertar el POID real directamente |
-| D | La carpeta raíz del ejemplo es `TPFB-2753_Prod` | Confirmar si `_Prod` es fijo, depende del ambiente o sobra |
-| E | `INSERT INTO ACTIVATOR.VENDOR_PERMISSIONS VALUES (...)` sin columnas | Confirmar nombres de columnas para hacerla explícita |
-| F | `last_id_table + 5` en `TBL_PROM_VARIABLES` | Confirmar por qué se deja un salto de 5 IDs |
+| A | El rollback de SIEBEL repite los `UPDATE` del aplica y deja `cancela_cp_planes` con los planes nuevos | `cancela_cp_planes` vuelve a la lista **sin** los planes nuevos. Los `UPDATE` de `S_PROD_INT`/`S_PROD_INT_X` quedan **igual que en el ejemplo**: esos productos los carga una aplicación de configuración y no se pueden borrar |
+| B | El rollback de PROMOTIONS no borra la fila `PLAN_TYPE` (`POSPAGO5`) | El aplica la inserta **solo si no existe**; el rollback no la borra, porque la comparten todos los RQ de la familia |
+| C | PROMOTIONS inserta `POID = '99999'` y luego lo actualiza | Se inserta el POID real directamente; se eliminan los `UPDATE` |
+| D | Carpeta raíz `TPFB-2753_Prod` | El sufijo depende del ambiente: `_Dev`, `_UAT` o `_Prod` (campo del formulario) |
+| E | `VENDOR_PERMISSIONS` sin lista de columnas | Se conserva sin lista (no se conocen los nombres). Revisar cuando se conozcan |
+| F | `last_id_table + 5` en `TBL_PROM_VARIABLES` | Se conserva tal cual (motivo desconocido) |
 
-Mientras no se confirmen, se conserva el comportamiento del ejemplo (A–F) y solo se normaliza el formato.
+Regla general: **la lista de columnas solo se escribe cuando el ejemplo la trae**; no se infiere el
+orden de columnas de una tabla.

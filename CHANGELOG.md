@@ -21,6 +21,8 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
 - Campo `autor` en la solicitud; puertos `Reloj`, `UsuarioActual` y `TemplateRenderer`.
 - Plantillas Jinja2 comunes, generadores base (Template Method), wrappers de las 3 BD y Pool.
 - Golden tests de aprobación + equivalencia de sentencias contra TPFB-2753.
+- Generador ACTIVADOR (aplica y rollback) con la regla de la matriz CPL_PLAN_PLAN documentada.
+- Golden tests con parametrización real y equivalencia de sentencias con correcciones declaradas.
 
 ### Corregido
 - Scoring modelado como dos listas independientes (SCORING_PLAN y CPL_SCORING_PLAN).

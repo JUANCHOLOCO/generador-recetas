@@ -34,6 +34,8 @@ Los IDs (ej. `775` frente a `7751`) los escribe siempre el usuario; la app no lo
 | Campo | Obligatorio | Ejemplo | Validación |
 |---|---|---|---|
 | Número de requerimiento | Sí | `TPFB-2753` | Texto sin espacios |
+| Autor | Sí | `Juan Botero` | Precargado con el usuario de Windows (o el usuario logueado, cuando exista login) |
+| Ambiente | Sí | `Prod` | `Dev`, `UAT` o `Prod`; define el sufijo de la carpeta raíz (`TPFB-2753_Prod`) |
 | Carpeta de salida | Sí | `C:\receta` | Debe existir o poder crearse |
 | Tipo de facturación | Sí | Corriente (FC) | `CORRIENTE` o `ANTICIPADA` |
 
@@ -139,10 +141,23 @@ Notación: **F** = formulario, **P** = parametrización, **E** = estrategia de f
 | Services PCRF | `ACTIVATOR.SERVICES_PCRF` | Svall Datos=F; `PLAN_CODE`=F Código PCRF; `PCRF_CODE`=C `MONTH/<Código PCRF>` |
 | Vendor Permissions | `ACTIVATOR.VENDOR_PERMISSIONS` | `(Id_Plan, Nombre, NULL, NULL, '1')` |
 | Vendor Profile Permission | `ACTIVATOR.VENDOR_PROFILE_PERMISSION` | `(0, Id_Plan)` |
-| Prepago / Nintendo / ATP / Control | `ACTIVATOR.CPL_PLAN_PLAN` | Por cada ID de P matriz (filtrado por E) **y** cada plan del formulario: dos filas `(otro, nuevo)` y `(nuevo, otro)` |
+| Prepago / Nintendo / ATP / Control | `ACTIVATOR.CPL_PLAN_PLAN` | Ver regla de la matriz debajo de esta tabla |
 | cpl role plan | `ACTIVATOR.CPL_ROLE_PLAN` | Una fila por P rol |
 | Scoring plan | `ACTIVATOR.SCORING_PLAN` | Una fila por P `id_scor` |
 | cpl scoring plan | `ACTIVATOR.CPL_SCORING_PLAN` | Una fila por P `scoring_id` |
+
+**Regla de la matriz `CPL_PLAN_PLAN`** (por cada plan nuevo `N`, en este orden; los IDs de la
+parametrización que también están en el formulario se tratan como planes nuevos):
+
+| Lista | Filas por cada ID `X` de la lista |
+|---|---|
+| Prepago | `(N, X)` y `(X, N)` |
+| Nintendo (ya existentes) | `(X, N)` y `(N, X)` |
+| Nintendo (otros planes del formulario) | solo `(X, N)`: el par inverso sale en el bloque de `X` |
+| ATP | solo `(X, N)` |
+| CONTROL | solo `(X, N)` (incluye los códigos C01…P238) |
+
+TPFB-2753: Corriente 81 filas por plan (2 + 79), Anticipados 372 (2 + 79 + 24 + 267).
 
 Al final, una sola vez: bloque PL/SQL con cursor sobre `ACTIVATOR.channel` × `scoring_plan`
 filtrado por P canales y los Id_Plan del formulario → `scoring_channel`. Luego `COMMIT`.
@@ -208,4 +223,4 @@ Un nombre de plan por línea, en el orden del formulario.
 | Valores fijos en Siebel: `PROD_GLOBAL_UID='11042'`, `PROD_CLS_NUM='120'`, `UOM_CD='Por mes'`, `ATTRIB_04='120354'`, `target_high/low=300`, IDs `1,2,3` de `cx_add_ons_category` | Se tratarán como campos estáticos de parametrización; confirmar que no varían por plan |
 | Bloque `TBL_PROM_VARIABLES` (`plan_name='POSPAGO5'`, `cancelable_plan='NO'`) | Confirmar si son fijos o dependen del RQ |
 | "Es Retención" | Excluido del formulario por decisión del usuario |
-| Códigos no numéricos en la columna CONTROL (C01…C25, P02…P238) | Se ignoran (decisión del usuario, 2026-10-20). Reevaluar solo si los golden tests de la Fase 5 muestran que hacen falta |
+| Códigos no numéricos en la columna CONTROL (C01…C25, P02…P238) | **Resuelto:** el script de Anticipados sí los usa (267 filas de CONTROL por plan). Se cargan en la parametrización como cualquier otro ID |
