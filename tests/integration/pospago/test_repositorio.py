@@ -47,9 +47,9 @@ def test_corriente_cruza_con_nintendo_fc_y_prepago(corriente: Parametrizacion) -
 
 def test_anticipada_cruza_con_todas_las_listas(anticipada: Parametrizacion) -> None:
     assert anticipada.ids_de_lista(ListaCambioPlan.NINTENDO)[0] == "739"
-    assert len(anticipada.ids_de_lista(ListaCambioPlan.CONTROL)) == 221
+    assert len(anticipada.ids_de_lista(ListaCambioPlan.CONTROL)) == 267  # incluye C01…P238
     assert len(anticipada.ids_de_lista(ListaCambioPlan.ATP)) == 24
-    assert len(anticipada.ids_cambio_plan) == 290  # igual que el script Anticipados
+    assert len(anticipada.ids_cambio_plan) == 336  # igual que el script Anticipados
 
 
 def test_scoring_son_dos_listas_distintas(corriente: Parametrizacion) -> None:

@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import argparse
 import csv
-from collections.abc import Iterable, Sequence
+from collections.abc import Sequence
 from pathlib import Path
 
 from openpyxl import load_workbook
@@ -83,17 +83,7 @@ def pares(hoja: Worksheet, letra_clave: str, letra_valor: str) -> list[tuple[str
     return resultado
 
 
-def solo_numericos(valores: Iterable[str], omitidos: list[str]) -> list[str]:
-    resultado = []
-    for valor in valores:
-        if valor.isdigit():
-            resultado.append(valor)
-        else:
-            omitidos.append(valor)
-    return resultado
-
-
-def extraer(hoja: Worksheet, omitidos: list[str]) -> dict[str, list[Fila]]:
+def extraer(hoja: Worksheet) -> dict[str, list[Fila]]:
     cpl: list[Fila] = []
     # Mismo orden en que las listas aparecen en el script: Prepago, Nintendo, ATP, Control.
     for letra, lista in (
@@ -102,9 +92,7 @@ def extraer(hoja: Worksheet, omitidos: list[str]) -> dict[str, list[Fila]]:
         ("D", ListaCambioPlan.ATP),
         ("C", ListaCambioPlan.CONTROL),
     ):
-        cpl += [
-            (id_plan, lista.value) for id_plan in solo_numericos(columna(hoja, letra), omitidos)
-        ]
+        cpl += [(id_plan, lista.value) for id_plan in columna(hoja, letra)]
 
     scoring = [(TablaScoring.SCORING_PLAN.value, v) for v in columna(hoja, "F")]
     scoring += [(TablaScoring.CPL_SCORING_PLAN.value, v) for v in columna(hoja, "G")]
@@ -135,12 +123,12 @@ def extraer(hoja: Worksheet, omitidos: list[str]) -> dict[str, list[Fila]]:
     }
 
 
-def extraer_libro(ruta: Path, omitidos: list[str]) -> dict[str, list[Fila]]:
+def extraer_libro(ruta: Path) -> dict[str, list[Fila]]:
     # read_only: lectura en streaming, mucho más rápida en libros grandes.
     # data_only: valores calculados de las fórmulas, no la fórmula.
     libro = load_workbook(ruta, read_only=True, data_only=True)
     try:
-        return extraer(libro[HOJA], omitidos)
+        return extraer(libro[HOJA])
     finally:
         libro.close()
 
@@ -172,9 +160,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--destino", type=Path, default=DESTINO)
     args = parser.parse_args(argv)
 
-    omitidos: list[str] = []
-    anticipada = extraer_libro(args.anticipada, omitidos)
-    corriente = extraer_libro(args.corriente, omitidos)
+    anticipada = extraer_libro(args.anticipada)
+    corriente = extraer_libro(args.corriente)
     args.destino.mkdir(parents=True, exist_ok=True)
 
     for nombre, columnas in COLUMNAS_CSV.items():
@@ -185,11 +172,6 @@ def main(argv: Sequence[str] | None = None) -> int:
     identify = [(fila, BillingScope.AMBAS) for fila in IDENTIFY]
     escribir(args.destino / "identify.csv", ("tipo_paquete", "identify"), identify)
     print(f"{'identify.csv':<22}{len(identify):>5} filas")
-
-    if omitidos:
-        unicos = sorted(set(omitidos))
-        print(f"\nValores no numéricos omitidos en listas de IDs ({len(unicos)}): {unicos}")
-    return 0
 
 
 if __name__ == "__main__":
