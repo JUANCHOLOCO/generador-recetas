@@ -1,0 +1,9 @@
+{% macro actualizar_producto(p) -%}
+UPDATE SIEBEL.S_PROD_INT SET DESC_TEXT = {{ p.nombre | sql }}, TYPE = {{ p.tipo | sql }}, UOM_CD = {{ p.uom_cd | sql }}, CRT_AST_REC_FLG = 'Y', PART_NUM = {{ p.part_num | sql }}, PROD_GLOBAL_UID = {{ p.prod_global_uid | sql }}, PROD_CLS_NUM = {{ p.prod_cls_num | sql }} WHERE NAME = {{ p.nombre | sql }};
+{%- endmacro %}
+
+{% macro actualizar_categorias(ids, cancela) -%}
+{% for id in ids %}
+UPDATE SIEBEL.CX_ADD_ONS_CATEGORY SET CANCELA_CP_PLANES = {{ cancela | sql }} WHERE ID = {{ id }};
+{% endfor %}
+{%- endmacro %}
