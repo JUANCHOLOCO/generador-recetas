@@ -17,6 +17,10 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
 - Parametrización del módulo Pospago: seeds CSV extraídos de los Excel, carga inicial idempotente
   y repositorio que filtra por tipo de facturación.
 - `AppContext` y hook `Module.initialize()` para inyectar dependencias en los módulos.
+- Estándar de scripts (docs/estandar-scripts.md): cp1252, CRLF, cabecera única con autor y fecha.
+- Campo `autor` en la solicitud; puertos `Reloj`, `UsuarioActual` y `TemplateRenderer`.
+- Plantillas Jinja2 comunes, generadores base (Template Method), wrappers de las 3 BD y Pool.
+- Golden tests de aprobación + equivalencia de sentencias contra TPFB-2753.
 
 ### Corregido
 - Scoring modelado como dos listas independientes (SCORING_PLAN y CPL_SCORING_PLAN).
