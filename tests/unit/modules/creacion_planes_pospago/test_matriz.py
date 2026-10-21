@@ -48,7 +48,9 @@ def test_atp_y_control_en_un_solo_sentido_incluso_codigos() -> None:
 
 
 def test_toda_la_receta_sin_pares_repetidos_ni_faltantes_entre_planes_nuevos() -> None:
-    todos = [p for n in NUEVOS for s in matriz_cambio_plan(n, NUEVOS, PARAMETRIZACION) for p in s.pares]
+    todos = [
+        p for n in NUEVOS for s in matriz_cambio_plan(n, NUEVOS, PARAMETRIZACION) for p in s.pares
+    ]
 
     assert len(todos) == len(set(todos))
     assert ("7751", "7761") in todos

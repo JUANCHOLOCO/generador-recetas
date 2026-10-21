@@ -1,6 +1,5 @@
 """Golden tests de TPFB-2753: salida estandarizada y equivalencia con los scripts originales."""
 
-import json
 from datetime import date
 from pathlib import Path, PurePosixPath
 
@@ -9,13 +8,12 @@ import pytest
 from recetas.core.domain.billing import BillingType
 from recetas.core.domain.recipe_bundle import RecipeBundle, RecipeFile
 from recetas.core.infrastructure.templating.jinja import JinjaRenderer
-from recetas.modules.creacion_planes_pospago.domain.plan import SolicitudReceta
+from recetas.modules.creacion_planes_pospago.generators.activador import ActivadorGenerator
 from recetas.modules.creacion_planes_pospago.generators.base import (
     BaseSqlGenerator,
     ContextoGeneracion,
 )
 from recetas.modules.creacion_planes_pospago.generators.conf import PoolGenerator
-from recetas.modules.creacion_planes_pospago.generators.activador import ActivadorGenerator
 from recetas.modules.creacion_planes_pospago.generators.scripts import (
     PromotionsGenerator,
     SiebelGenerator,
@@ -45,7 +43,12 @@ def a_bytes(ruta: str, contenido: str) -> bytes:
 @pytest.mark.parametrize("tipo", TIPOS)
 @pytest.mark.parametrize("clase", GENERADORES)
 @pytest.mark.parametrize("wrapper", ["aplica-cambio.sql", "rollback-cambio.sql"])
-def test_wrappers(tipo: BillingType, clase: type[BaseSqlGenerator], wrapper: str, contextos_tpfb_2753: dict[BillingType, ContextoGeneracion]) -> None:
+def test_wrappers(
+    tipo: BillingType,
+    clase: type[BaseSqlGenerator],
+    wrapper: str,
+    contextos_tpfb_2753: dict[BillingType, ContextoGeneracion],
+) -> None:
     ctx = contextos_tpfb_2753[tipo]
     generador = clase(RENDERER)
     texto = (
@@ -56,14 +59,13 @@ def test_wrappers(tipo: BillingType, clase: type[BaseSqlGenerator], wrapper: str
     ruta = f"{ctx.estrategia.carpeta}/Script/{generador.carpeta}/{wrapper}"
 
     verificar_golden(CASO / "esperado" / ruta, a_bytes(ruta, texto))
-    verificar_equivalencia(
-        sentencias(texto), sentencias(leer_original(CASO / "original" / ruta))
-    )
-    
+    verificar_equivalencia(sentencias(texto), sentencias(leer_original(CASO / "original" / ruta)))
 
 
 @pytest.mark.parametrize("tipo", TIPOS)
-def test_pool(tipo: BillingType, contextos_tpfb_2753: dict[BillingType, ContextoGeneracion]) -> None:
+def test_pool(
+    tipo: BillingType, contextos_tpfb_2753: dict[BillingType, ContextoGeneracion]
+) -> None:
     ctx = contextos_tpfb_2753[tipo]
     bundle = RecipeBundle("TPFB-2753")
 
@@ -73,6 +75,7 @@ def test_pool(tipo: BillingType, contextos_tpfb_2753: dict[BillingType, Contexto
     ruta = str(archivo.path)
     verificar_golden(CASO / "esperado" / ruta, archivo.to_bytes())
     assert archivo.to_bytes() == (CASO / "original" / ruta).read_bytes()
+
 
 # Correcciones intencionales del estándar (docs/estandar-scripts.md §6 y §7).
 CORRECCIONES_ACTIVADOR_ROLLBACK = [

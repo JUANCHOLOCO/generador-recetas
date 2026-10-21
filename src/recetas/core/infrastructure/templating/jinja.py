@@ -1,6 +1,7 @@
 """Adaptador TemplateRenderer sobre Jinja2."""
 
 from jinja2 import ChoiceLoader, Environment, PackageLoader, StrictUndefined
+
 from recetas.core.domain.sql import sql_literal
 
 

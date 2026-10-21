@@ -61,5 +61,5 @@ class Parametrizacion:
             ) from None
 
     def valores(self, tabla: str, tipo_paquete: TipoPaquete) -> dict[str, str]:
-            """Campos estáticos de una tabla como {columna: valor_sql}."""
-            return {c.columna: c.valor_sql for c in self.campos(tabla, tipo_paquete)}
+        """Campos estáticos de una tabla como {columna: valor_sql}."""
+        return {c.columna: c.valor_sql for c in self.campos(tabla, tipo_paquete)}
