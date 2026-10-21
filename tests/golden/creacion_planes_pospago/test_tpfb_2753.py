@@ -19,9 +19,12 @@ from recetas.modules.creacion_planes_pospago.generators.scripts import (
     SiebelGenerator,
 )
 from tests.golden_utils import (
+    Correccion,
     corregir,
     leer_original,
+    reemplazar,
     sentencias,
+    sentencias_sql,
     verificar_equivalencia,
     verificar_golden,
 )
@@ -78,9 +81,9 @@ def test_pool(
 
 
 # Correcciones intencionales del estándar (docs/estandar-scripts.md §6 y §7).
-CORRECCIONES_ACTIVADOR_ROLLBACK = [
-    ("FROM SCORING_PLAN WHERE", "FROM ACTIVATOR.SCORING_PLAN WHERE"),  # tabla sin esquema
-    ("FROM SERVICES S WHERE", "FROM ACTIVATOR.SERVICES S WHERE"),  # tabla sin esquema
+CORRECCIONES_ACTIVADOR_ROLLBACK: list[Correccion] = [
+    reemplazar("FROM SCORING_PLAN WHERE", "FROM ACTIVATOR.SCORING_PLAN WHERE"),  # #7: esquema
+    reemplazar("FROM SERVICES S WHERE", "FROM ACTIVATOR.SERVICES S WHERE"),  # #7: esquema
 ]
 
 
@@ -96,7 +99,7 @@ def test_activador(
     if carpeta == "SQL":
         nombre = generador.nombre_script(ctx.rq)
         texto = generador.contenido_script(ctx, generador.cabecera(ctx, generador.objetivo_aplica))
-        correcciones: list[tuple[str, str]] = []
+        correcciones: list[Correccion] = []
     else:
         nombre = generador.nombre_rollback(ctx.rq)
         texto = generador.contenido_rollback(
@@ -106,5 +109,5 @@ def test_activador(
     ruta = f"{ctx.estrategia.carpeta}/Script/{generador.carpeta}/{carpeta}/{nombre}"
 
     verificar_golden(CASO / "esperado" / ruta, a_bytes(ruta, texto))
-    original = sentencias(leer_original(CASO / "original" / ruta), solo_logica=True)
-    verificar_equivalencia(sentencias(texto, solo_logica=True), corregir(original, correcciones))
+    original = sentencias_sql(leer_original(CASO / "original" / ruta))
+    verificar_equivalencia(sentencias_sql(texto), corregir(original, correcciones))

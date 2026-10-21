@@ -3,12 +3,15 @@
 import difflib
 import os
 import re
+from collections.abc import Callable, Sequence
 from pathlib import Path
 
 import pytest
 
 ACTUALIZAR = os.environ.get("ACTUALIZAR_GOLDEN") == "1"
-_IGNORAR_EN_DATOS = re.compile(r"^(SET |SELECT TO_CHAR\(SYSDATE|/$|COMMIT;$)")
+_CONTROL_SQLPLUS = re.compile(r"^(SET |SELECT TO_CHAR\(SYSDATE|/$|COMMIT;?$)")
+
+Correccion = Callable[[list[str]], list[str]]
 
 
 def verificar_golden(esperado: Path, obtenido: bytes) -> None:
@@ -39,30 +42,49 @@ def leer_original(ruta: Path) -> str:
         return datos.decode("cp1252")
 
 
-def sentencias(sql: str, *, solo_logica: bool = False) -> list[str]:
-    """Líneas normalizadas: sin comentarios ni diferencias de espacios o mayúsculas.
+def _normalizar(texto: str) -> str:
+    texto = re.sub(r"\s+", " ", texto.strip()).upper()
+    return re.sub(r"\s*([(),=])\s*", r"\1", texto)
 
-    Con solo_logica se omiten las líneas de control de SQL*Plus (SET, hora, '/', COMMIT),
-    cuyo formato cambió a propósito con el estándar.
+
+def _lineas_utiles(sql: str) -> list[str]:
+    return [
+        _normalizar(linea)
+        for linea in sql.splitlines()
+        if linea.strip() and not linea.strip().startswith("--")
+    ]
+
+
+def sentencias(sql: str) -> list[str]:
+    """Líneas normalizadas. Para los wrappers, donde se comparan todas las líneas."""
+    return _lineas_utiles(sql)
+
+
+def sentencias_sql(sql: str) -> list[str]:
+    """Sentencias de un script de datos, sin el control de SQL*Plus (SET, hora, '/', COMMIT).
+
+    Une las líneas y corta por ';', así una sentencia escrita en 1 o en 19 líneas
+    se compara igual.
     """
-    resultado = []
-    for linea in sql.splitlines():
-        linea = linea.strip()
-        if not linea or linea.startswith("--"):
-            continue
-        linea = re.sub(r"\s+", " ", linea).upper()
-        linea = re.sub(r"\s*([(),=])\s*", r"\1", linea)
-        if solo_logica and _IGNORAR_EN_DATOS.match(linea):
-            continue
-        resultado.append(linea)
-    return resultado
+    lineas = [linea for linea in _lineas_utiles(sql) if not _CONTROL_SQLPLUS.match(linea)]
+    partes = (_normalizar(parte) for parte in " ".join(lineas).split(";"))
+    return [parte for parte in partes if parte]
 
 
-def corregir(lineas: list[str], correcciones: list[tuple[str, str]]) -> list[str]:
-    """Aplica al original las correcciones intencionales del estándar."""
-    for antes, despues in correcciones:
-        lineas = [linea.replace(antes, despues) for linea in lineas]
-    return lineas
+def reemplazar(antes: str, despues: str) -> Correccion:
+    """Corrección simple: reemplaza un texto en todas las sentencias."""
+
+    def aplicar(lista: list[str]) -> list[str]:
+        return [s.replace(antes, despues) for s in lista]
+
+    return aplicar
+
+
+def corregir(lista: list[str], correcciones: Sequence[Correccion]) -> list[str]:
+    """Aplica al original, en orden, las correcciones intencionales del estándar."""
+    for correccion in correcciones:
+        lista = correccion(lista)
+    return lista
 
 
 def verificar_equivalencia(generado: list[str], original: list[str]) -> None:
