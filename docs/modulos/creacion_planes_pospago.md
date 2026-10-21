@@ -204,8 +204,8 @@ Un nombre de plan por línea, en el orden del formulario.
 
 | Tema | Situación actual |
 |---|---|
-| Efecto de "Es 5.3 = S" en Siebel | El campo existe en el formulario; falta definir la sentencia/propiedad que genera |
+| Efecto de "Es 5.3 = S" | Genera un **archivo de propiedades**. Se implementará en una entrega posterior, cuando la generación de scripts de BD funcione. Por ahora el campo solo se captura y se usa para registrar el plan en 5.3 OLDS |
 | Valores fijos en Siebel: `PROD_GLOBAL_UID='11042'`, `PROD_CLS_NUM='120'`, `UOM_CD='Por mes'`, `ATTRIB_04='120354'`, `target_high/low=300`, IDs `1,2,3` de `cx_add_ons_category` | Se tratarán como campos estáticos de parametrización; confirmar que no varían por plan |
 | Bloque `TBL_PROM_VARIABLES` (`plan_name='POSPAGO5'`, `cancelable_plan='NO'`) | Confirmar si son fijos o dependen del RQ |
 | "Es Retención" | Excluido del formulario por decisión del usuario |
-| Códigos no numéricos en la columna CONTROL (C01…C25, P02…P238) | No aparecen en los scripts; el extractor de seeds los omite. Confirmar que se pueden descartar |
+| Códigos no numéricos en la columna CONTROL (C01…C25, P02…P238) | Se ignoran (decisión del usuario, 2026-10-20). Reevaluar solo si los golden tests de la Fase 5 muestran que hacen falta |
