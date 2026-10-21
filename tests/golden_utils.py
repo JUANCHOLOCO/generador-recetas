@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 ACTUALIZAR = os.environ.get("ACTUALIZAR_GOLDEN") == "1"
+_IGNORAR_EN_DATOS = re.compile(r"^(SET |SELECT TO_CHAR\(SYSDATE|/$|COMMIT;$)")
 
 
 def verificar_golden(esperado: Path, obtenido: bytes) -> None:
@@ -38,12 +39,33 @@ def leer_original(ruta: Path) -> str:
         return datos.decode("cp1252")
 
 
-def sentencias(sql: str) -> list[str]:
-    """Sentencias normalizadas: sin comentarios, líneas vacías ni diferencias de espaciado."""
+def sentencias(sql: str, *, solo_logica: bool = False) -> list[str]:
+    """Líneas normalizadas: sin comentarios ni diferencias de espacios o mayúsculas.
+
+    Con solo_logica se omiten las líneas de control de SQL*Plus (SET, hora, '/', COMMIT),
+    cuyo formato cambió a propósito con el estándar.
+    """
     resultado = []
     for linea in sql.splitlines():
         linea = linea.strip()
         if not linea or linea.startswith("--"):
             continue
-        resultado.append(re.sub(r"\s+", " ", linea).upper())
+        linea = re.sub(r"\s+", " ", linea).upper()
+        linea = re.sub(r"\s*([(),=])\s*", r"\1", linea)
+        if solo_logica and _IGNORAR_EN_DATOS.match(linea):
+            continue
+        resultado.append(linea)
     return resultado
+
+
+def corregir(lineas: list[str], correcciones: list[tuple[str, str]]) -> list[str]:
+    """Aplica al original las correcciones intencionales del estándar."""
+    for antes, despues in correcciones:
+        lineas = [linea.replace(antes, despues) for linea in lineas]
+    return lineas
+
+
+def verificar_equivalencia(generado: list[str], original: list[str]) -> None:
+    if generado != original:
+        diferencias = difflib.unified_diff(original, generado, "original", "generado", lineterm="")
+        pytest.fail("Las sentencias difieren del original:\n" + "\n".join(diferencias))

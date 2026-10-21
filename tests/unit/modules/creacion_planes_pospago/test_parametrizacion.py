@@ -40,3 +40,17 @@ def test_identify_de_un_tipo_configurado() -> None:
 def test_identify_faltante_lanza_error_de_negocio() -> None:
     with pytest.raises(ParametrizacionIncompletaError, match="SMS"):
         crear_parametrizacion().identify_de(TipoPaquete.SMS)
+
+
+def test_valores_como_diccionario_columna_valor() -> None:
+    parametrizacion = crear_parametrizacion(
+        campos_estaticos=(
+            CampoEstatico("PLANS", TipoPaquete.PLAN, "STATUS", "'1'"),
+            CampoEstatico("PLANS", TipoPaquete.PLAN, "PART_NUM_PKG", "null"),
+        )
+    )
+
+    assert parametrizacion.valores("PLANS", TipoPaquete.PLAN) == {
+        "STATUS": "'1'",
+        "PART_NUM_PKG": "null",
+    }

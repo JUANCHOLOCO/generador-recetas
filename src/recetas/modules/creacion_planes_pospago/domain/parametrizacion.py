@@ -59,3 +59,7 @@ class Parametrizacion:
             raise ParametrizacionIncompletaError(
                 f"No hay IDENTIFY configurado para el tipo de paquete {tipo_paquete}."
             ) from None
+
+    def valores(self, tabla: str, tipo_paquete: TipoPaquete) -> dict[str, str]:
+        """Campos estáticos de una tabla como {columna: valor_sql}."""
+        return {c.columna: c.valor_sql for c in self.campos(tabla, tipo_paquete)}

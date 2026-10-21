@@ -10,7 +10,7 @@ from recetas.modules.creacion_planes_pospago.infrastructure.seeds import (
 pytestmark = pytest.mark.integration
 
 FILAS_ESPERADAS = {
-    "cpl_plan_plan.csv": 334,
+    "cpl_plan_plan.csv": 380,
     "scoring.csv": 47,
     "canal.csv": 16,
     "campo_estatico.csv": 66,
