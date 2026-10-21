@@ -1,0 +1,57 @@
+{% import "_comun.sql.j2" as comun %}
+{{ comun.inicio_datos(cab) }}
+{% for plan in planes %}
+
+{{ comun.seccion("Plan " ~ loop.index ~ " de " ~ loop.length ~ ": " ~ plan.nombre) }}
+-- PLANS
+INSERT INTO ACTIVATOR.PLANS ({{ columnas.plans | join(",") }}) VALUES ({{ plan.plans | join(",") }});
+-- SERVICES DATOS
+INSERT INTO ACTIVATOR.SERVICES ({{ columnas.services | join(",") }}) VALUES ({{ plan.services_datos | join(",") }});
+-- SERVICES SMS
+INSERT INTO ACTIVATOR.SERVICES ({{ columnas.services | join(",") }}) VALUES ({{ plan.services_sms | join(",") }});
+-- PLAN_SERVICE (DATOS, SMS Y ADD-ONS)
+{% for valores in plan.plan_services %}
+INSERT INTO ACTIVATOR.PLAN_SERVICE ({{ columnas.plan_service | join(",") }}) VALUES ({{ valores | join(",") }});
+{% endfor %}
+-- SERVICES_PCRF
+INSERT INTO ACTIVATOR.SERVICES_PCRF (PART_NUM,PLAN_CODE,PCRF_CODE) VALUES ({{ plan.svall_datos | sql }},{{ plan.codigo_pcrf | sql }},{{ plan.pcrf_code | sql }});
+-- VENDOR_PERMISSIONS
+INSERT INTO ACTIVATOR.VENDOR_PERMISSIONS VALUES ({{ plan.id_plan | sql }},{{ plan.nombre | sql }},NULL,NULL,'1');
+-- VENDOR_PROFILE_PERMISSION
+INSERT INTO ACTIVATOR.VENDOR_PROFILE_PERMISSION (ID_PROFILE,ID_PERMISSION) VALUES (0,{{ plan.id_plan | sql }});
+{% for seccion in plan.matriz %}
+-- CPL_PLAN_PLAN {{ seccion.lista }}
+{% for origen, destino in seccion.pares %}
+INSERT INTO ACTIVATOR.CPL_PLAN_PLAN VALUES ({{ origen | sql }},{{ destino | sql }});
+{% endfor %}
+{% endfor %}
+-- CPL_ROLE_PLAN
+{% for rol in roles %}
+INSERT INTO ACTIVATOR.CPL_ROLE_PLAN (ROLE_GRANTED,PLAN_ID) VALUES ({{ rol | sql }},{{ plan.id_plan | sql }});
+{% endfor %}
+-- SCORING_PLAN
+{% for id_scor in scoring_plan %}
+INSERT INTO ACTIVATOR.SCORING_PLAN (ID_SCOR,ID_PLAN) VALUES ({{ id_scor }},{{ plan.id_plan | sql }});
+{% endfor %}
+-- CPL_SCORING_PLAN
+{% for scoring_id in cpl_scoring_plan %}
+INSERT INTO ACTIVATOR.CPL_SCORING_PLAN (SCORING_ID,PLAN_ID) VALUES ({{ scoring_id }},{{ plan.id_plan | sql }});
+{% endfor %}
+{% endfor %}
+
+{{ comun.seccion("Canales de venta de los planes nuevos (SCORING_CHANNEL)") }}
+DECLARE
+  CURSOR C1 IS
+    SELECT 'insert into ACTIVATOR.scoring_channel (id_scoring_plan, id_channel, date_update,user_update) values ('||sp.id||','||c.id||','||'SYSDATE,'||CHR(39)||'install'||CHR(39)||')' LINEA
+      FROM ACTIVATOR.CHANNEL C, ACTIVATOR.SCORING_PLAN SP
+     WHERE C.NAME IN ({{ canales | map("sql") | join(",") }})
+       AND SP.ID_PLAN IN ({{ ids_planes | map("sql") | join(",") }})
+     ORDER BY SP.ID_PLAN, C.NAME;
+BEGIN
+  FOR R1 IN C1 LOOP
+    EXECUTE IMMEDIATE R1.LINEA;
+  END LOOP;
+END;
+/
+
+{{ comun.fin_datos() }}

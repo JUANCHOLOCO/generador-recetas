@@ -11,25 +11,6 @@ from recetas.modules.creacion_planes_pospago.generators.base import (
 )
 
 
-class ActivadorGenerator(BaseSqlGenerator):
-    esquema = "ACTIVATOR"
-    carpeta = "ACTIVADOR"
-    objetivo_aplica = "Insercion de nuevos planes"
-    objetivo_rollback = "Rollback de la insercion de nuevos planes"
-
-    def nombre_script(self, rq: str) -> str:
-        return f"1_INSERT_{rq}_SCRIPT.SQL"
-
-    def nombre_rollback(self, rq: str) -> str:
-        return f"1_ROLLBACK_INSERT_{rq}_SCRIPT.SQL"
-
-    def contenido_script(self, ctx: ContextoGeneracion, cab: CabeceraScript) -> str:
-        raise NotImplementedError("Fase 5B")
-
-    def contenido_rollback(self, ctx: ContextoGeneracion, cab: CabeceraScript) -> str:
-        raise NotImplementedError("Fase 5B")
-
-
 class SiebelGenerator(BaseSqlGenerator):
     esquema = "SIEBEL"
     carpeta = "SIEBEL"

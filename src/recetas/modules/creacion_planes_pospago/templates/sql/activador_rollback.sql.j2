@@ -1,0 +1,24 @@
+{% import "_comun.sql.j2" as comun %}
+{% set ids = ids_planes | map("sql") | join(",") %}
+{% set svalls = svalls_nuevos | map("sql") | join(",") %}
+{{ comun.inicio_datos(cab) }}
+
+{{ comun.seccion("Rollback de los planes " ~ ids_planes | join(", ")) }}
+DECLARE
+BEGIN
+  DELETE FROM ACTIVATOR.VENDOR_PROFILE_PERMISSION A WHERE A.ID_PERMISSION IN ({{ ids }});
+  DELETE FROM ACTIVATOR.VENDOR_PERMISSIONS A WHERE A.ID IN ({{ ids }});
+  DELETE FROM ACTIVATOR.CPL_PLAN_PLAN A WHERE A.PLAN_ID IN ({{ ids }}) OR A.PLAN_PARTNER_ID IN ({{ ids }});
+  DELETE FROM ACTIVATOR.CPL_SCORING_PLAN A WHERE A.PLAN_ID IN ({{ ids }});
+  DELETE FROM ACTIVATOR.CPL_ROLE_PLAN A WHERE A.PLAN_ID IN ({{ ids }});
+  DELETE FROM ACTIVATOR.SCORING_CHANNEL A WHERE A.ID_SCORING_PLAN IN (SELECT ID FROM ACTIVATOR.SCORING_PLAN WHERE ID_PLAN IN ({{ ids }}));
+  DELETE FROM ACTIVATOR.SCORING_PLAN A WHERE A.ID_PLAN IN ({{ ids }});
+  DELETE FROM ACTIVATOR.PLAN_SERVICE A WHERE A.ID_SERVICE IN (SELECT S.ID FROM ACTIVATOR.SERVICES S WHERE S.PART_NUM IN ({{ svalls_y_addons | map("sql") | join(",") }})) AND A.ID_PLAN IN ({{ ids }});
+  DELETE FROM ACTIVATOR.SERVICES A WHERE A.PART_NUM IN ({{ svalls }});
+  DELETE FROM ACTIVATOR.SERVICES_PCRF A WHERE A.PART_NUM IN ({{ svalls }});
+  DELETE FROM ACTIVATOR.PLANS A WHERE A.ID IN ({{ ids }});
+  COMMIT;
+END;
+/
+
+{{ comun.fin_datos() }}
