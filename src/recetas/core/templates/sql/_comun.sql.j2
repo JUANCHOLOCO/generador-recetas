@@ -8,3 +8,26 @@
 -- GENERADO POR  : Generador de Recetas {{ cab.version }}
 -------------------------------------------------------------------------------
 {%- endmacro %}
+
+{% macro seccion(titulo) -%}
+-- ============================================================================
+-- {{ titulo }}
+-- ============================================================================
+{%- endmacro %}
+
+{% macro inicio_datos(cab) -%}
+{{ cabecera(cab) }}
+SET SERVEROUTPUT ON SIZE 1000000
+SET HEAD OFF
+SET DEF OFF
+SET ECHO ON
+SET FEED ON
+
+SELECT TO_CHAR(SYSDATE, 'DD/MM/YYYY HH24:MI:SS') HORA_INICIO FROM DUAL;
+{%- endmacro %}
+
+{% macro fin_datos() -%}
+COMMIT;
+
+SELECT TO_CHAR(SYSDATE, 'DD/MM/YYYY HH24:MI:SS') HORA_FIN FROM DUAL;
+{%- endmacro %}
