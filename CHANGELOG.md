@@ -25,6 +25,10 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
 - Golden tests con parametrización real y equivalencia de sentencias con correcciones declaradas.
 - Generadores SIEBEL y PROMOTIONS con plantillas de aplica y rollback.
 - Equivalencia por sentencias con correcciones declaradas como funciones.
+- Ambiente (Dev/UAT/Prod) en la solicitud: define la carpeta raíz `<RQ>_<Ambiente>`.
+- Caso de uso `GenerarReceta` y escritor atómico de recetas en disco.
+- Registro idempotente de los planes nuevos en la parametrización.
+- Golden de punta a punta de la receta TPFB-2753 completa.
 
 ### Corregido
 - Scoring modelado como dos listas independientes (SCORING_PLAN y CPL_SCORING_PLAN).
