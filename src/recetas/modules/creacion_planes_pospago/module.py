@@ -2,11 +2,8 @@
 
 from PySide6.QtWidgets import QWidget
 
-from recetas.core.infrastructure.files.escritor import EscritorDeRecetas
-from recetas.modules.creacion_planes_pospago.ui.formulario_presenter import FormularioPresenter
-from recetas.modules.creacion_planes_pospago.ui.formulario_view import FormularioView
-
 from recetas import __version__
+from recetas.core.infrastructure.files.escritor import EscritorDeRecetas
 from recetas.core.infrastructure.templating.jinja import JinjaRenderer
 from recetas.core.plugins import AppContext, Module, ModuleInfo
 from recetas.modules.creacion_planes_pospago.application.generar_receta import GenerarReceta
@@ -16,6 +13,8 @@ from recetas.modules.creacion_planes_pospago.infrastructure.repositories import 
 from recetas.modules.creacion_planes_pospago.infrastructure.seeds import (
     cargar_parametrizacion_inicial,
 )
+from recetas.modules.creacion_planes_pospago.ui.formulario_presenter import FormularioPresenter
+from recetas.modules.creacion_planes_pospago.ui.formulario_view import FormularioView
 
 INFO = ModuleInfo(
     id="creacion_planes_pospago",

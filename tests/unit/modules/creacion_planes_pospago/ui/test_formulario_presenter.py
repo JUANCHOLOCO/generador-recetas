@@ -16,7 +16,6 @@ from recetas.modules.creacion_planes_pospago.ui.formulario_presenter import (
 )
 from tests.factories import datos_plan
 
-
 # ---------- Dobles de prueba ----------
 
 
@@ -116,7 +115,10 @@ def presenter(
     registro: RegistroFalso | None = None,
 ) -> FormularioPresenter:
     return FormularioPresenter(
-        vista, generador or GeneradorFalso(), escritor or EscritorFalso(), registro or RegistroFalso()
+        vista,
+        generador or GeneradorFalso(),
+        escritor or EscritorFalso(),
+        registro or RegistroFalso(),
     )
 
 
