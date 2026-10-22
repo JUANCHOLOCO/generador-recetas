@@ -1,22 +1,22 @@
 """Golden tests de TPFB-2753: salida estandarizada y equivalencia con los scripts originales."""
 
+import re
 from datetime import date
 from pathlib import Path, PurePosixPath
 
 import pytest
-import re
 
 from recetas.core.domain.billing import BillingType
 from recetas.core.domain.recipe_bundle import RecipeBundle, RecipeFile
 from recetas.core.infrastructure.templating.jinja import JinjaRenderer
 from recetas.modules.creacion_planes_pospago.generators.activador import ActivadorGenerator
-from recetas.modules.creacion_planes_pospago.generators.promotions import PromotionsGenerator
-from recetas.modules.creacion_planes_pospago.generators.siebel import SiebelGenerator
 from recetas.modules.creacion_planes_pospago.generators.base import (
     BaseSqlGenerator,
     ContextoGeneracion,
 )
 from recetas.modules.creacion_planes_pospago.generators.conf import PoolGenerator
+from recetas.modules.creacion_planes_pospago.generators.promotions import PromotionsGenerator
+from recetas.modules.creacion_planes_pospago.generators.siebel import SiebelGenerator
 from tests.golden_utils import (
     Correccion,
     corregir,
@@ -153,7 +153,9 @@ CORRECCIONES: dict[tuple[type[BaseSqlGenerator], str], list[Correccion]] = {
 }
 
 
-def _contenido(generador: BaseSqlGenerator, ctx: ContextoGeneracion, carpeta: str) -> tuple[str, str]:
+def _contenido(
+    generador: BaseSqlGenerator, ctx: ContextoGeneracion, carpeta: str
+) -> tuple[str, str]:
     if carpeta == "SQL":
         cab = generador.cabecera(ctx, generador.objetivo_aplica)
         return generador.nombre_script(ctx.rq), generador.contenido_script(ctx, cab)
@@ -177,4 +179,6 @@ def test_scripts_de_datos(
 
     verificar_golden(CASO / "esperado" / ruta, a_bytes(ruta, texto))
     original = sentencias_sql(leer_original(CASO / "original" / ruta))
-    verificar_equivalencia(sentencias_sql(texto), corregir(original, CORRECCIONES[(clase, carpeta)]))
+    verificar_equivalencia(
+        sentencias_sql(texto), corregir(original, CORRECCIONES[(clase, carpeta)])
+    )
