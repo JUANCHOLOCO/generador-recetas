@@ -1,0 +1,18 @@
+{% import "_comun.sql.j2" as comun %}
+{% import "_siebel.sql.j2" as siebel %}
+{{ comun.inicio_datos(cab) }}
+
+{{ comun.seccion("Rollback de los productos (los UPDATE se repiten: decision A)") }}
+DECLARE
+BEGIN
+{% for plan in planes %}
+{% for p in plan.orden_alta %}
+  {{ siebel.actualizar_producto(p) }}
+{% endfor %}
+{% endfor %}
+{{ siebel.actualizar_categorias(ids_categoria, cancela) | indent(2, first=True) }}
+  COMMIT;
+END;
+/
+
+{{ comun.fin_datos() }}

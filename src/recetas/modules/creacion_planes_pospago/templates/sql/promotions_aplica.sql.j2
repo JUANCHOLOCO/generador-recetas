@@ -1,0 +1,55 @@
+{% import "_comun.sql.j2" as comun %}
+{{ comun.inicio_datos(cab) }}
+
+{{ comun.seccion("Identificacion de POIDs (TBL_PROM_POID_IDENTIFY)") }}
+{% for f in filas %}
+INSERT INTO PROMOTIONS.TBL_PROM_POID_IDENTIFY (ID_PROM_POID_IDENTIFY, NAME_PACKAGE, POID, IDENTIFY, STATUS, DESCRIPTION) VALUES ((SELECT MAX(ID_PROM_POID_IDENTIFY)+1 ID_PROM_POID_IDENTIFY FROM PROMOTIONS.TBL_PROM_POID_IDENTIFY), {{ f.nombre | sql }}, {{ f.poid | sql }}, {{ f.identify | sql }}, 'ACTIVE', {{ f.descripcion | sql }});
+{% endfor %}
+
+{{ comun.seccion("Variables de promociones (TBL_PROM_VARIABLES)") }}
+DECLARE
+  variable_type VARCHAR2(1000);
+  variable_plan VARCHAR2(1000);
+  last_id_table NUMBER(8);
+  plan_name VARCHAR2(1000);
+  cancelable_plan VARCHAR(2);
+  TYPE nintendo_id_plan_type IS TABLE OF VARCHAR2(1000) INDEX BY PLS_INTEGER;
+  nintendo_id_plan nintendo_id_plan_type;
+  TYPE plan_name_array_type IS TABLE OF VARCHAR2(1000) INDEX BY PLS_INTEGER;
+  plan_name_array plan_name_array_type;
+BEGIN
+  variable_plan:='PLAN';
+  variable_type:='PLAN_TYPE';
+  plan_name:={{ familia | sql }};
+{% for plan in planes %}
+  plan_name_array({{ loop.index0 }}):={{ plan.nombre | sql }};
+{% endfor %}
+{% for plan in planes %}
+  nintendo_id_plan({{ loop.index0 }}):={{ plan.id_plan | sql }};
+{% endfor %}
+  cancelable_plan:='NO';
+
+  DBMS_OUTPUT.PUT_LINE('Start insert...'||last_id_table);
+  DBMS_OUTPUT.PUT_LINE('last_id_table'||last_id_table);
+  SELECT MAX(ID_VARIABLE) INTO last_id_table FROM PROMOTIONS.TBL_PROM_VARIABLES;
+
+  last_id_table:=last_id_table+5;
+  FOR i IN 0 .. plan_name_array.COUNT-1 LOOP
+    DBMS_OUTPUT.PUT_LINE('insert...');
+    INSERT INTO PROMOTIONS.TBL_PROM_VARIABLES (ID_VARIABLE,VARIABLE_TYPE,NAME,VALUE,DESCRIPTION,CANCELABLE)
+    VALUES (last_id_table,variable_plan,plan_name_array(i),nintendo_id_plan(i),plan_name_array(i),cancelable_plan);
+    last_id_table:=last_id_table+1;
+    COMMIT;
+  END LOOP;
+
+  -- La fila PLAN_TYPE es de toda la familia: solo se inserta si no existe (decision B).
+  INSERT INTO PROMOTIONS.TBL_PROM_VARIABLES (ID_VARIABLE,VARIABLE_TYPE,NAME,VALUE,DESCRIPTION,CANCELABLE)
+  SELECT last_id_table,variable_type,plan_name,plan_name,plan_name,cancelable_plan
+    FROM DUAL
+   WHERE NOT EXISTS (SELECT 1 FROM PROMOTIONS.TBL_PROM_VARIABLES WHERE VARIABLE_TYPE = 'PLAN_TYPE' AND NAME = {{ familia | sql }});
+
+  DBMS_OUTPUT.PUT_LINE('insert finished...');
+END;
+/
+
+{{ comun.fin_datos() }}

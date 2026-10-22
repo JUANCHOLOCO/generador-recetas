@@ -1,0 +1,57 @@
+{% import "_comun.sql.j2" as comun %}
+{% import "_siebel.sql.j2" as siebel %}
+{{ comun.inicio_datos(cab) }}
+
+{{ comun.seccion("Productos (S_PROD_INT)") }}
+{% for plan in planes %}
+{% for p in plan.orden_alta %}
+{{ siebel.actualizar_producto(p) }}
+{% endfor %}
+{% endfor %}
+
+{{ comun.seccion("Extension de los productos (S_PROD_INT_X)") }}
+{% for plan in planes %}
+{% for p in plan.orden_alta %}
+INSERT INTO SIEBEL.S_PROD_INT_X
+(
+    ROW_ID,
+    CREATED_BY,
+    LAST_UPD_BY,
+    PAR_ROW_ID
+)
+SELECT
+    SPI.ROW_ID,
+    SPI.CREATED_BY,
+    SPI.LAST_UPD_BY,
+    SPI.ROW_ID
+FROM SIEBEL.S_PROD_INT SPI
+WHERE SPI.NAME = {{ p.nombre | sql }}
+AND NOT EXISTS (
+    SELECT 1
+    FROM SIEBEL.S_PROD_INT_X SPX
+    WHERE SPX.ROW_ID = SPI.ROW_ID
+);
+
+{% endfor %}
+{% endfor %}
+{{ comun.seccion("Atributos de los productos (con POID provisional)") }}
+{% for plan in planes %}
+{% for p in plan.orden_atributos %}
+UPDATE SIEBEL.S_PROD_INT_X SET ATTRIB_01 = '', ATTRIB_02 = {{ p.product(poid_provisional) | sql }}, ATTRIB_03 = '', ATTRIB_04 = {{ p.attrib_04 | sql }}, ATTRIB_05 = '', ATTRIB_08 = '', ATTRIB_10 = 'Y', ATTRIB_44 = {{ p.servicio_brm | sql }}, ATTRIB_50 = '', ATTRIB_45 = {{ p.deal(poid_provisional) | sql }} WHERE PAR_ROW_ID IN (SELECT ROW_ID FROM SIEBEL.S_PROD_INT WHERE NAME = {{ p.nombre | sql }});
+{% endfor %}
+{% endfor %}
+
+{{ comun.seccion("Sincronizacion de POIDs") }}
+{% for p in sincronizacion %}
+UPDATE SIEBEL.S_PROD_INT_X SET ATTRIB_02 = {{ p.product() | sql }}, ATTRIB_44 = {{ p.servicio_brm | sql }}, ATTRIB_45 = {{ p.deal() | sql }} WHERE PAR_ROW_ID IN (SELECT ROW_ID FROM SIEBEL.S_PROD_INT WHERE NAME = {{ p.nombre | sql }});
+{% endfor %}
+
+{{ comun.seccion("Planes que cancelan add-ons (CX_ADD_ONS_CATEGORY)") }}
+{{ siebel.actualizar_categorias(ids_categoria, cancela) }}
+
+{{ comun.seccion("Cadena de pool (S_LST_OF_VAL)") }}
+{% for plan in planes %}
+UPDATE SIEBEL.S_LST_OF_VAL SET ACTIVE_FLG = 'Y', DESC_TEXT = {{ plan.lista_de_valores | sql }}, TARGET_HIGH = 300, TARGET_LOW = 300 WHERE NAME = {{ plan.plan.nombre | sql }};
+{% endfor %}
+
+{{ comun.fin_datos() }}

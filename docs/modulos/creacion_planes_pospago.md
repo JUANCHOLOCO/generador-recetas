@@ -223,4 +223,5 @@ Un nombre de plan por línea, en el orden del formulario.
 | Valores fijos en Siebel: `PROD_GLOBAL_UID='11042'`, `PROD_CLS_NUM='120'`, `UOM_CD='Por mes'`, `ATTRIB_04='120354'`, `target_high/low=300`, IDs `1,2,3` de `cx_add_ons_category` | Se tratarán como campos estáticos de parametrización; confirmar que no varían por plan |
 | Bloque `TBL_PROM_VARIABLES` (`plan_name='POSPAGO5'`, `cancelable_plan='NO'`) | Confirmar si son fijos o dependen del RQ |
 | "Es Retención" | Excluido del formulario por decisión del usuario |
+| `PLAN_TYPE` de PROMOTIONS (`POSPAGO5`) y valores fijos de SIEBEL (`11042`, `120`, `120354`, `Por mes`, IDs `1,2,3` de `CX_ADD_ONS_CATEGORY`, `300`) | Fijos en el generador, igual que en la macro. Si llegan planes de otra familia, pasarlos a la parametrización |
 | Códigos no numéricos en la columna CONTROL (C01…C25, P02…P238) | **Resuelto:** el script de Anticipados sí los usa (267 filas de CONTROL por plan). Se cargan en la parametrización como cualquier otro ID |

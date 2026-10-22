@@ -24,13 +24,21 @@ class SeccionMatriz:
     pares: tuple[Par, ...]
 
 
+def ids_existentes(
+    lista: ListaCambioPlan, ids_nuevos: Sequence[str], parametrizacion: Parametrizacion
+) -> list[str]:
+    """IDs de la lista que no son planes del formulario (esos se tratan siempre como nuevos)."""
+    nuevos = set(ids_nuevos)
+    return [x for x in parametrizacion.ids_de_lista(lista) if x not in nuevos]
+
+
 def matriz_cambio_plan(
     id_plan: str, ids_nuevos: Sequence[str], parametrizacion: Parametrizacion
 ) -> tuple[SeccionMatriz, ...]:
     nuevos = set(ids_nuevos)
     secciones = []
     for lista in ListaCambioPlan:
-        existentes = [x for x in parametrizacion.ids_de_lista(lista) if x not in nuevos]
+        existentes = ids_existentes(lista, ids_nuevos, parametrizacion)
         pares: list[Par] = []
         match lista:
             case ListaCambioPlan.PREPAGO:
