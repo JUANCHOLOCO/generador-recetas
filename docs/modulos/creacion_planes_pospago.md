@@ -58,6 +58,20 @@ Los IDs (ej. `775` frente a `7751`) los escribe siempre el usuario; la app no lo
 | POID Datos | `990000885` | Numérico |
 | POID SMS | `990001008` | Numérico |
 
+**Orden de las columnas de la tabla** (para pegar desde Excel con Ctrl+V, en este orden exacto):
+
+| # | Columna | # | Columna |
+|---|---|---|---|
+| 1 | Id_Plan | 8 | Es 5.3 (S/N) |
+| 2 | Part_num | 9 | Nombre paquete Datos |
+| 3 | Nombre del producto | 10 | Svall Datos |
+| 4 | Valor con IVA | 11 | POID Datos |
+| 5 | Valor sin IVA | 12 | Nombre paquete SMS |
+| 6 | Código perfil PCRF | 13 | Svall SMS |
+| 7 | Tarif group | 14 | POID SMS |
+
+"Es 5.3" acepta `S`, `SI`, `X` (sí) o `N`, `NO`, vacío (no). Las filas completamente vacías se ignoran.
+
 Valores que calcula la app: subtipo Datos `DPI`, subtipo SMS `SMS`, textos `0.0.0.1 /product <POID> 1`
 y `0.0.0.1 /deal <POID> 0`, nombres de paquete para promociones, IDENTIFY.
 
@@ -223,5 +237,5 @@ Un nombre de plan por línea, en el orden del formulario.
 | Valores fijos en Siebel: `PROD_GLOBAL_UID='11042'`, `PROD_CLS_NUM='120'`, `UOM_CD='Por mes'`, `ATTRIB_04='120354'`, `target_high/low=300`, IDs `1,2,3` de `cx_add_ons_category` | Se tratarán como campos estáticos de parametrización; confirmar que no varían por plan |
 | Bloque `TBL_PROM_VARIABLES` (`plan_name='POSPAGO5'`, `cancelable_plan='NO'`) | Confirmar si son fijos o dependen del RQ |
 | "Es Retención" | Excluido del formulario por decisión del usuario |
-| `PLAN_TYPE` de PROMOTIONS (`POSPAGO5`) y valores fijos de SIEBEL (`11042`, `120`, `120354`, `Por mes`, IDs `1,2,3` de `CX_ADD_ONS_CATEGORY`, `300`) | Fijos en el generador, igual que en la macro. Si llegan planes de otra familia, pasarlos a la parametrización |
+| `PLAN_TYPE` de PROMOTIONS (`POSPAGO5`) y valores fijos de SIEBEL (`11042`, `120`, `120354`, `Por mes`, IDs `1,2,3` de `CX_ADD_ONS_CATEGORY`, `300`) | **Resuelto (2026-10-22):** el usuario confirmó que son constantes de la familia Pospago. Quedan como constantes con nombre en los generadores. Si un módulo futuro maneja otra familia, se parametrizan |
 | Códigos no numéricos en la columna CONTROL (C01…C25, P02…P238) | **Resuelto:** el script de Anticipados sí los usa (267 filas de CONTROL por plan). Se cargan en la parametrización como cualquier otro ID |
