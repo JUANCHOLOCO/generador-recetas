@@ -23,7 +23,13 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
 - Golden tests de aprobación + equivalencia de sentencias contra TPFB-2753.
 - Generador ACTIVADOR (aplica y rollback) con la regla de la matriz CPL_PLAN_PLAN documentada.
 - Golden tests con parametrización real y equivalencia de sentencias con correcciones declaradas.
+- Generadores SIEBEL y PROMOTIONS con plantillas de aplica y rollback.
+- Equivalencia por sentencias con correcciones declaradas como funciones.
 
 ### Corregido
 - Scoring modelado como dos listas independientes (SCORING_PLAN y CPL_SCORING_PLAN).
 - Los códigos no numéricos de CONTROL (C01…P238) se incluyen en la parametrización.
+
+### Cambiado
+- PROMOTIONS inserta el POID real directamente y la fila PLAN_TYPE solo si no existe (decisiones B y C).
+- SIEBEL usa el tarif group como POID del plan en `/product` y `/deal` (corrige el desfase de Corriente).

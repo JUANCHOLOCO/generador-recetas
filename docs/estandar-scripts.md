@@ -99,12 +99,13 @@ SELECT TO_CHAR(SYSDATE, 'DD/MM/YYYY HH24:MI:SS') HORA_FIN FROM DUAL;
 | 5 | `SELECT ...;` seguido de `/` (la consulta se ejecuta dos veces) | `/` solo tras bloques PL/SQL |
 | 6 | Corriente: en Siebel el `/product` del plan va desfasado en 1 respecto del tarif group | `/product` y `/deal` del plan = tarif group (como en Anticipados y en Promotions) |
 | 7 | `UPDATE cx_add_ons_category` sin esquema en el rollback de Siebel | Siempre `SIEBEL.CX_ADD_ONS_CATEGORY` |
+| 8 | El `INSERT INTO SIEBEL.S_PROD_INT_X` está escrito con dos formatos distintos (Anticipados con alias `SPI`/`SPX` y una columna por línea; Corriente compacto) | Un único formato para ambos tipos: el de Anticipados (alias `SPI`/`SPX`, una columna por línea), por decisión del usuario |
 
 ## 8. Decisiones de comportamiento (confirmadas el 2026-10-20)
 
 | # | Observación en los ejemplos | Decisión |
 |---|---|---|
-| A | El rollback de SIEBEL repite los `UPDATE` del aplica y deja `cancela_cp_planes` con los planes nuevos | `cancela_cp_planes` vuelve a la lista **sin** los planes nuevos. Los `UPDATE` de `S_PROD_INT`/`S_PROD_INT_X` quedan **igual que en el ejemplo**: esos productos los carga una aplicación de configuración y no se pueden borrar |
+| A | El rollback de SIEBEL repite los `UPDATE` de `S_PROD_INT` del aplica | Se conservan **igual que en el ejemplo**: esos productos los carga una aplicación de configuración y no se pueden borrar. `cancela_cp_planes` vuelve a la lista **sin** los planes nuevos, que es lo que el ejemplo ya hacía (en la primera revisión se leyó mal) |
 | B | El rollback de PROMOTIONS no borra la fila `PLAN_TYPE` (`POSPAGO5`) | El aplica la inserta **solo si no existe**; el rollback no la borra, porque la comparten todos los RQ de la familia |
 | C | PROMOTIONS inserta `POID = '99999'` y luego lo actualiza | Se inserta el POID real directamente; se eliminan los `UPDATE` |
 | D | Carpeta raíz `TPFB-2753_Prod` | El sufijo depende del ambiente: `_Dev`, `_UAT` o `_Prod` (campo del formulario) |
