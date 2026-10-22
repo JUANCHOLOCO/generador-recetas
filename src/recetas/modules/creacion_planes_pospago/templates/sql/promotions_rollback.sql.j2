@@ -1,0 +1,16 @@
+{% import "_comun.sql.j2" as comun %}
+{{ comun.inicio_datos(cab) }}
+
+{{ comun.seccion("Identificacion de POIDs") }}
+{% for plan in planes %}
+DELETE FROM PROMOTIONS.TBL_PROM_POID_IDENTIFY WHERE NAME_PACKAGE = {{ plan.nombre | sql }};
+DELETE FROM PROMOTIONS.TBL_PROM_POID_IDENTIFY WHERE NAME_PACKAGE = {{ plan.sms.nombre | sql }};
+DELETE FROM PROMOTIONS.TBL_PROM_POID_IDENTIFY WHERE NAME_PACKAGE = {{ plan.datos.nombre | sql }};
+{% endfor %}
+
+{{ comun.seccion("Variables de promociones (la fila PLAN_TYPE de la familia no se borra)") }}
+{% for plan in planes %}
+DELETE FROM PROMOTIONS.TBL_PROM_VARIABLES WHERE NAME = {{ plan.nombre | sql }} AND VALUE = {{ plan.id_plan | sql }};
+{% endfor %}
+
+{{ comun.fin_datos() }}
