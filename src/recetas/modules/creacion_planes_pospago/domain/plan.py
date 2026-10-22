@@ -8,6 +8,7 @@ from pydantic import AfterValidator, BaseModel, ConfigDict, model_validator
 from pydantic_core import PydanticCustomError
 
 from recetas.core.domain.billing import BillingType
+from recetas.core.domain.ambiente import Ambiente
 from recetas.modules.creacion_planes_pospago.domain.valores import (
     CodigoPcrf,
     IdPlan,
@@ -70,6 +71,7 @@ def _al_menos_un_plan(planes: tuple[PlanNuevo, ...]) -> tuple[PlanNuevo, ...]:
 class SolicitudReceta(_Inmutable):
     requerimiento: Requerimiento
     autor: TextoObligatorio
+    ambiente: Ambiente
     tipo: BillingType
     planes: Annotated[tuple[PlanNuevo, ...], AfterValidator(_al_menos_un_plan)]
 
