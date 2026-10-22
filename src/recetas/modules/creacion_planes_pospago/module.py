@@ -1,9 +1,9 @@
 """Registro del módulo Creación de planes Pospago."""
 
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QLabel, QWidget
+from PySide6.QtWidgets import QWidget
 
 from recetas import __version__
+from recetas.core.infrastructure.files.escritor import EscritorDeRecetas
 from recetas.core.infrastructure.templating.jinja import JinjaRenderer
 from recetas.core.plugins import AppContext, Module, ModuleInfo
 from recetas.modules.creacion_planes_pospago.application.generar_receta import GenerarReceta
@@ -13,6 +13,8 @@ from recetas.modules.creacion_planes_pospago.infrastructure.repositories import 
 from recetas.modules.creacion_planes_pospago.infrastructure.seeds import (
     cargar_parametrizacion_inicial,
 )
+from recetas.modules.creacion_planes_pospago.ui.formulario_presenter import FormularioPresenter
+from recetas.modules.creacion_planes_pospago.ui.formulario_view import FormularioView
 
 INFO = ModuleInfo(
     id="creacion_planes_pospago",
@@ -34,10 +36,19 @@ class CreacionPlanesPospagoModule(Module):
         cargar_parametrizacion_inicial(self._context.session_factory)
 
     def create_widget(self, parent: QWidget | None = None) -> QWidget:
-        # Provisional: en la Fase 7 será el formulario completo.
-        label = QLabel("Creación de planes Pospago: en construcción.", parent)
-        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        return label
+        vista = FormularioView(
+            autor_sugerido=self._context.usuario.nombre(),
+            carpeta_sugerida=str(self._context.paths.output),
+            parent=parent,
+        )
+        presenter = FormularioPresenter(
+            vista,
+            self.generar_receta(),
+            EscritorDeRecetas(),
+            SqlParametrizacionRepository(self._context.session_factory),
+        )
+        vista.generar_solicitado.connect(lambda: presenter.generar(vista.datos()))
+        return vista
 
     def generar_receta(self) -> GenerarReceta:
         """Caso de uso con sus dependencias reales (lo usará el formulario en la Fase 6)."""

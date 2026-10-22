@@ -29,6 +29,10 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
 - Caso de uso `GenerarReceta` y escritor atómico de recetas en disco.
 - Registro idempotente de los planes nuevos en la parametrización.
 - Golden de punta a punta de la receta TPFB-2753 completa.
+- Formulario de creación de planes (MVP): tabla tipo Excel con pegado, errores marcados por celda,
+  advertencias, confirmación de sobrescritura y registro de planes en la parametrización.
+- Tabla editable reutilizable (`ui/widgets/tabla_editable.py`).
+
 
 ### Corregido
 - Scoring modelado como dos listas independientes (SCORING_PLAN y CPL_SCORING_PLAN).
