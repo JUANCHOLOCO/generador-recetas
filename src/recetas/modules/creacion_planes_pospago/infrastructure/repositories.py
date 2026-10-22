@@ -2,8 +2,11 @@
 
 from collections.abc import Sequence
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session, sessionmaker
+
+
+
 
 from recetas.core.domain.billing import BillingScope, BillingType
 from recetas.core.infrastructure.db.base import ParametroMixin
@@ -13,7 +16,9 @@ from recetas.modules.creacion_planes_pospago.domain.parametrizacion import (
     Parametrizacion,
     Plan53,
 )
-from recetas.modules.creacion_planes_pospago.domain.tipos import TablaScoring
+from recetas.modules.creacion_planes_pospago.application.ports import PlanesRegistrados
+from recetas.modules.creacion_planes_pospago.domain.plan import SolicitudReceta
+from recetas.modules.creacion_planes_pospago.domain.tipos import ListaCambioPlan, TablaScoring
 from recetas.modules.creacion_planes_pospago.infrastructure.models import (
     AddonModel,
     CadenaPoolModel,
@@ -71,3 +76,46 @@ class SqlParametrizacionRepository:
                 roles=tuple(f.role_granted for f in activos(RolModel)),
                 addons=tuple(f.part_num for f in activos(AddonModel)),
             )
+
+    def registrar(self, solicitud: SolicitudReceta) -> PlanesRegistrados:
+        scope = BillingScope(solicitud.tipo.value)
+        vigentes = BillingScope.for_billing(solicitud.tipo)
+        with self._session_factory.begin() as session:
+            registrados = set(
+                session.scalars(
+                    select(CplPlanPlanModel.id_plan).where(
+                        CplPlanPlanModel.tipo_facturacion.in_(vigentes)
+                    )
+                )
+            )
+            orden = session.scalar(select(func.max(CplPlanPlanModel.orden))) or 0
+            nuevos = [p for p in solicitud.planes if p.id_plan not in registrados]
+            for i, plan in enumerate(nuevos, start=1):
+                session.add(
+                    CplPlanPlanModel(
+                        id_plan=plan.id_plan,
+                        lista=ListaCambioPlan.NINTENDO,
+                        orden=orden + i,
+                        tipo_facturacion=scope,
+                    )
+                )
+
+            registrados_53 = set(
+                session.scalars(
+                    select(Plan53OldModel.id_plan).where(
+                        Plan53OldModel.tipo_facturacion.in_(vigentes)
+                    )
+                )
+            )
+            orden_53 = session.scalar(select(func.max(Plan53OldModel.orden))) or 0
+            nuevos_53 = [p for p in solicitud.planes if p.es_53 and p.id_plan not in registrados_53]
+            for i, plan in enumerate(nuevos_53, start=1):
+                session.add(
+                    Plan53OldModel(
+                        id_plan=plan.id_plan,
+                        part_num=plan.part_num,
+                        orden=orden_53 + i,
+                        tipo_facturacion=scope,
+                    )
+                )
+        return PlanesRegistrados(len(nuevos), len(nuevos_53))
