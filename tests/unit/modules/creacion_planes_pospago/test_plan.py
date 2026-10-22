@@ -102,3 +102,10 @@ def test_autor_es_obligatorio() -> None:
         crear_solicitud(autor="  ")
 
     assert {e["loc"] for e in error.value.errors()} == {("autor",)}
+
+
+def test_ambiente_desconocido_falla() -> None:
+    with pytest.raises(ValidationError) as error:
+        crear_solicitud(ambiente="QA")
+
+    assert {e["loc"] for e in error.value.errors()} == {("ambiente",)}

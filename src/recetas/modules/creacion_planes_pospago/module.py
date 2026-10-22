@@ -3,7 +3,13 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QLabel, QWidget
 
+from recetas import __version__
+from recetas.core.infrastructure.templating.jinja import JinjaRenderer
 from recetas.core.plugins import AppContext, Module, ModuleInfo
+from recetas.modules.creacion_planes_pospago.application.generar_receta import GenerarReceta
+from recetas.modules.creacion_planes_pospago.infrastructure.repositories import (
+    SqlParametrizacionRepository,
+)
 from recetas.modules.creacion_planes_pospago.infrastructure.seeds import (
     cargar_parametrizacion_inicial,
 )
@@ -32,3 +38,12 @@ class CreacionPlanesPospagoModule(Module):
         label = QLabel("Creación de planes Pospago: en construcción.", parent)
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         return label
+
+    def generar_receta(self) -> GenerarReceta:
+        """Caso de uso con sus dependencias reales (lo usará el formulario en la Fase 6)."""
+        return GenerarReceta(
+            SqlParametrizacionRepository(self._context.session_factory),
+            JinjaRenderer("recetas.modules.creacion_planes_pospago", "recetas.core"),
+            self._context.reloj,
+            __version__,
+        )

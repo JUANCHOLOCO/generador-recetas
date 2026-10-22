@@ -2,6 +2,7 @@
   "requerimiento": "TPFB-2753",
   "tipo": "ANTICIPADA",
   "autor": "Equipo Tecnico",
+  "ambiente": "PROD",
   "planes": [
     {
       "id_plan": "775",
