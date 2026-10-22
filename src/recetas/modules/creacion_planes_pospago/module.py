@@ -3,16 +3,15 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QLabel, QWidget
 
-from recetas.core.plugins import AppContext, Module, ModuleInfo
-from recetas.modules.creacion_planes_pospago.infrastructure.seeds import (
-    cargar_parametrizacion_inicial,
-)
-
 from recetas import __version__
 from recetas.core.infrastructure.templating.jinja import JinjaRenderer
+from recetas.core.plugins import AppContext, Module, ModuleInfo
 from recetas.modules.creacion_planes_pospago.application.generar_receta import GenerarReceta
 from recetas.modules.creacion_planes_pospago.infrastructure.repositories import (
     SqlParametrizacionRepository,
+)
+from recetas.modules.creacion_planes_pospago.infrastructure.seeds import (
+    cargar_parametrizacion_inicial,
 )
 
 INFO = ModuleInfo(

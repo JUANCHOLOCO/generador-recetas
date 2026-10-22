@@ -5,18 +5,15 @@ from collections.abc import Sequence
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, sessionmaker
 
-
-
-
 from recetas.core.domain.billing import BillingScope, BillingType
 from recetas.core.infrastructure.db.base import ParametroMixin
+from recetas.modules.creacion_planes_pospago.application.ports import PlanesRegistrados
 from recetas.modules.creacion_planes_pospago.domain.parametrizacion import (
     CampoEstatico,
     IdCambioPlan,
     Parametrizacion,
     Plan53,
 )
-from recetas.modules.creacion_planes_pospago.application.ports import PlanesRegistrados
 from recetas.modules.creacion_planes_pospago.domain.plan import SolicitudReceta
 from recetas.modules.creacion_planes_pospago.domain.tipos import ListaCambioPlan, TablaScoring
 from recetas.modules.creacion_planes_pospago.infrastructure.models import (

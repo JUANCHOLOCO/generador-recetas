@@ -21,7 +21,9 @@ def test_escribe_cada_archivo_con_sus_bytes(tmp_path: Path) -> None:
     raiz = EscritorDeRecetas().escribir(_bundle("Corriente", "Creación\n"), tmp_path)
 
     assert raiz == tmp_path / "TPFB-2753_Prod"
-    assert (raiz / "Corriente/Script/ACTIVADOR/aplica-cambio.sql").read_bytes() == b"Creaci\xf3n\r\n"
+    assert (
+        raiz / "Corriente/Script/ACTIVADOR/aplica-cambio.sql"
+    ).read_bytes() == b"Creaci\xf3n\r\n"
     assert (raiz / "Corriente/Conf/Pool.txt").is_file()
 
 

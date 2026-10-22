@@ -6,6 +6,7 @@ from typing import Protocol
 
 from recetas.core.domain.recipe_bundle import RecipeBundle
 
+
 class Reloj(Protocol):
     def hoy(self) -> date: ...
 

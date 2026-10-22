@@ -46,9 +46,7 @@ class GenerarReceta:
 
     def ejecutar(self, solicitud: SolicitudReceta) -> RecetaGenerada:
         parametrizacion = self._parametrizacion.cargar(solicitud.tipo)
-        ctx = ContextoGeneracion.crear(
-            solicitud, parametrizacion, self._reloj.hoy(), self._version
-        )
+        ctx = ContextoGeneracion.crear(solicitud, parametrizacion, self._reloj.hoy(), self._version)
         bundle = RecipeBundle(f"{solicitud.requerimiento}_{solicitud.ambiente.sufijo}")
         for generador in self._generadores:
             generador.generar(ctx, bundle)

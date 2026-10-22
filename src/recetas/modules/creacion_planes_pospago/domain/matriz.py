@@ -35,7 +35,6 @@ def ids_existentes(
 def matriz_cambio_plan(
     id_plan: str, ids_nuevos: Sequence[str], parametrizacion: Parametrizacion
 ) -> tuple[SeccionMatriz, ...]:
-    nuevos = set(ids_nuevos)
     secciones = []
     for lista in ListaCambioPlan:
         existentes = ids_existentes(lista, ids_nuevos, parametrizacion)
