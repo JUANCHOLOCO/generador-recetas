@@ -38,3 +38,11 @@ class InvalidRecipeContentError(RecetasError):
         )
         self.path = path
         self.caracteres = caracteres
+
+
+class RecetaExistenteError(RecetasError):
+    def __init__(self, rutas: list[str]) -> None:
+        super().__init__(
+            f"Ya existe una receta en: {', '.join(rutas)}. Confirme si desea sobrescribirla."
+        )
+        self.rutas = rutas
