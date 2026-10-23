@@ -19,6 +19,9 @@ class TablaEditableModel(QAbstractTableModel):
         self._titulos = list(titulos)
         self._filas: list[list[str]] = []
         self._errores: dict[Celda, str] = {}
+        self._claves: list[object] = []
+        self._ayudas: list[str] = []
+
 
     # ---------- Contrato de Qt ----------
     @override
@@ -54,11 +57,12 @@ class TablaEditableModel(QAbstractTableModel):
     def headerData(
         self, section: int, orientation: Qt.Orientation, role: int = Qt.ItemDataRole.DisplayRole
     ) -> object:
+        horizontal = orientation == Qt.Orientation.Horizontal
+        if role == Qt.ItemDataRole.ToolTipRole and horizontal and section < len(self._ayudas):
+            return self._ayudas[section] or None
         if role != Qt.ItemDataRole.DisplayRole:
             return None
-        if orientation == Qt.Orientation.Horizontal:
-            return self._titulos[section]
-        return str(section + 1)
+        return self._titulos[section] if horizontal else str(section + 1)
 
     # ---------- API propia ----------
 
@@ -69,12 +73,14 @@ class TablaEditableModel(QAbstractTableModel):
         n = len(self._filas)
         self.beginInsertRows(QModelIndex(), n, n)
         self._filas.append([""] * len(self._titulos))
+        self._claves.append(None)
         self.endInsertRows()
 
     def quitar_filas(self, filas: Sequence[int]) -> None:
         for fila in sorted(set(filas), reverse=True):
             self.beginRemoveRows(QModelIndex(), fila, fila)
             del self._filas[fila]
+            del self._claves[fila]
             self.endRemoveRows()
         self.marcar_errores({})
 
@@ -95,6 +101,25 @@ class TablaEditableModel(QAbstractTableModel):
         if self._filas:
             ultima = self.index(len(self._filas) - 1, len(self._titulos) - 1)
             self.dataChanged.emit(self.index(0, 0), ultima)
+
+    def cargar(
+        self,
+        titulos: Sequence[str],
+        filas: Sequence[Sequence[str]],
+        claves: Sequence[object] | None = None,
+        ayudas: Sequence[str] | None = None,
+    ) -> None:
+        """Reemplaza columnas y filas de una vez. `claves` acompaña a cada fila (p. ej. su id)."""
+        self.beginResetModel()
+        self._titulos = list(titulos)
+        self._filas = [list(fila) for fila in filas]
+        self._claves = list(claves) if claves is not None else [None] * len(self._filas)
+        self._ayudas = list(ayudas or [])
+        self._errores = {}
+        self.endResetModel()
+
+    def claves(self) -> list[object]:
+        return list(self._claves)
 
 @override
 class TablaEditable(QTableView):

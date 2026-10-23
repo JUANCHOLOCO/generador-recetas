@@ -52,3 +52,18 @@ def test_quitar_varias_filas(qapp: QApplication) -> None:
     modelo.quitar_filas([0, 2])
 
     assert [f[0] for f in modelo.filas()] == ["2", "4"]
+
+
+def test_cargar_cambia_columnas_y_conserva_claves_al_editar(qapp: QApplication) -> None:
+    modelo = _modelo()
+    modelo.cargar(["X", "Y"], [["1", "a"], ["2", "b"]], claves=[10, 20], ayudas=["", "Valores: a, b"])
+
+    modelo.agregar_fila()
+    modelo.quitar_filas([0])
+
+    assert modelo.columnCount() == 2
+    assert modelo.filas() == [["2", "b"], ["", ""]]
+    assert modelo.claves() == [20, None]
+    assert modelo.headerData(1, Qt.Orientation.Horizontal, Qt.ItemDataRole.ToolTipRole) == (
+        "Valores: a, b"
+    )
