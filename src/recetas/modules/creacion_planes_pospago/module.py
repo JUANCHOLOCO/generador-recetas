@@ -1,6 +1,6 @@
 """Registro del módulo Creación de planes Pospago."""
 
-from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QTabWidget, QWidget
 
 from recetas import __version__
 from recetas.core.infrastructure.files.escritor import EscritorDeRecetas
@@ -39,7 +39,6 @@ class CreacionPlanesPospagoModule(Module):
         vista = FormularioView(
             autor_sugerido=self._context.usuario.nombre(),
             carpeta_sugerida=str(self._context.paths.output),
-            parent=parent,
         )
         presenter = FormularioPresenter(
             vista,
@@ -48,10 +47,13 @@ class CreacionPlanesPospagoModule(Module):
             SqlParametrizacionRepository(self._context.session_factory),
         )
         vista.generar_solicitado.connect(lambda: presenter.generar(vista.datos()))
-        return vista
+
+        pestanas = QTabWidget(parent)
+        pestanas.addTab(vista, "Generar receta")
+        return pestanas
 
     def generar_receta(self) -> GenerarReceta:
-        """Caso de uso con sus dependencias reales (lo usará el formulario en la Fase 6)."""
+        """Caso de uso con sus dependencias reales."""
         return GenerarReceta(
             SqlParametrizacionRepository(self._context.session_factory),
             JinjaRenderer("recetas.modules.creacion_planes_pospago", "recetas.core"),

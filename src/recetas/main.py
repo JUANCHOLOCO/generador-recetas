@@ -11,6 +11,7 @@ from recetas.core.infrastructure.sistema import RelojSistema, UsuarioSistemaOper
 from recetas.core.plugins import AppContext, ModuleRegistry
 from recetas.modules import installed_modules
 from recetas.ui.main_window import MainWindow
+from recetas.ui.tema import aplicar_tema
 
 
 def build_context(paths: AppPaths) -> AppContext:
@@ -38,6 +39,7 @@ def main() -> int:
         module.initialize()
 
     app = QApplication(sys.argv)
+    aplicar_tema(app)
     window = MainWindow(registry)
     window.show()
     return app.exec()

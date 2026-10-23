@@ -1,0 +1,94 @@
+/* Tema "Generador de Recetas": paleta inspirada en coloresDiseno.jpeg (ver docs/diseno-visual.md). */
+
+/* ---------- Fondo y cabecera ---------- */
+QFrame#Fondo {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+        stop:0 #00C83C, stop:0.40 #0A8F8A, stop:0.65 #0A25D1, stop:1 #08137A);
+}
+QLabel#TituloApp { color: #FFFFFF; font-size: 24px; font-weight: 700; }
+QLabel#SubtituloApp { color: #D2F5A0; font-size: 13px; }
+
+/* ---------- Menú lateral de módulos ---------- */
+QListWidget#MenuModulos {
+    background: rgba(8, 19, 122, 150);
+    border: none;
+    border-radius: 14px;
+    padding: 8px;
+    color: #FFFFFF;
+    font-size: 14px;
+    outline: none;
+}
+QListWidget#MenuModulos::item { padding: 10px 12px; margin: 2px 0; border-radius: 10px; }
+QListWidget#MenuModulos::item:hover { background: rgba(255, 255, 255, 40); }
+QListWidget#MenuModulos::item:selected { background: #D2F5A0; color: #08137A; font-weight: 600; }
+
+/* ---------- Tarjeta de contenido ---------- */
+QFrame#Tarjeta { background: #FFFFFF; border-radius: 16px; }
+QFrame#Tarjeta QLabel { color: #0B1660; }
+QLabel#TituloTarjeta { color: #08137A; font-size: 20px; font-weight: 700; }
+QLabel#Bienvenida { color: #08137A; font-size: 16px; }
+QLabel#Errores { color: #B00020; }
+
+/* ---------- Pestañas ---------- */
+QTabWidget::pane { border: none; }
+QTabBar::tab {
+    background: #EEF1FF;
+    color: #08137A;
+    padding: 8px 20px;
+    margin-right: 4px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+QTabBar::tab:hover { background: #E4F9C8; }
+QTabBar::tab:selected { background: #D2F5A0; font-weight: 700; }
+
+/* ---------- Campos ---------- */
+QLineEdit, QComboBox {
+    background: #FFFFFF;
+    color: #0B1660;
+    border: 1px solid #C5CAE9;
+    border-radius: 8px;
+    padding: 6px 10px;
+}
+QLineEdit:focus, QComboBox:focus { border: 2px solid #0A25D1; }
+QRadioButton { color: #0B1660; spacing: 6px; }
+
+/* ---------- Botones ---------- */
+QPushButton { border-radius: 18px; padding: 8px 20px; font-weight: 600; }
+QPushButton[variante="primario"] {
+    background: #0A25D1;
+    color: #FFFFFF;
+    border: 2px solid #0A25D1;
+}
+QPushButton[variante="primario"]:hover { background: #2342F0; border-color: #2342F0; }
+QPushButton[variante="primario"]:pressed { background: #08137A; border-color: #08137A; }
+QPushButton[variante="secundario"] {
+    background: #FFFFFF;
+    color: #08137A;
+    border: 2px solid #08137A;
+}
+QPushButton[variante="secundario"]:hover { background: #EEF1FF; }
+
+/* ---------- Tabla ---------- */
+QTableView {
+    background: #FFFFFF;
+    alternate-background-color: #F4FBEA;
+    color: #0B1660;
+    gridline-color: #DDE2F5;
+    border: 1px solid #C5CAE9;
+    border-radius: 8px;
+    selection-background-color: #0A25D1;
+    selection-color: #FFFFFF;
+}
+QHeaderView::section {
+    background: #08137A;
+    color: #FFFFFF;
+    padding: 6px;
+    border: none;
+    border-right: 1px solid #0A25D1;
+    font-weight: 600;
+}
+
+/* ---------- Ayudas y diálogos ---------- */
+QToolTip { background: #08137A; color: #FFFFFF; border: none; padding: 6px; }
+QMessageBox QLabel { color: #0B1660; }
