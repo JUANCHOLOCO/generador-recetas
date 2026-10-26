@@ -59,6 +59,7 @@ class FormularioView(QWidget):
 
         self._carpeta = QLineEdit(carpeta_sugerida)
         examinar = QPushButton("Examinar…")
+        examinar.setProperty("variante", "secundario")
         examinar.clicked.connect(self._elegir_carpeta)
         fila_carpeta = QHBoxLayout()
         fila_carpeta.addWidget(self._carpeta)
@@ -76,10 +77,13 @@ class FormularioView(QWidget):
         self._tabla = TablaEditable(self._modelo)
 
         agregar = QPushButton("Agregar fila")
+        agregar.setProperty("variante", "secundario")
         agregar.clicked.connect(self._modelo.agregar_fila)
         quitar = QPushButton("Quitar filas seleccionadas")
+        quitar.setProperty("variante", "secundario")
         quitar.clicked.connect(self._quitar_seleccionadas)
         generar = QPushButton("Generar receta")
+        generar.setProperty("variante", "primario")
         generar.setDefault(True)
         generar.clicked.connect(self.generar_solicitado)
         botones = QHBoxLayout()
@@ -90,10 +94,14 @@ class FormularioView(QWidget):
 
         self._errores = QLabel()
         self._errores.setWordWrap(True)
-        self._errores.setStyleSheet("color: #b00020;")
+        self._errores.setObjectName("Errores")
 
         layout = QVBoxLayout(self)
-        layout.addWidget(QLabel(f"<h2>{TITULO}</h2>"))
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        titulo = QLabel(TITULO)
+        titulo.setObjectName("TituloTarjeta")
+        layout.addWidget(titulo)
         layout.addLayout(cabecera)
         layout.addWidget(QLabel("Planes (puede pegar filas copiadas de Excel con Ctrl+V):"))
         layout.addWidget(self._tabla, stretch=1)

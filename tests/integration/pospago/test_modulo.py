@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import pytest
+from PySide6.QtWidgets import QTabWidget
 from pytestqt.qtbot import QtBot
 
 from recetas.config import AppPaths
@@ -28,4 +29,6 @@ def test_el_modulo_muestra_el_formulario(tmp_path: Path, qtbot: QtBot) -> None:
     widget = modulo.create_widget()
     qtbot.addWidget(widget)
 
-    assert isinstance(widget, FormularioView)
+    assert isinstance(widget, QTabWidget)
+    assert widget.tabText(0) == "Generar receta"
+    assert isinstance(widget.widget(0), FormularioView)
