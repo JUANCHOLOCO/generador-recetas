@@ -34,6 +34,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
 - Tabla editable reutilizable (`ui/widgets/tabla_editable.py`).
 - Tema visual (QSS) con degradado verde-azul, tarjeta de contenido, pestañas y botones píldora
   (docs/diseno-visual.md).
+- Pestaña "Parametrización": mantenimiento de las 9 tablas del módulo con validación, filtro por
+  tipo de facturación y guardado en una transacción.
+- Mantenimiento genérico de tablas por introspección (`core`), reutilizable por cualquier módulo.
 
 ### Corregido
 - Scoring modelado como dos listas independientes (SCORING_PLAN y CPL_SCORING_PLAN).
