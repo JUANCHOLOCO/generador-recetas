@@ -2,12 +2,14 @@
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
+    QFrame,
     QHBoxLayout,
     QLabel,
     QListWidget,
     QListWidgetItem,
     QMainWindow,
     QStackedWidget,
+    QVBoxLayout,
     QWidget,
 )
 
@@ -34,16 +36,39 @@ class MainWindow(QMainWindow):
             item.setToolTip(module.info.description)
             self._menu.addItem(item)
 
+        self._menu.setObjectName("MenuModulos")
+
         self._bienvenida = QLabel("Seleccione un módulo para comenzar.")
+        self._bienvenida.setObjectName("Bienvenida")
         self._bienvenida.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._stack = QStackedWidget()
         self._stack.addWidget(self._bienvenida)
 
-        central = QWidget()
-        layout = QHBoxLayout(central)
-        layout.addWidget(self._menu)
-        layout.addWidget(self._stack, stretch=1)
-        self.setCentralWidget(central)
+        tarjeta = QFrame()
+        tarjeta.setObjectName("Tarjeta")
+        capa_tarjeta = QVBoxLayout(tarjeta)
+        capa_tarjeta.setContentsMargins(20, 20, 20, 20)
+        capa_tarjeta.addWidget(self._stack)
+
+        titulo = QLabel(APP_NAME)
+        titulo.setObjectName("TituloApp")
+        subtitulo = QLabel("Instaladores SQL estandarizados")
+        subtitulo.setObjectName("SubtituloApp")
+
+        cuerpo = QHBoxLayout()
+        cuerpo.setSpacing(16)
+        cuerpo.addWidget(self._menu)
+        cuerpo.addWidget(tarjeta, stretch=1)
+
+        fondo = QFrame()
+        fondo.setObjectName("Fondo")
+        capa = QVBoxLayout(fondo)
+        capa.setContentsMargins(24, 20, 24, 24)
+        capa.setSpacing(12)
+        capa.addWidget(titulo)
+        capa.addWidget(subtitulo)
+        capa.addLayout(cuerpo, stretch=1)
+        self.setCentralWidget(fondo)
 
         self._menu.currentItemChanged.connect(self._on_item_changed)
 

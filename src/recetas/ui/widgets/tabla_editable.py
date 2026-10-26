@@ -22,14 +22,15 @@ class TablaEditableModel(QAbstractTableModel):
         self._claves: list[object] = []
         self._ayudas: list[str] = []
 
-
     # ---------- Contrato de Qt ----------
     @override
     def rowCount(self, parent: Indice | None = None) -> int:
         return 0 if parent is not None and parent.isValid() else len(self._filas)
+
     @override
     def columnCount(self, parent: Indice | None = None) -> int:
         return 0 if parent is not None and parent.isValid() else len(self._titulos)
+
     @override
     def data(self, index: Indice, role: int = Qt.ItemDataRole.DisplayRole) -> object:
         if not index.isValid():
@@ -42,6 +43,7 @@ class TablaEditableModel(QAbstractTableModel):
         if role == Qt.ItemDataRole.ToolTipRole:
             return self._errores.get(celda)
         return None
+
     @override
     def setData(self, index: Indice, value: object, role: int = Qt.ItemDataRole.EditRole) -> bool:
         if not index.isValid() or role != Qt.ItemDataRole.EditRole:
@@ -50,9 +52,11 @@ class TablaEditableModel(QAbstractTableModel):
         self._errores.pop((index.row(), index.column()), None)
         self.dataChanged.emit(index, index)
         return True
+
     @override
     def flags(self, index: Indice) -> Qt.ItemFlag:
         return super().flags(index) | Qt.ItemFlag.ItemIsEditable
+
     @override
     def headerData(
         self, section: int, orientation: Qt.Orientation, role: int = Qt.ItemDataRole.DisplayRole
@@ -121,7 +125,7 @@ class TablaEditableModel(QAbstractTableModel):
     def claves(self) -> list[object]:
         return list(self._claves)
 
-@override
+
 class TablaEditable(QTableView):
     """Vista de la tabla que entiende Ctrl+V con datos copiados de Excel."""
 
@@ -130,6 +134,9 @@ class TablaEditable(QTableView):
         self._modelo = modelo
         self.setModel(modelo)
         self.horizontalHeader().setStretchLastSection(True)
+        self.setAlternatingRowColors(True)
+        self.verticalHeader().setDefaultSectionSize(30)
+
     @override
     def keyPressEvent(self, event: QKeyEvent) -> None:
         if event.matches(QKeySequence.StandardKey.Paste):

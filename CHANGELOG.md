@@ -32,7 +32,8 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
 - Formulario de creación de planes (MVP): tabla tipo Excel con pegado, errores marcados por celda,
   advertencias, confirmación de sobrescritura y registro de planes en la parametrización.
 - Tabla editable reutilizable (`ui/widgets/tabla_editable.py`).
-
+- Tema visual (QSS) con degradado verde-azul, tarjeta de contenido, pestañas y botones píldora
+  (docs/diseno-visual.md).
 
 ### Corregido
 - Scoring modelado como dos listas independientes (SCORING_PLAN y CPL_SCORING_PLAN).
