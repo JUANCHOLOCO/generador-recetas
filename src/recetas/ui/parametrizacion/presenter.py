@@ -70,7 +70,9 @@ class ParametrizacionPresenter:
             self._vista.mostrar_solo(None)
             return
         i = nombres.index(_TIPO)
-        visibles = {n for n, fila in enumerate(self._vista.filas()) if fila[i] in (tipo, _AMBAS, "")}
+        visibles = {
+            n for n, fila in enumerate(self._vista.filas()) if fila[i] in (tipo, _AMBAS, "")
+        }
         self._vista.mostrar_solo(visibles)
 
     def guardar(self) -> None:

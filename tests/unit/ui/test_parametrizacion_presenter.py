@@ -30,7 +30,9 @@ class TablaFalsa:
 
     def guardar(self, filas: Sequence[FilaParametro]) -> CambiosGuardados:
         if self.falla:
-            raise ParametrizacionInvalidaError([ErrorCelda("Fila 1 › Tipo: inválido", 0, "tipo_facturacion")])
+            raise ParametrizacionInvalidaError(
+                [ErrorCelda("Fila 1 › Tipo: inválido", 0, "tipo_facturacion")]
+            )
         self.guardados.append(list(filas))
         return CambiosGuardados(insertadas=1)
 
@@ -47,7 +49,10 @@ class VistaFalsa:
         self.seleccionada: int | None = None
 
     def mostrar_tabla(
-        self, columnas: Sequence[ColumnaEditable], filas: Sequence[list[str]], claves: Sequence[int | None]
+        self,
+        columnas: Sequence[ColumnaEditable],
+        filas: Sequence[list[str]],
+        claves: Sequence[int | None],
     ) -> None:
         self._filas = [list(f) for f in filas]
         self._claves = list(claves)
