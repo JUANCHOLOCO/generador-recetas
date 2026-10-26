@@ -102,6 +102,16 @@ queda como `AMBAS`; presente solo en uno, con el tipo de ese libro.
 Secciones del Excel que **no** son parametrización (son datos del RQ y salen del formulario):
 "Sincronización POIDs Siebel", "Sincronización POIDs Promotions" y "Configuración promociones".
 
+### Mantenimiento desde la app
+
+La pestaña **Parametrización** del módulo permite ver, agregar, editar, desactivar (`Activo = N`) y
+eliminar filas de las 9 tablas. Reglas:
+
+- Se guarda **toda la tabla en una transacción**: si una fila es inválida, no se guarda nada.
+- El filtro por tipo de facturación solo **oculta** filas; nunca las elimina al guardar.
+- `Orden` vacío = la fila va al final. `Tipo de facturación` vacío = `AMBAS`. `Activo` vacío = `S`.
+- Preferir **desactivar** antes que eliminar: la fila se conserva y puede reactivarse.
+
 ### Registro de planes nuevos
 
 Los planes del formulario se incluyen **automáticamente** en la matriz de cambios de plan del RQ
