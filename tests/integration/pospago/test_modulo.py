@@ -32,3 +32,4 @@ def test_el_modulo_muestra_el_formulario(tmp_path: Path, qtbot: QtBot) -> None:
     assert isinstance(widget, QTabWidget)
     assert widget.tabText(0) == "Generar receta"
     assert isinstance(widget.widget(0), FormularioView)
+    assert widget.tabText(1) == "Parametrización"
