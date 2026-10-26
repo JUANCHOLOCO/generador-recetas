@@ -10,7 +10,10 @@ pytestmark = pytest.mark.ui
 def test_muestra_la_tabla_oculta_filas_y_marca_errores(qtbot: QtBot) -> None:
     vista = ParametrizacionView(["Canales", "Roles"])
     qtbot.addWidget(vista)
-    columnas = [ColumnaEditable("nombre", "Nombre"), ColumnaEditable("activo", "Activo", ("S", "N"))]
+    columnas = [
+        ColumnaEditable("nombre", "Nombre"),
+        ColumnaEditable("activo", "Activo", ("S", "N")),
+    ]
 
     vista.mostrar_tabla(columnas, [["Retail", "S"], ["Pyme", "N"]], [1, 2])
     vista.mostrar_solo({0})
