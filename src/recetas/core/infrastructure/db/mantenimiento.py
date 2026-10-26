@@ -57,7 +57,7 @@ class SqlTablaParametrizacion:
             objetos = session.scalars(select(self._model).order_by(*orden)).all()
             return [
                 FilaParametro(
-                    getattr(objeto, "id"),
+                    _id(objeto),
                     {n: _a_texto(getattr(objeto, n)) for n in self._columnas},
                 )
                 for objeto in objetos
@@ -109,7 +109,7 @@ class SqlTablaParametrizacion:
         filas: Sequence[FilaParametro],
         convertidas: list[dict[str, object]],
     ) -> CambiosGuardados:
-        existentes = {getattr(o, "id"): o for o in session.scalars(select(self._model))}
+        existentes = {_id(o): o for o in session.scalars(select(self._model))}
         enviados = {f.id for f in filas if f.id is not None}
 
         eliminadas = 0
@@ -119,20 +119,20 @@ class SqlTablaParametrizacion:
                 eliminadas += 1
         session.flush()  # primero se borra, para no chocar con restricciones únicas al reinsertar
 
-        ordenes = [v[_ORDEN] for v in convertidas if isinstance(v.get(_ORDEN), int)]
+        ordenes = [o for v in convertidas if isinstance(o := v.get(_ORDEN), int)]
         siguiente = max(ordenes, default=0)
         insertadas = modificadas = 0
         for fila, valores in zip(filas, convertidas, strict=True):
             if _ORDEN in valores and valores[_ORDEN] is None:
                 siguiente += 1
                 valores[_ORDEN] = siguiente
-            objeto = existentes.get(fila.id) if fila.id is not None else None
-            if objeto is None:
+            existente = existentes.get(fila.id) if fila.id is not None else None
+            if existente is None:
                 session.add(self._model(**valores))
                 insertadas += 1
-            elif any(getattr(objeto, k) != v for k, v in valores.items()):
+            elif any(getattr(existente, k) != v for k, v in valores.items()):
                 for k, v in valores.items():
-                    setattr(objeto, k, v)
+                    setattr(existente, k, v)
                 modificadas += 1
         return CambiosGuardados(insertadas, modificadas, eliminadas)
 
@@ -155,8 +155,8 @@ def _ayuda(nombre: str, columna: Column[Any]) -> str:
         partes.append("Valores: " + ", ".join(opciones))
     if nombre == _ORDEN:
         partes.append("Vacío = al final")
-    elif getattr(columna.default, "arg", None) is not None:
-        partes.append(f"Vacío = {_a_texto(getattr(columna.default, 'arg'))}")
+    elif (defecto := _valor_por_defecto(columna)) is not None:
+        partes.append(f"Vacío = {_a_texto(defecto)}")
     return ". ".join(partes)
 
 
@@ -170,7 +170,7 @@ def _a_texto(valor: object) -> str:
 
 def _desde_texto(columna: Column[Any], texto: str) -> object:
     if not texto:
-        defecto = getattr(columna.default, "arg", None)
+        defecto = _valor_por_defecto(columna)
         if defecto is not None:
             return defecto
         if columna.nullable:
@@ -196,3 +196,14 @@ def _desde_texto(columna: Column[Any], texto: str) -> object:
     if isinstance(tipo, String) and tipo.length and len(texto) > tipo.length:
         raise ValueError(f"Máximo {tipo.length} caracteres.")
     return texto
+
+
+def _id(objeto: Base) -> int:
+    """Clave primaria de una fila de parametrización (columna `id` de ParametroMixin)."""
+    valor: int = getattr(objeto, "id")
+    return valor
+
+
+def _valor_por_defecto(columna: Column[Any]) -> object:
+    """Valor por defecto escalar de la columna (p. ej. AMBAS o True), o None si no tiene."""
+    return getattr(columna.default, "arg", None)

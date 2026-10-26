@@ -56,7 +56,9 @@ def test_quitar_varias_filas(qapp: QApplication) -> None:
 
 def test_cargar_cambia_columnas_y_conserva_claves_al_editar(qapp: QApplication) -> None:
     modelo = _modelo()
-    modelo.cargar(["X", "Y"], [["1", "a"], ["2", "b"]], claves=[10, 20], ayudas=["", "Valores: a, b"])
+    modelo.cargar(
+        ["X", "Y"], [["1", "a"], ["2", "b"]], claves=[10, 20], ayudas=["", "Valores: a, b"]
+    )
 
     modelo.agregar_fila()
     modelo.quitar_filas([0])

@@ -50,5 +50,8 @@ class TablaMantenible(Protocol):
     def listar(self) -> list[FilaParametro]: ...
 
     def guardar(self, filas: Sequence[FilaParametro]) -> CambiosGuardados:
-        """Deja la tabla exactamente como `filas`: inserta, modifica y elimina en una transacción."""
+        """Deja la tabla exactamente como `filas`.
+
+        Inserta, modifica y elimina lo necesario en una sola transacción.
+        """
         ...

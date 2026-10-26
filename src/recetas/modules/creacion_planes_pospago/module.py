@@ -2,12 +2,6 @@
 
 from PySide6.QtWidgets import QTabWidget, QWidget
 
-from recetas.modules.creacion_planes_pospago.infrastructure.mantenimiento import (
-    tablas_de_parametrizacion,
-)
-from recetas.ui.parametrizacion.presenter import ParametrizacionPresenter
-from recetas.ui.parametrizacion.vista import ParametrizacionView
-
 from recetas import __version__
 from recetas.core.infrastructure.files.escritor import EscritorDeRecetas
 from recetas.core.infrastructure.templating.jinja import JinjaRenderer
@@ -83,7 +77,6 @@ class CreacionPlanesPospagoModule(Module):
         pestanas.addTab(vista, "Generar receta")
         pestanas.addTab(mantenimiento, "Parametrización")
         return pestanas
-
 
     def generar_receta(self) -> GenerarReceta:
         """Caso de uso con sus dependencias reales."""
