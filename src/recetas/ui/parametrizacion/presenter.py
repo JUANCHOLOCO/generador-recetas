@@ -3,7 +3,6 @@
 from collections.abc import Sequence
 from typing import Protocol
 
-from recetas.core.domain.errors import RecetasError
 from recetas.core.application.mantenimiento import (
     ColumnaEditable,
     ErrorCelda,
@@ -11,6 +10,7 @@ from recetas.core.application.mantenimiento import (
     ParametrizacionInvalidaError,
     TablaMantenible,
 )
+from recetas.core.domain.errors import RecetasError
 
 _TIPO = "tipo_facturacion"
 _AMBAS = "AMBAS"

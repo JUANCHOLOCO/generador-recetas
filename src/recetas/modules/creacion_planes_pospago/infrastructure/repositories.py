@@ -5,9 +5,9 @@ from collections.abc import Sequence
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, sessionmaker
 
-from recetas.core.infrastructure.db.errores import traducir_errores_de_bd
 from recetas.core.domain.billing import BillingScope, BillingType
 from recetas.core.infrastructure.db.base import ParametroMixin
+from recetas.core.infrastructure.db.errores import traducir_errores_de_bd
 from recetas.modules.creacion_planes_pospago.application.ports import PlanesRegistrados
 from recetas.modules.creacion_planes_pospago.domain.parametrizacion import (
     CampoEstatico,
@@ -85,7 +85,6 @@ class SqlParametrizacionRepository:
             traducir_errores_de_bd("registrar los planes"),
             self._session_factory.begin() as session,
         ):
-
             registrados = set(
                 session.scalars(
                     select(CplPlanPlanModel.id_plan).where(

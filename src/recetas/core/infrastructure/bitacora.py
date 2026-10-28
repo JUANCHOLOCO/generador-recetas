@@ -15,8 +15,7 @@ def configurar_bitacora(carpeta: Path) -> Path:
     logger = logging.getLogger(NOMBRE)
     logger.setLevel(logging.INFO)
     ya_configurada = any(
-        isinstance(h, RotatingFileHandler) and Path(h.baseFilename) == ruta
-        for h in logger.handlers
+        isinstance(h, RotatingFileHandler) and Path(h.baseFilename) == ruta for h in logger.handlers
     )
     if not ya_configurada:
         manejador = RotatingFileHandler(ruta, maxBytes=1_000_000, backupCount=5, encoding="utf-8")

@@ -4,7 +4,7 @@ import pytest
 from sqlalchemy.orm import Session, sessionmaker
 
 from recetas.core.domain.billing import BillingType
-from recetas.core.domain.errors import ErrorDePersistencia
+from recetas.core.domain.errors import PersistenciaError
 from recetas.core.infrastructure.db.engine import (
     create_session_factory,
     create_sqlite_engine,
@@ -106,7 +106,7 @@ def test_bd_sin_tablas_se_informa_como_error_de_persistencia(tmp_path: Path) -> 
     try:
         repo = SqlParametrizacionRepository(create_session_factory(engine))
 
-        with pytest.raises(ErrorDePersistencia, match="leer la parametrización"):
+        with pytest.raises(PersistenciaError, match="leer la parametrización"):
             repo.cargar(BillingType.CORRIENTE)
     finally:
         engine.dispose()

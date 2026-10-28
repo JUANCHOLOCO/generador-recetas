@@ -4,24 +4,25 @@ import pytest
 from pydantic import TypeAdapter, ValidationError
 
 from recetas.modules.creacion_planes_pospago.domain.valores import (
-    IdPlan,
-    PartNum,
-    Requerimiento,
-    Svall,
-    TextoObligatorio,
-    Valor,
-    Autor,
-    CodigoPcrf,
-    Nombre,
-    Poid,
-    TarifGroup,
-    MAX_REQUERIMIENTO,
     MAX_AUTOR,
-    MAX_NOMBRE,
     MAX_CODIGO_PCRF,
     MAX_ID,
+    MAX_NOMBRE,
     MAX_POID,
+    MAX_REQUERIMIENTO,
+    Autor,
+    CodigoPcrf,
+    IdPlan,
+    Nombre,
+    PartNum,
+    Poid,
+    Requerimiento,
+    Svall,
+    TarifGroup,
+    TextoObligatorio,
+    Valor,
 )
+
 
 def validar(tipo: Any, valor: object) -> object:
     return TypeAdapter(tipo).validate_python(valor)
@@ -65,6 +66,7 @@ def test_valor_convierte_texto_a_entero_y_exige_positivo() -> None:
     assert validar(Valor, "19900") == 19900
     with pytest.raises(ValidationError, match="mayor que cero"):
         validar(Valor, 0)
+
 
 @pytest.mark.parametrize("tipo", [TextoObligatorio, Nombre, CodigoPcrf, Requerimiento])
 def test_rechaza_saltos_de_linea_y_tabuladores(tipo: Any) -> None:

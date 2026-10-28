@@ -4,7 +4,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
 from recetas.core.domain.scripts import CabeceraScript
-from recetas.core.domain.sql import sql_literal, es_literal_sql
+from recetas.core.domain.sql import es_literal_sql, sql_literal
 from recetas.modules.creacion_planes_pospago.domain.errors import ParametrizacionIncompletaError
 from recetas.modules.creacion_planes_pospago.domain.matriz import (
     SeccionMatriz,

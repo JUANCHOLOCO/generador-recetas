@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
-from recetas.core.domain.errors import RecetaExistenteError, RecetasError, ErrorDePersistencia
+from recetas.core.domain.errors import PersistenciaError, RecetaExistenteError, RecetasError
 from recetas.core.domain.recipe_bundle import RecipeBundle
 from recetas.modules.creacion_planes_pospago.application.generar_receta import RecetaGenerada
 from recetas.modules.creacion_planes_pospago.application.ports import PlanesRegistrados
@@ -78,10 +78,9 @@ class RegistroFalso:
         self.falla = falla
         self.registradas: list[SolicitudReceta] = []
 
-
     def registrar(self, solicitud: SolicitudReceta) -> PlanesRegistrados:
         if self.falla:
-            raise ErrorDePersistencia("No se pudo registrar los planes: error de la base de datos.")
+            raise PersistenciaError("No se pudo registrar los planes: error de la base de datos.")
         self.registradas.append(solicitud)
         return PlanesRegistrados(cambio_plan=len(solicitud.planes), planes_53=0)
 

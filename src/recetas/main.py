@@ -1,25 +1,23 @@
 """Punto de entrada y composition root de la aplicación."""
 
-import sys
 import logging
-
-from recetas import __version__
-from recetas.core.infrastructure.bitacora import configurar_bitacora
-from recetas.ui.errores import instalar_manejador_global
-
-logger = logging.getLogger(__name__)
+import sys
 
 from PySide6.QtWidgets import QApplication
 
+from recetas import __version__
 from recetas.config import AppPaths
+from recetas.core.infrastructure.bitacora import configurar_bitacora
 from recetas.core.infrastructure.db.engine import create_session_factory, create_sqlite_engine
 from recetas.core.infrastructure.db.migrator import upgrade_database
 from recetas.core.infrastructure.sistema import RelojSistema, UsuarioSistemaOperativo
 from recetas.core.plugins import AppContext, ModuleRegistry
 from recetas.modules import installed_modules
+from recetas.ui.errores import instalar_manejador_global
 from recetas.ui.main_window import MainWindow
 from recetas.ui.tema import aplicar_tema
 
+logger = logging.getLogger(__name__)
 
 def build_context(paths: AppPaths) -> AppContext:
     upgrade_database(paths.database)

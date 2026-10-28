@@ -18,10 +18,10 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from recetas.modules.creacion_planes_pospago.domain.valores import MAX_AUTOR, MAX_REQUERIMIENTO
 from recetas.core.domain.ambiente import Ambiente
 from recetas.core.domain.billing import BillingType
 from recetas.modules.creacion_planes_pospago.domain.advertencias import Advertencia
+from recetas.modules.creacion_planes_pospago.domain.valores import MAX_AUTOR, MAX_REQUERIMIENTO
 from recetas.modules.creacion_planes_pospago.ui.formulario_presenter import (
     COLUMNAS,
     DatosFormulario,

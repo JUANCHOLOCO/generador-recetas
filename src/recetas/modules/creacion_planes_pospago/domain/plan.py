@@ -10,17 +10,16 @@ from pydantic_core import PydanticCustomError
 from recetas.core.domain.ambiente import Ambiente
 from recetas.core.domain.billing import BillingType
 from recetas.modules.creacion_planes_pospago.domain.valores import (
+    Autor,
     CodigoPcrf,
     IdPlan,
+    Nombre,
     PartNum,
     Poid,
     Requerimiento,
     Svall,
     TarifGroup,
-    TextoObligatorio,
     Valor,
-    Autor,
-    Nombre,
 )
 
 

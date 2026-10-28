@@ -1,7 +1,7 @@
 import pytest
 from jinja2 import UndefinedError
 
-from recetas.core.domain.sql import sql_literal, es_literal_sql
+from recetas.core.domain.sql import es_literal_sql, sql_literal
 from recetas.core.infrastructure.templating.jinja import JinjaRenderer
 
 

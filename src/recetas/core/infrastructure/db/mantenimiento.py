@@ -8,8 +8,6 @@ from sqlalchemy import inspect as inspeccionar
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, sessionmaker
 
-from recetas.core.infrastructure.db.errores import traducir_errores_de_bd
-from recetas.core.domain.texto import tiene_caracteres_de_control
 from recetas.core.application.mantenimiento import (
     CambiosGuardados,
     ColumnaEditable,
@@ -17,7 +15,9 @@ from recetas.core.application.mantenimiento import (
     FilaParametro,
     ParametrizacionInvalidaError,
 )
+from recetas.core.domain.texto import tiene_caracteres_de_control
 from recetas.core.infrastructure.db.base import Base
+from recetas.core.infrastructure.db.errores import traducir_errores_de_bd
 
 _SI = {"S", "SI", "SÍ", "X", "1", "TRUE"}
 _NO = {"N", "NO", "0", "FALSE"}
@@ -210,7 +210,9 @@ def _desde_texto(columna: Column[Any], texto: str) -> object:
 
 def _id(objeto: Base) -> int:
     """Clave primaria de una fila de parametrización (columna `id` de ParametroMixin)."""
-    valor: int = getattr(objeto, "id")
+    # getattr a propósito: `Base` no declara `id` (lo declara ParametroMixin), así que mypy
+    # rechazaría `objeto.id`.
+    valor: int = getattr(objeto, "id")  # noqa: B009
     return valor
 
 

@@ -1,6 +1,5 @@
 from collections.abc import Sequence
 
-from recetas.core.domain.errors import ErrorDePersistencia
 from recetas.core.application.mantenimiento import (
     CambiosGuardados,
     ColumnaEditable,
@@ -8,6 +7,7 @@ from recetas.core.application.mantenimiento import (
     FilaParametro,
     ParametrizacionInvalidaError,
 )
+from recetas.core.domain.errors import PersistenciaError
 from recetas.ui.parametrizacion.presenter import ParametrizacionPresenter
 
 COLUMNAS = (
@@ -90,6 +90,7 @@ class VistaFalsa:
 
     def mostrar_error(self, mensaje: str) -> None:
         self.mensajes.append(f"ERROR: {mensaje}")
+
 
 def _canales() -> TablaFalsa:
     return TablaFalsa(
@@ -174,7 +175,7 @@ def test_cambiar_de_tabla_con_cambios_pide_confirmacion() -> None:
 
 class TablaQueNoLee(TablaFalsa):
     def listar(self) -> list[FilaParametro]:
-        raise ErrorDePersistencia("No se pudo leer la tabla: error de la base de datos.")
+        raise PersistenciaError("No se pudo leer la tabla: error de la base de datos.")
 
 
 def test_error_al_leer_la_tabla_se_muestra() -> None:

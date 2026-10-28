@@ -48,5 +48,5 @@ class RecetaExistenteError(RecetasError):
         self.rutas = rutas
 
 
-class ErrorDePersistencia(RecetasError):
+class PersistenciaError(RecetasError):
     """La base de datos local no respondió como se esperaba (bloqueada, dañada, sin espacio…)."""

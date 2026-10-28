@@ -1,8 +1,7 @@
 """Caso de uso: generar la receta completa de una solicitud."""
 
-from dataclasses import dataclass
-
 import logging
+from dataclasses import dataclass
 
 from recetas.core.application.ports import Reloj, TemplateRenderer
 from recetas.core.domain.recipe_bundle import RecipeBundle
@@ -22,6 +21,7 @@ from recetas.modules.creacion_planes_pospago.generators.promotions import Promot
 from recetas.modules.creacion_planes_pospago.generators.siebel import SiebelGenerator
 
 logger = logging.getLogger(__name__)
+
 
 @dataclass(frozen=True, slots=True)
 class RecetaGenerada:
