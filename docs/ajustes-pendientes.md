@@ -37,7 +37,41 @@ Ordenados por impacto para el usuario / esfuerzo. Recomendados primero: **1, 2, 
 
 ## Ajustes del usuario (primera prueba)
 
-_Pendiente: el usuario los está documentando. Se agregan aquí al iniciar la fase de ajustes._
+Recibidos el 2026-10-27 (el usuario puede agregar más).
+
+| # | Ajuste | Validación | Prioridad |
+|---|---|---|---|
+| U1 | **Cargar los planes desde un Excel** al formulario | Viable. Los ejemplos `D:\proyectosJuan\Receta\PlanesAnticipados.xlsx` y `PlanesCorrientes.xlsx` tienen las 14 columnas en el orden del formulario (encabezado en la fila 2, datos desde la 3) y sus datos coinciden al 100 % con TPFB-2753. Requiere mover `openpyxl` de `dev` a dependencias de ejecución | Alta |
+| U2 | **Aviso de "FC" al elegir Anticipada** (solo aviso) | Ya existe como advertencia al pulsar *Generar* (estrategia Anticipada, Fase 4). El ajuste es mostrarlo **en el momento** de elegir el tipo | Media |
+| U3 | **Restricciones de longitud** en los campos | Hoy solo los formatos fijos (`PLCON####`, `SVALL####`) limitan la longitud; nombres, código PCRF, IDs, POIDs y tarif group no tienen máximo. Falta conocer las longitudes de las columnas Oracle de destino | Alta |
+| U4 | **Botón "Limpiar formulario"** | Viable; con confirmación si hay datos | Media |
+
+**Decisiones del usuario (2026-10-27):**
+
+- **U1:** el Excel debe traer al menos un plan (si viene vacío, se informa y no cambia nada). Sus planes **reemplazan** las filas del formulario, con confirmación si el formulario ya tenía datos. Lo importado pasa por la misma validación que lo escrito a mano.
+- **U2:** aviso en ambos sentidos al elegir el tipo: Anticipada con nombres que terminan en `FC`, y Corriente con nombres que **no** terminan en `FC`. Solo aviso, no bloquea.
+- **U3:** límites **provisionales** hasta conocer las longitudes reales de las columnas Oracle:
+
+  | Campo | Máximo |
+  |---|---|
+  | Número de requerimiento | 30 |
+  | Autor | 100 |
+  | Nombre del producto, nombre paquete Datos y SMS | 100 |
+  | Código perfil PCRF | 50 |
+  | Id_Plan, Tarif group | 10 dígitos |
+  | POID Datos y SMS | 20 dígitos |
+  | Part_num, Svall | 9 (formato fijo, ya validado) |
+
+## Recomendaciones de robustez y seguridad (2026-10-27)
+
+| # | Recomendación | Por qué | Prioridad |
+|---|---|---|---|
+| S1 | **Rechazar caracteres de control** (saltos de línea, tabuladores) en los campos de texto | Un salto de línea dentro de un nombre partiría el literal SQL en varias líneas; en SQL*Plus una línea con solo `/` o que empiece por `@` dentro del script puede ejecutar el búfer o llamar a otro archivo | Alta |
+| S2 | **Manejador global de errores inesperados** con mensaje al usuario y archivo de log | Hoy un error no previsto (un bug) solo se imprime en la consola: el usuario no ve nada y no queda registro | Alta |
+| S3 | **Capturar errores de BD** al registrar planes y en la pestaña Parametrización (BD bloqueada, disco lleno) | Hoy solo se capturan los errores de validación; un `OperationalError` caería en el caso de S2 | Alta |
+| S4 | **Fijar versiones de dependencias** (archivo de bloqueo) y revisarlas con `pip-audit` | Reproducibilidad del `.exe` y detección de vulnerabilidades conocidas. Encaja en la Fase 7 | Media (Fase 7) |
+| D1 | **Glosario** (RQ, FC, POID, Svall, PLCON, Nintendo, 5.3…) y **guía de incorporación** para otro desarrollador | Facilita explicar y mantener el proyecto | Media |
+
 
 ## Otros pendientes acordados
 
