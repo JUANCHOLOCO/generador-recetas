@@ -1,7 +1,7 @@
 import pytest
 from jinja2 import UndefinedError
 
-from recetas.core.domain.sql import sql_literal
+from recetas.core.domain.sql import sql_literal, es_literal_sql
 from recetas.core.infrastructure.templating.jinja import JinjaRenderer
 
 
@@ -24,3 +24,13 @@ def test_variable_inexistente_falla() -> None:
 
     with pytest.raises(UndefinedError):
         renderer.render("wrapper.sql.j2", esquema="ACTIVATOR")  # falta cab y script
+
+
+@pytest.mark.parametrize("valor", ["null", "NULL", "63", "-9999", "'12055'", "'D''Angelo'", "''"])
+def test_literales_sql_validos(valor: str) -> None:
+    assert es_literal_sql(valor)
+
+
+@pytest.mark.parametrize("valor", ["1; DROP TABLE X", "'abc", "'a' || 'b'", "CONTROL", "'a'b'"])
+def test_literales_sql_invalidos(valor: str) -> None:
+    assert not es_literal_sql(valor)

@@ -8,6 +8,7 @@ from sqlalchemy import inspect as inspeccionar
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, sessionmaker
 
+from recetas.core.domain.texto import tiene_caracteres_de_control
 from recetas.core.application.mantenimiento import (
     CambiosGuardados,
     ColumnaEditable,
@@ -176,6 +177,8 @@ def _desde_texto(columna: Column[Any], texto: str) -> object:
         if columna.nullable:
             return None
         raise ValueError("Es obligatorio.")
+    if tiene_caracteres_de_control(texto):
+        raise ValueError("No puede contener saltos de línea ni tabuladores.")
     tipo = columna.type
     if isinstance(tipo, Boolean):
         if texto.upper() in _SI:
