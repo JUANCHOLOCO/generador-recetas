@@ -25,7 +25,7 @@ def matriz(session_factory: sessionmaker[Session]) -> SqlTablaParametrizacion:
     return SqlTablaParametrizacion("Matriz", CplPlanPlanModel, session_factory)
 
 
-def _fila(id_: int | None = None, **valores: str) -> FilaParametro:
+def _fila(id_: int | None = None, /, **valores: str) -> FilaParametro:
     return FilaParametro(id_, valores)
 
 
