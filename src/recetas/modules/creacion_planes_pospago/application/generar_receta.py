@@ -2,6 +2,8 @@
 
 from dataclasses import dataclass
 
+import logging
+
 from recetas.core.application.ports import Reloj, TemplateRenderer
 from recetas.core.domain.recipe_bundle import RecipeBundle
 from recetas.modules.creacion_planes_pospago.application.ports import ParametrizacionRepository
@@ -19,6 +21,7 @@ from recetas.modules.creacion_planes_pospago.generators.conf import PoolGenerato
 from recetas.modules.creacion_planes_pospago.generators.promotions import PromotionsGenerator
 from recetas.modules.creacion_planes_pospago.generators.siebel import SiebelGenerator
 
+logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True, slots=True)
 class RecetaGenerada:
@@ -51,4 +54,12 @@ class GenerarReceta:
         for generador in self._generadores:
             generador.generar(ctx, bundle)
         self._pool.generar(ctx, bundle)
-        return RecetaGenerada(bundle, calcular_advertencias(solicitud, parametrizacion))
+        logger.info(
+            "Receta %s (%s, %s): %d archivos, %d advertencias",
+            bundle.root,
+            solicitud.tipo,
+            solicitud.ambiente,
+            len(bundle),
+            len(advertencias := calcular_advertencias(solicitud, parametrizacion)),
+        )
+        return RecetaGenerada(bundle, advertencias)

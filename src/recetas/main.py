@@ -1,6 +1,13 @@
 """Punto de entrada y composition root de la aplicación."""
 
 import sys
+import logging
+
+from recetas import __version__
+from recetas.core.infrastructure.bitacora import configurar_bitacora
+from recetas.ui.errores import instalar_manejador_global
+
+logger = logging.getLogger(__name__)
 
 from PySide6.QtWidgets import QApplication
 
@@ -33,13 +40,17 @@ def build_registry(context: AppContext) -> ModuleRegistry:
 
 
 def main() -> int:
-    context = build_context(AppPaths.default())
+    app = QApplication(sys.argv)
+    aplicar_tema(app)
+    paths = AppPaths.default()
+    instalar_manejador_global(configurar_bitacora(paths.logs))
+    logger.info("Inicio del Generador de Recetas %s", __version__)
+
+    context = build_context(paths)
     registry = build_registry(context)
     for module in registry.modules():
         module.initialize()
 
-    app = QApplication(sys.argv)
-    aplicar_tema(app)
     window = MainWindow(registry)
     window.show()
     return app.exec()

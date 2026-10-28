@@ -12,6 +12,7 @@ def test_rutas_se_derivan_de_la_base(tmp_path: Path) -> None:
     assert paths.database == tmp_path / "recetas.db"
     assert paths.output == tmp_path / "output"
     assert paths.backups == tmp_path / "backups"
+    assert paths.logs == tmp_path / "logs"
 
 
 def test_en_desarrollo_la_base_es_la_raiz_del_repositorio() -> None:
