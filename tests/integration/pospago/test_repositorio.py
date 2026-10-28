@@ -1,7 +1,14 @@
+from pathlib import Path
+
 import pytest
 from sqlalchemy.orm import Session, sessionmaker
 
 from recetas.core.domain.billing import BillingType
+from recetas.core.domain.errors import PersistenciaError
+from recetas.core.infrastructure.db.engine import (
+    create_session_factory,
+    create_sqlite_engine,
+)
 from recetas.modules.creacion_planes_pospago.domain.parametrizacion import (
     CampoEstatico,
     Parametrizacion,
@@ -92,3 +99,14 @@ def test_filas_inactivas_se_excluyen(
         retail.activo = False
 
     assert "Retail" not in repo.cargar(BillingType.CORRIENTE).canales
+
+
+def test_bd_sin_tablas_se_informa_como_error_de_persistencia(tmp_path: Path) -> None:
+    engine = create_sqlite_engine(tmp_path / "sin_migrar.db")
+    try:
+        repo = SqlParametrizacionRepository(create_session_factory(engine))
+
+        with pytest.raises(PersistenciaError, match="leer la parametrización"):
+            repo.cargar(BillingType.CORRIENTE)
+    finally:
+        engine.dispose()

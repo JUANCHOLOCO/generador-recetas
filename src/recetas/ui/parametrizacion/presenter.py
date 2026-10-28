@@ -10,6 +10,7 @@ from recetas.core.application.mantenimiento import (
     ParametrizacionInvalidaError,
     TablaMantenible,
 )
+from recetas.core.domain.errors import RecetasError
 
 _TIPO = "tipo_facturacion"
 _AMBAS = "AMBAS"
@@ -29,6 +30,7 @@ class VistaParametrizacion(Protocol):
     def mostrar_errores(self, errores: Sequence[ErrorCelda]) -> None: ...
     def confirmar(self, titulo: str, texto: str) -> bool: ...
     def mostrar_resultado(self, mensaje: str) -> None: ...
+    def mostrar_error(self, mensaje: str) -> None: ...
 
 
 class ParametrizacionPresenter:
@@ -54,7 +56,11 @@ class ParametrizacionPresenter:
     def recargar(self) -> None:
         tabla = self._tablas[self._actual]
         columnas = tabla.columnas()
-        filas = tabla.listar()
+        try:
+            filas = tabla.listar()
+        except RecetasError as error:
+            self._vista.mostrar_error(str(error))
+            return
         texto = [[f.valores.get(c.nombre, "") for c in columnas] for f in filas]
         self._cargadas = [fila.copy() for fila in texto]
         self._claves_cargadas = {f.id for f in filas if f.id is not None}

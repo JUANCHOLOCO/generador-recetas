@@ -10,14 +10,15 @@ from pydantic_core import PydanticCustomError
 from recetas.core.domain.ambiente import Ambiente
 from recetas.core.domain.billing import BillingType
 from recetas.modules.creacion_planes_pospago.domain.valores import (
+    Autor,
     CodigoPcrf,
     IdPlan,
+    Nombre,
     PartNum,
     Poid,
     Requerimiento,
     Svall,
     TarifGroup,
-    TextoObligatorio,
     Valor,
 )
 
@@ -27,7 +28,7 @@ class _Inmutable(BaseModel):
 
 
 class Paquete(_Inmutable):
-    nombre: TextoObligatorio
+    nombre: Nombre
     svall: Svall
     poid: Poid
 
@@ -35,7 +36,7 @@ class Paquete(_Inmutable):
 class PlanNuevo(_Inmutable):
     id_plan: IdPlan
     part_num: PartNum
-    nombre: TextoObligatorio
+    nombre: Nombre
     valor_con_iva: Valor
     valor_sin_iva: Valor
     codigo_pcrf: CodigoPcrf
@@ -70,7 +71,7 @@ def _al_menos_un_plan(planes: tuple[PlanNuevo, ...]) -> tuple[PlanNuevo, ...]:
 
 class SolicitudReceta(_Inmutable):
     requerimiento: Requerimiento
-    autor: TextoObligatorio
+    autor: Autor
     ambiente: Ambiente
     tipo: BillingType
     planes: Annotated[tuple[PlanNuevo, ...], AfterValidator(_al_menos_un_plan)]

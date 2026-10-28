@@ -1,5 +1,6 @@
 """Caso de uso: generar la receta completa de una solicitud."""
 
+import logging
 from dataclasses import dataclass
 
 from recetas.core.application.ports import Reloj, TemplateRenderer
@@ -18,6 +19,8 @@ from recetas.modules.creacion_planes_pospago.generators.base import (
 from recetas.modules.creacion_planes_pospago.generators.conf import PoolGenerator
 from recetas.modules.creacion_planes_pospago.generators.promotions import PromotionsGenerator
 from recetas.modules.creacion_planes_pospago.generators.siebel import SiebelGenerator
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
@@ -51,4 +54,12 @@ class GenerarReceta:
         for generador in self._generadores:
             generador.generar(ctx, bundle)
         self._pool.generar(ctx, bundle)
-        return RecetaGenerada(bundle, calcular_advertencias(solicitud, parametrizacion))
+        logger.info(
+            "Receta %s (%s, %s): %d archivos, %d advertencias",
+            bundle.root,
+            solicitud.tipo,
+            solicitud.ambiente,
+            len(bundle),
+            len(advertencias := calcular_advertencias(solicitud, parametrizacion)),
+        )
+        return RecetaGenerada(bundle, advertencias)

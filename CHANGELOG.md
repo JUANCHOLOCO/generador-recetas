@@ -37,6 +37,10 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
 - Pestaña "Parametrización": mantenimiento de las 9 tablas del módulo con validación, filtro por
   tipo de facturación y guardado en una transacción.
 - Mantenimiento genérico de tablas por introspección (`core`), reutilizable por cualquier módulo.
+- Longitudes máximas provisionales en los campos del formulario (U3).
+- Bitácora en `logs/recetas.log` y manejador global de errores inesperados (S2).
+- Errores de base de datos con mensaje claro en el registro de planes y en Parametrización (S3).
+- mypy revisa también los tests (T1).
 
 ### Corregido
 - Scoring modelado como dos listas independientes (SCORING_PLAN y CPL_SCORING_PLAN).
@@ -45,3 +49,7 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
 ### Cambiado
 - PROMOTIONS inserta el POID real directamente y la fila PLAN_TYPE solo si no existe (decisiones B y C).
 - SIEBEL usa el tarif group como POID del plan en `/product` y `/deal` (corrige el desfase de Corriente).
+
+### Seguridad
+- Los textos rechazan saltos de línea y tabuladores (formulario y parametrización), y los valores
+  estáticos deben ser literales SQL válidos antes de llegar a un script (S1).

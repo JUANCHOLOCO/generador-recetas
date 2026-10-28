@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from recetas.core.domain.billing import BillingScope, BillingType
 from recetas.core.infrastructure.db.base import ParametroMixin
+from recetas.core.infrastructure.db.errores import traducir_errores_de_bd
 from recetas.modules.creacion_planes_pospago.application.ports import PlanesRegistrados
 from recetas.modules.creacion_planes_pospago.domain.parametrizacion import (
     CampoEstatico,
@@ -38,7 +39,10 @@ class SqlParametrizacionRepository:
     def cargar(self, tipo: BillingType) -> Parametrizacion:
         scopes = BillingScope.for_billing(tipo)
 
-        with self._session_factory() as session:
+        with (
+            traducir_errores_de_bd("leer la parametrización"),
+            self._session_factory() as session,
+        ):
 
             def activos[M: ParametroMixin](model: type[M]) -> Sequence[M]:
                 consulta = (
@@ -77,7 +81,10 @@ class SqlParametrizacionRepository:
     def registrar(self, solicitud: SolicitudReceta) -> PlanesRegistrados:
         scope = BillingScope(solicitud.tipo.value)
         vigentes = BillingScope.for_billing(solicitud.tipo)
-        with self._session_factory.begin() as session:
+        with (
+            traducir_errores_de_bd("registrar los planes"),
+            self._session_factory.begin() as session,
+        ):
             registrados = set(
                 session.scalars(
                     select(CplPlanPlanModel.id_plan).where(

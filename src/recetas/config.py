@@ -34,6 +34,10 @@ class AppPaths:
     def backups(self) -> Path:
         return self.base / "backups"
 
+    @property
+    def logs(self) -> Path:
+        return self.base / "logs"
+
     @classmethod
     def default(cls) -> AppPaths:
         return cls(base=_base_dir())

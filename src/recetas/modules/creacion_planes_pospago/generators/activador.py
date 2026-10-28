@@ -4,7 +4,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 
 from recetas.core.domain.scripts import CabeceraScript
-from recetas.core.domain.sql import sql_literal
+from recetas.core.domain.sql import es_literal_sql, sql_literal
 from recetas.modules.creacion_planes_pospago.domain.errors import ParametrizacionIncompletaError
 from recetas.modules.creacion_planes_pospago.domain.matriz import (
     SeccionMatriz,
@@ -65,6 +65,13 @@ def valores_fila(
     if faltantes:
         raise ParametrizacionIncompletaError(
             f"Faltan campos estáticos de {tabla}: {', '.join(faltantes)}."
+        )
+    invalidos = [c for c in columnas if c not in dinamicos and not es_literal_sql(estaticos[c])]
+    if invalidos:
+        detalle = ", ".join(f"{c} = {estaticos[c]!r}" for c in invalidos)
+        raise ParametrizacionIncompletaError(
+            f"Valores estáticos inválidos en {tabla}: {detalle}. "
+            "Use null, un número o un texto entre comillas simples."
         )
     return tuple(dinamicos[c] if c in dinamicos else estaticos[c] for c in columnas)
 

@@ -138,3 +138,6 @@ class ParametrizacionView(QWidget):
     def _quitar_seleccionadas(self) -> None:
         filas = {indice.row() for indice in self._tabla.selectionModel().selectedIndexes()}
         self._modelo.quitar_filas(sorted(filas))
+
+    def mostrar_error(self, mensaje: str) -> None:
+        QMessageBox.critical(self, TITULO, mensaje)

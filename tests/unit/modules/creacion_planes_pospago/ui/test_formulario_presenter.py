@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
-from recetas.core.domain.errors import RecetaExistenteError, RecetasError
+from recetas.core.domain.errors import PersistenciaError, RecetaExistenteError, RecetasError
 from recetas.core.domain.recipe_bundle import RecipeBundle
 from recetas.modules.creacion_planes_pospago.application.generar_receta import RecetaGenerada
 from recetas.modules.creacion_planes_pospago.application.ports import PlanesRegistrados
@@ -74,10 +74,13 @@ class EscritorFalso:
 
 
 class RegistroFalso:
-    def __init__(self) -> None:
+    def __init__(self, falla: bool = False) -> None:
+        self.falla = falla
         self.registradas: list[SolicitudReceta] = []
 
     def registrar(self, solicitud: SolicitudReceta) -> PlanesRegistrados:
+        if self.falla:
+            raise PersistenciaError("No se pudo registrar los planes: error de la base de datos.")
         self.registradas.append(solicitud)
         return PlanesRegistrados(cambio_plan=len(solicitud.planes), planes_53=0)
 
@@ -216,3 +219,12 @@ def test_error_de_negocio_se_muestra_sin_romper_la_app() -> None:
     presenter(vista, GeneradorFalso(falla=True)).generar(datos())
 
     assert vista.mensajes == ["ERROR: Faltan campos estáticos de PLANS: STATUS."]
+
+
+def test_error_al_registrar_se_informa_sin_perder_la_receta_generada() -> None:
+    vista = VistaFalsa()
+
+    presenter(vista, registro=RegistroFalso(falla=True)).generar(datos())
+
+    assert "Receta generada en" in vista.mensajes[0]
+    assert vista.mensajes[1].startswith("ERROR: La receta se generó, pero no se pudieron registrar")

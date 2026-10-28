@@ -7,6 +7,7 @@ from recetas.core.application.mantenimiento import (
     FilaParametro,
     ParametrizacionInvalidaError,
 )
+from recetas.core.domain.errors import PersistenciaError
 from recetas.ui.parametrizacion.presenter import ParametrizacionPresenter
 
 COLUMNAS = (
@@ -86,6 +87,9 @@ class VistaFalsa:
     def quitar(self, fila: int) -> None:
         del self._filas[fila]
         del self._claves[fila]
+
+    def mostrar_error(self, mensaje: str) -> None:
+        self.mensajes.append(f"ERROR: {mensaje}")
 
 
 def _canales() -> TablaFalsa:
@@ -167,3 +171,16 @@ def test_cambiar_de_tabla_con_cambios_pide_confirmacion() -> None:
     assert vista.preguntas == ["Cambios sin guardar"]
     assert vista.seleccionada == 0  # el selector vuelve a la tabla actual
     assert vista.filas()[0][0] == "Retail 2"  # no se descartó lo editado
+
+
+class TablaQueNoLee(TablaFalsa):
+    def listar(self) -> list[FilaParametro]:
+        raise PersistenciaError("No se pudo leer la tabla: error de la base de datos.")
+
+
+def test_error_al_leer_la_tabla_se_muestra() -> None:
+    vista = VistaFalsa()
+
+    _presenter(vista, TablaQueNoLee("Canales", []))
+
+    assert vista.mensajes == ["ERROR: No se pudo leer la tabla: error de la base de datos."]

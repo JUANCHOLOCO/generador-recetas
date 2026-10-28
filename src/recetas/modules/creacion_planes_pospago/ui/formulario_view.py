@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (
 from recetas.core.domain.ambiente import Ambiente
 from recetas.core.domain.billing import BillingType
 from recetas.modules.creacion_planes_pospago.domain.advertencias import Advertencia
+from recetas.modules.creacion_planes_pospago.domain.valores import MAX_AUTOR, MAX_REQUERIMIENTO
 from recetas.modules.creacion_planes_pospago.ui.formulario_presenter import (
     COLUMNAS,
     DatosFormulario,
@@ -41,7 +42,9 @@ class FormularioView(QWidget):
 
         self._requerimiento = QLineEdit()
         self._requerimiento.setPlaceholderText("TPFB-2753")
+        self._requerimiento.setMaxLength(MAX_REQUERIMIENTO)
         self._autor = QLineEdit(autor_sugerido)
+        self._autor.setMaxLength(MAX_AUTOR)
         self._ambiente = QComboBox()
         for ambiente in Ambiente:
             self._ambiente.addItem(ambiente.sufijo, ambiente.value)

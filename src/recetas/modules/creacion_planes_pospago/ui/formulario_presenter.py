@@ -120,7 +120,13 @@ class FormularioPresenter:
         self._vista.mostrar_resultado(f"Receta generada en:\n{raiz}")
 
         if self._vista.confirmar_registro(len(solicitud.planes)):
-            registrados = self._registro.registrar(solicitud)
+            try:
+                registrados = self._registro.registrar(solicitud)
+            except RecetasError as error:
+                self._vista.mostrar_error(
+                    f"La receta se generó, pero no se pudieron registrar los planes: {error}"
+                )
+                return
             self._vista.mostrar_resultado(
                 f"Planes registrados en la parametrización: {registrados.cambio_plan} en la "
                 f"matriz de cambios de plan y {registrados.planes_53} en 5.3 OLDS."

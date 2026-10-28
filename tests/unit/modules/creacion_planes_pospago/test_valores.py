@@ -4,10 +4,21 @@ import pytest
 from pydantic import TypeAdapter, ValidationError
 
 from recetas.modules.creacion_planes_pospago.domain.valores import (
+    MAX_AUTOR,
+    MAX_CODIGO_PCRF,
+    MAX_ID,
+    MAX_NOMBRE,
+    MAX_POID,
+    MAX_REQUERIMIENTO,
+    Autor,
+    CodigoPcrf,
     IdPlan,
+    Nombre,
     PartNum,
+    Poid,
     Requerimiento,
     Svall,
+    TarifGroup,
     TextoObligatorio,
     Valor,
 )
@@ -55,3 +66,34 @@ def test_valor_convierte_texto_a_entero_y_exige_positivo() -> None:
     assert validar(Valor, "19900") == 19900
     with pytest.raises(ValidationError, match="mayor que cero"):
         validar(Valor, 0)
+
+
+@pytest.mark.parametrize("tipo", [TextoObligatorio, Nombre, CodigoPcrf, Requerimiento])
+def test_rechaza_saltos_de_linea_y_tabuladores(tipo: Any) -> None:
+    for valor in ["Pospago\n/\nConectados", "Pospago\tFC"]:
+        with pytest.raises(ValidationError, match="saltos de línea"):
+            validar(tipo, valor)
+
+
+@pytest.mark.parametrize(
+    ("tipo", "maximo"),
+    [
+        (Nombre, MAX_NOMBRE),
+        (Autor, MAX_AUTOR),
+        (CodigoPcrf, MAX_CODIGO_PCRF),
+        (Requerimiento, MAX_REQUERIMIENTO),
+    ],
+)
+def test_longitud_maxima_de_textos(tipo: Any, maximo: int) -> None:
+    assert validar(tipo, "A" * maximo) == "A" * maximo
+    with pytest.raises(ValidationError, match=f"Máximo {maximo} caracteres"):
+        validar(tipo, "A" * (maximo + 1))
+
+
+@pytest.mark.parametrize(
+    ("tipo", "maximo"), [(IdPlan, MAX_ID), (TarifGroup, MAX_ID), (Poid, MAX_POID)]
+)
+def test_longitud_maxima_de_numericos(tipo: Any, maximo: int) -> None:
+    assert validar(tipo, "9" * maximo) == "9" * maximo
+    with pytest.raises(ValidationError, match=f"Máximo {maximo} caracteres"):
+        validar(tipo, "9" * (maximo + 1))

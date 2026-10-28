@@ -67,7 +67,7 @@ select = ["E", "F", "W", "I", "B", "UP", "N", "SIM"]
 python_version = "3.13"
 strict = true
 mypy_path = "src"
-packages = ["recetas"]
+files = ["src/recetas", "tests"]
 exclude = ["src/recetas/migrations/"]
 plugins = ["pydantic.mypy"]
 

@@ -15,7 +15,9 @@ from recetas.core.application.mantenimiento import (
     FilaParametro,
     ParametrizacionInvalidaError,
 )
+from recetas.core.domain.texto import tiene_caracteres_de_control
 from recetas.core.infrastructure.db.base import Base
+from recetas.core.infrastructure.db.errores import traducir_errores_de_bd
 
 _SI = {"S", "SI", "SÍ", "X", "1", "TRUE"}
 _NO = {"N", "NO", "0", "FALSE"}
@@ -53,7 +55,10 @@ class SqlTablaParametrizacion:
     def listar(self) -> list[FilaParametro]:
         mapeo = inspeccionar(self._model).columns
         orden = [mapeo[n] for n in (_ORDEN, "id") if n in mapeo]
-        with self._session_factory() as session:
+        with (
+            traducir_errores_de_bd("leer la tabla"),
+            self._session_factory() as session,
+        ):
             objetos = session.scalars(select(self._model).order_by(*orden)).all()
             return [
                 FilaParametro(
@@ -68,7 +73,10 @@ class SqlTablaParametrizacion:
         if errores:
             raise ParametrizacionInvalidaError(errores)
         try:
-            with self._session_factory.begin() as session:
+            with (
+                traducir_errores_de_bd("guardar la parametrización"),
+                self._session_factory.begin() as session,
+            ):
                 return self._sincronizar(session, filas, convertidas)
         except IntegrityError:
             raise ParametrizacionInvalidaError(
@@ -176,6 +184,8 @@ def _desde_texto(columna: Column[Any], texto: str) -> object:
         if columna.nullable:
             return None
         raise ValueError("Es obligatorio.")
+    if tiene_caracteres_de_control(texto):
+        raise ValueError("No puede contener saltos de línea ni tabuladores.")
     tipo = columna.type
     if isinstance(tipo, Boolean):
         if texto.upper() in _SI:
@@ -200,7 +210,9 @@ def _desde_texto(columna: Column[Any], texto: str) -> object:
 
 def _id(objeto: Base) -> int:
     """Clave primaria de una fila de parametrización (columna `id` de ParametroMixin)."""
-    valor: int = getattr(objeto, "id")
+    # getattr a propósito: `Base` no declara `id` (lo declara ParametroMixin), así que mypy
+    # rechazaría `objeto.id`.
+    valor: int = getattr(objeto, "id")  # noqa: B009
     return valor
 
 
