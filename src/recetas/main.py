@@ -19,6 +19,7 @@ from recetas.ui.tema import aplicar_tema
 
 logger = logging.getLogger(__name__)
 
+
 def build_context(paths: AppPaths) -> AppContext:
     upgrade_database(paths.database)
     engine = create_sqlite_engine(paths.database)
