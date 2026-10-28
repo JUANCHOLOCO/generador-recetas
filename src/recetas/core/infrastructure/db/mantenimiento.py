@@ -8,6 +8,7 @@ from sqlalchemy import inspect as inspeccionar
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, sessionmaker
 
+from recetas.core.infrastructure.db.errores import traducir_errores_de_bd
 from recetas.core.domain.texto import tiene_caracteres_de_control
 from recetas.core.application.mantenimiento import (
     CambiosGuardados,
@@ -54,7 +55,10 @@ class SqlTablaParametrizacion:
     def listar(self) -> list[FilaParametro]:
         mapeo = inspeccionar(self._model).columns
         orden = [mapeo[n] for n in (_ORDEN, "id") if n in mapeo]
-        with self._session_factory() as session:
+        with (
+            traducir_errores_de_bd("leer la tabla"),
+            self._session_factory() as session,
+        ):
             objetos = session.scalars(select(self._model).order_by(*orden)).all()
             return [
                 FilaParametro(
@@ -69,7 +73,10 @@ class SqlTablaParametrizacion:
         if errores:
             raise ParametrizacionInvalidaError(errores)
         try:
-            with self._session_factory.begin() as session:
+            with (
+                traducir_errores_de_bd("guardar la parametrización"),
+                self._session_factory.begin() as session,
+            ):
                 return self._sincronizar(session, filas, convertidas)
         except IntegrityError:
             raise ParametrizacionInvalidaError(

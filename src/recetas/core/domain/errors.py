@@ -46,3 +46,7 @@ class RecetaExistenteError(RecetasError):
             f"Ya existe una receta en: {', '.join(rutas)}. Confirme si desea sobrescribirla."
         )
         self.rutas = rutas
+
+
+class ErrorDePersistencia(RecetasError):
+    """La base de datos local no respondió como se esperaba (bloqueada, dañada, sin espacio…)."""
