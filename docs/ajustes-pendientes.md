@@ -3,13 +3,33 @@
 Se trabajan **después de la Fase 6B** y **antes de la Fase 7 (portable)**, junto con los ajustes que
 el usuario documentó tras la primera prueba de la app.
 
-Orden acordado (actualizado 2026-10-28):
+Orden acordado (actualizado 2026-10-29):
 
 ```
 6A+ tema visual ✅ → 6B parametrización ✅ → Ajustes A (robustez) ✅
-→ Análisis de "Alza de tarifas" → Ajustes B (uso diario) → Ajustes C (pulido)
-→ 7 portable → Archivo de propiedades 5.3 → 8 módulo "Alza de tarifas"
+→ P1 propiedades (.properties en Conf/) → P2 panel "Propiedades para el MOP"
+→ Ajustes B (importador Excel genérico + uso diario)
+→ Análisis de Alza de tarifas (3 módulos) → 8A base común + Alza ATP
+→ 8B Alza planes pospago → 8C Alza paquetes → Ajustes C (pulido) → 7 portable
 ```
+
+**Decisiones del usuario sobre Alza de tarifas (2026-10-29):**
+
+- Son **tres módulos**: Alza de planes pospago, Alza de paquetes y Alza ATP. El usuario entregará
+  scripts de ejemplo de los tres.
+- En **Alza ATP** (actualiza `SERVICES` y `ATP_CORP_PRECIOS_SERVICE`), `SERVICES.ITEM_PRICE`
+  lleva siempre el precio **con IVA**. El aplica de TPFB-1726 lo tiene mal en 265 paquetes.
+- Los valores del rollback (tarifas actuales) los entrega el área comercial: van en el Excel de
+  entrada junto con los nuevos. El formato del Excel se define por módulo.
+- Números sin comillas y con punto decimal (`10605.04`), ejecutables en Oracle con cualquier
+  configuración regional.
+- Siempre BD **ACTIVATOR**; no aplica Corriente/Anticipada; mismo campo Ambiente (Dev/UAT/Prod).
+
+**Decisiones sobre las propiedades (2026-10-29):**
+
+- Los valores empiezan con coma porque el operador los **agrega** a la línea existente en el servidor.
+- Se generan los 6 `.properties` en `Conf/` (A) y un panel para copiarlos al MOP (B), también para
+  Prod. La fuente correcta son los archivos de `TPFB-2753_UAT/*/Conf`, no el MOP (tiene errores).
 
 | Entrega | Contenido | Estado |
 |---|---|---|
@@ -86,3 +106,4 @@ Recibidos el 2026-10-27 (el usuario puede agregar más).
 |---|---|
 | Uso de la imagen `coloresDiseno.jpeg` en la pantalla de bienvenida | Solo si el área de comunicaciones/marca lo aprueba (docs/diseno-visual.md) |
 | Login de usuario (el autor pasaría a ser el usuario logueado) | Opcional; el diseño ya lo soporta con el puerto `UsuarioActual` |
+| **Generar el MOP desde una plantilla Excel** según la receta o el alza de tarifas | Pedido del usuario (2026-10-29), para analizar más adelante. Ojo: openpyxl elimina extensiones que no soporta (validaciones de datos) al guardar una plantilla existente |
