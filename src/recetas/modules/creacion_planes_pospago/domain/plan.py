@@ -20,6 +20,7 @@ from recetas.modules.creacion_planes_pospago.domain.valores import (
     Svall,
     TarifGroup,
     Valor,
+    NombrePlan,
 )
 
 
@@ -36,7 +37,7 @@ class Paquete(_Inmutable):
 class PlanNuevo(_Inmutable):
     id_plan: IdPlan
     part_num: PartNum
-    nombre: Nombre
+    nombre: NombrePlan
     valor_con_iva: Valor
     valor_sin_iva: Valor
     codigo_pcrf: CodigoPcrf

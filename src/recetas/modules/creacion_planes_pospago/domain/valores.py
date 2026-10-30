@@ -52,6 +52,14 @@ def _sin_caracteres_de_control(valor: str) -> str:
     return valor
 
 
+def _sin_comas(valor: str) -> str:
+    if "," in valor:
+        raise PydanticCustomError(
+            "con_comas", "No puede contener comas (separan los valores en las propiedades)."
+        )
+    return valor
+
+
 def _obligatorio(valor: str) -> str:
     if not valor:
         raise PydanticCustomError("obligatorio", "Es obligatorio.")
@@ -71,6 +79,7 @@ _Texto = Annotated[
 
 TextoObligatorio = Annotated[_Texto, AfterValidator(_obligatorio)]
 Nombre = Annotated[TextoObligatorio, _maximo(MAX_NOMBRE)]
+NombrePlan = Annotated[Nombre, AfterValidator(_sin_comas)]
 Autor = Annotated[TextoObligatorio, _maximo(MAX_AUTOR)]
 Requerimiento = Annotated[
     _Texto,
@@ -85,6 +94,7 @@ TarifGroup = Annotated[_Texto, _maximo(MAX_ID), _formato(r"\d+", "numérico (ej.
 CodigoPcrf = Annotated[
     _Texto,
     _maximo(MAX_CODIGO_PCRF),
+    AfterValidator(_sin_comas),
     _formato(r"\S+", "sin espacios (ej. Conectados_51_FC)"),
 ]
 Valor = Annotated[int, AfterValidator(_positivo)]
