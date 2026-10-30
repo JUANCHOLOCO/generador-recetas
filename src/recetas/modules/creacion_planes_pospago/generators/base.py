@@ -5,6 +5,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import date
+from typing import Protocol
 
 from recetas.core.application.ports import TemplateRenderer
 from recetas.core.domain.recipe_bundle import RecipeBundle
@@ -43,6 +44,12 @@ class ContextoGeneracion:
     def rq(self) -> str:
         """Requerimiento tal como va en nombres de archivo y cabeceras."""
         return self.estrategia.rq_archivos(self.solicitud.requerimiento)
+
+
+class Generador(Protocol):
+    """Todo lo que agrega archivos a la receta: scripts de BD, Pool y propiedades."""
+
+    def generar(self, ctx: ContextoGeneracion, bundle: RecipeBundle) -> None: ...
 
 
 class BaseSqlGenerator(ABC):
