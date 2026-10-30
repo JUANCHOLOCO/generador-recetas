@@ -28,6 +28,11 @@ class BillingStrategy(ABC):
     def sufijo_rq(self) -> str:
         """Sufijo del RQ en nombres de archivo y cabeceras de los scripts."""
 
+    @property
+    @abstractmethod
+    def sufijo_propiedades(self) -> str:
+        """Sufijo de las claves .properties propias del tipo (idPlansNintendo<sufijo>)."""
+
     @abstractmethod
     def advertencia_nombre(self, nombre: str) -> str | None:
         """Mensaje si el nombre no parece de este tipo de facturación; None si está bien."""
@@ -58,6 +63,9 @@ class CorrienteStrategy(BillingStrategy):
             return None
         return f"'{nombre}' no termina en 'FC', habitual en planes Corriente."
 
+    @property
+    def sufijo_propiedades(self) -> str:
+        return "Corriente"
 
 class AnticipadaStrategy(BillingStrategy):
     @property
@@ -83,6 +91,10 @@ class AnticipadaStrategy(BillingStrategy):
             f"'{nombre}' termina en 'FC', propio de Corriente. ¿El tipo de facturación es correcto?"
         )
 
+    @property
+    def sufijo_propiedades(self) -> str:
+        return ""
+    
 
 def estrategia_para(tipo: BillingType) -> BillingStrategy:
     match tipo:
