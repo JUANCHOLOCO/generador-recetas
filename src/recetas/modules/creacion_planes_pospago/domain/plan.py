@@ -14,6 +14,7 @@ from recetas.modules.creacion_planes_pospago.domain.valores import (
     CodigoPcrf,
     IdPlan,
     Nombre,
+    NombrePlan,
     PartNum,
     Poid,
     Requerimiento,
@@ -36,7 +37,7 @@ class Paquete(_Inmutable):
 class PlanNuevo(_Inmutable):
     id_plan: IdPlan
     part_num: PartNum
-    nombre: Nombre
+    nombre: NombrePlan
     valor_con_iva: Valor
     valor_sin_iva: Valor
     codigo_pcrf: CodigoPcrf

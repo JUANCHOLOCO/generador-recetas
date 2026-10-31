@@ -20,7 +20,8 @@ def test_el_modulo_genera_una_receta_con_dependencias_reales(tmp_path: Path) -> 
     receta = modulo.generar_receta().ejecutar(crear_solicitud())
 
     assert str(receta.bundle.root) == "TPFB-2753_Prod"
-    assert len(receta.bundle) == 13
+    assert len(receta.bundle) == 19  # 13 scripts SQL + 6 archivos .properties en Conf/
+    assert sum(archivo.path.suffix == ".properties" for archivo in receta.bundle.files) == 6
 
 
 def test_el_modulo_muestra_el_formulario(tmp_path: Path, qtbot: QtBot) -> None:

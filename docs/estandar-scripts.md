@@ -114,3 +114,14 @@ SELECT TO_CHAR(SYSDATE, 'DD/MM/YYYY HH24:MI:SS') HORA_FIN FROM DUAL;
 
 Regla general: **la lista de columnas solo se escribe cuando el ejemplo la trae**; no se infiere el
 orden de columnas de una tabla.
+
+## 9. Archivos de propiedades (`Conf/*.properties`, confirmado el 2026-10-29)
+
+| # | Observación en los ejemplos | Decisión |
+|---|---|---|
+| G | El MOP y los archivos entregados no coinciden (en el MOP, SiebelService Corriente usa `idPlansNintendo`) | Mandan los **archivos** de `TPFB-2753_UAT/*/Conf`: el MOP tiene errores de copia |
+| H | El paquete de Prod no traía los `.properties` | Se generan en **todos** los ambientes |
+| I | `SiebelService.properties` empieza con líneas en blanco y mezcla LF y CRLF | Una propiedad por línea, sin líneas en blanco, todo CRLF y cp1252 como el resto de la receta |
+
+Los valores empiezan con coma porque se **agregan** al final de la propiedad que ya existe en el
+servidor.

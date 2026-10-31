@@ -16,6 +16,7 @@ from recetas.modules.creacion_planes_pospago.generators.base import (
 )
 from recetas.modules.creacion_planes_pospago.generators.conf import PoolGenerator
 from recetas.modules.creacion_planes_pospago.generators.promotions import PromotionsGenerator
+from recetas.modules.creacion_planes_pospago.generators.propiedades import PropiedadesGenerator
 from recetas.modules.creacion_planes_pospago.generators.siebel import SiebelGenerator
 from tests.golden_utils import (
     Correccion,
@@ -77,6 +78,38 @@ def test_pool(
     ruta = str(archivo.path)
     verificar_golden(CASO / "esperado" / ruta, archivo.to_bytes())
     assert archivo.to_bytes() == (CASO / "original" / ruta).read_bytes()
+
+
+PROPIEDADES = [
+    "InfranetService.properties",
+    "PCRFService.properties",
+    "PostSale.properties",
+    "promotions.properties",
+    "SiebelService.properties",
+    "ussdGw.properties",
+]
+
+
+def _propiedades(texto: str) -> list[str]:
+    """Líneas con contenido: los originales traen líneas en blanco y finales mezclados (§9 I)."""
+    return [linea.strip() for linea in texto.splitlines() if linea.strip()]
+
+
+@pytest.mark.parametrize("tipo", TIPOS)
+def test_propiedades(
+    tipo: BillingType, contextos_tpfb_2753: dict[BillingType, ContextoGeneracion]
+) -> None:
+    ctx = contextos_tpfb_2753[tipo]
+    bundle = RecipeBundle("TPFB-2753")
+
+    PropiedadesGenerator().generar(ctx, bundle)
+
+    assert sorted(archivo.path.name for archivo in bundle.files) == sorted(PROPIEDADES)
+    for archivo in bundle.files:
+        ruta = str(archivo.path)
+        verificar_golden(CASO / "esperado" / ruta, archivo.to_bytes())
+        original = leer_original(CASO / "original" / ruta)
+        assert _propiedades(archivo.content) == _propiedades(original), ruta
 
 
 # ---------- Correcciones intencionales (docs/estandar-scripts.md, §7 y §8) ----------

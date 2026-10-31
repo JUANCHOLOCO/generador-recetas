@@ -13,11 +13,12 @@ from recetas.modules.creacion_planes_pospago.domain.advertencias import (
 from recetas.modules.creacion_planes_pospago.domain.plan import SolicitudReceta
 from recetas.modules.creacion_planes_pospago.generators.activador import ActivadorGenerator
 from recetas.modules.creacion_planes_pospago.generators.base import (
-    BaseSqlGenerator,
     ContextoGeneracion,
+    Generador,
 )
 from recetas.modules.creacion_planes_pospago.generators.conf import PoolGenerator
 from recetas.modules.creacion_planes_pospago.generators.promotions import PromotionsGenerator
+from recetas.modules.creacion_planes_pospago.generators.propiedades import PropiedadesGenerator
 from recetas.modules.creacion_planes_pospago.generators.siebel import SiebelGenerator
 
 logger = logging.getLogger(__name__)
@@ -40,12 +41,13 @@ class GenerarReceta:
         self._parametrizacion = parametrizacion
         self._reloj = reloj
         self._version = version
-        self._generadores: tuple[BaseSqlGenerator, ...] = (
+        self._generadores: tuple[Generador, ...] = (
             ActivadorGenerator(renderer),
             SiebelGenerator(renderer),
             PromotionsGenerator(renderer),
+            PoolGenerator(),
+            PropiedadesGenerator(),
         )
-        self._pool = PoolGenerator()
 
     def ejecutar(self, solicitud: SolicitudReceta) -> RecetaGenerada:
         parametrizacion = self._parametrizacion.cargar(solicitud.tipo)
@@ -53,7 +55,6 @@ class GenerarReceta:
         bundle = RecipeBundle(f"{solicitud.requerimiento}_{solicitud.ambiente.sufijo}")
         for generador in self._generadores:
             generador.generar(ctx, bundle)
-        self._pool.generar(ctx, bundle)
         logger.info(
             "Receta %s (%s, %s): %d archivos, %d advertencias",
             bundle.root,

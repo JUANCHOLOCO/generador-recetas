@@ -109,3 +109,15 @@ def test_ambiente_desconocido_falla() -> None:
         crear_solicitud(ambiente="QA")
 
     assert {e["loc"] for e in error.value.errors()} == {("ambiente",)}
+
+
+@pytest.mark.parametrize("campo", ["nombre", "codigo_pcrf"])
+def test_nombre_y_codigo_pcrf_no_admiten_comas(campo: str) -> None:
+    with pytest.raises(ValidationError, match="comas"):
+        crear_plan(**{campo: "Conectados_5,1"})
+
+
+def test_nombre_de_paquete_si_admite_comas() -> None:
+    datos = {"nombre": "Paquete Datos 5,1", "svall": "SVALL2632", "poid": "990000885"}
+
+    assert crear_plan(datos=datos).datos.nombre == "Paquete Datos 5,1"

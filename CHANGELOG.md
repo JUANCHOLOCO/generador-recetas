@@ -41,6 +41,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
 - Bitácora en `logs/recetas.log` y manejador global de errores inesperados (S2).
 - Errores de base de datos con mensaje claro en el registro de planes y en Parametrización (S3).
 - mypy revisa también los tests (T1).
+- Archivos de propiedades (`Conf/*.properties`) con los planes nuevos, incluida la línea de los
+  planes 5.3 en `SiebelService.properties`, para todos los ambientes.
+- El nombre del plan y el código PCRF no admiten comas (separan los valores en las propiedades).
 
 ### Corregido
 - Scoring modelado como dos listas independientes (SCORING_PLAN y CPL_SCORING_PLAN).
