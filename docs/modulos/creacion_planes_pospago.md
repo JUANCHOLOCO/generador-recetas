@@ -50,7 +50,7 @@ Los IDs (ej. `775` frente a `7751`) los escribe siempre el usuario; la app no lo
 | Valor sin IVA | `16723` | Entero > 0 y menor que el valor con IVA |
 | Código perfil PCRF | `Conectados_51_FC` | Obligatorio, sin espacios |
 | Tarif group | `120617` | Numérico. También es el **POID del plan** |
-| Es 5.3 | S/N | Por definir efecto en scripts (ver §7) |
+| Es 5.3 | S/N | Si es S, el plan entra en la consulta 5.3 de `SiebelService.properties` (ver §5.5) |
 | Nombre paquete Datos | `Paquete Conectados Datos 5.1 FC` | Obligatorio |
 | Svall Datos | `SVALL2632` | `^SVALL\d{4}$`, único |
 | Nombre paquete SMS | `Paquete Conectados SMS 5.1 FC` | Obligatorio |
@@ -250,7 +250,21 @@ antes una línea `SQL.ADD.ON.IS.NINTENDO = select decode(AP.sp_num,'<part_num>',
 1. Los Part_num de la lista **5.3 OLDS** de la parametrización (del tipo de facturación elegido).
 2. Los Part_num de los planes nuevos marcados como 5.3 que todavía no estén en esa lista.
 
-El resto de la consulta se copia literal de la macro.
+El resto de la consulta se copia literal de la macro. Es una consulta SQL que Siebel ejecuta para
+saber si un plan se comporta como 5.3; cada plan 5.3 nuevo se agrega dentro del `decode`. La clave
+es la misma en Anticipada y Corriente (sin sufijo), igual que en la macro.
+
+**Panel "Propiedades para el MOP".** Después de escribir la receta, la app muestra un diálogo con
+los 6 archivos en el orden del MOP. Para cada uno muestra el nombre, la ruta del servidor
+(`%JBOSS4_PROP%`, `%WEBLOGIC_PROP%`, `%USSD_PROP%`) y sus líneas, con un botón **Copiar** que
+pone esas líneas en el portapapeles.
+
+- En el MOP, cada archivo tiene una celda que junta las líneas de Anticipada y Corriente. Como cada
+  ejecución genera un solo tipo, el panel muestra las del tipo generado; las del otro tipo se copian
+  al generar ese tipo. Armar el MOP completo queda en el backlog ("Generar el MOP desde una
+  plantilla Excel").
+- Para pegar en Excel, primero hay que entrar a editar la celda (doble clic o F2). Si se pega con
+  la celda solo seleccionada, Excel pone cada línea en una fila distinta.
 
 ---
 
@@ -279,7 +293,7 @@ El resto de la consulta se copia literal de la macro.
 
 | Tema | Situación actual |
 |---|---|
-| Efecto de "Es 5.3 = S" | **Resuelto (2026-10-29):** agrega la línea `SQL.ADD.ON.IS.NINTENDO` a `SiebelService.properties` (sección 5.5). Por confirmar: si en Corriente esa clave también lleva sufijo; no hay ejemplo real con planes 5.3 |
+| Efecto de "Es 5.3 = S" | **Resuelto (2026-10-29):** agrega la línea `SQL.ADD.ON.IS.NINTENDO` a `SiebelService.properties` (sección 5.5). Confirmado con el usuario (2026-10-30): es la consulta SQL donde se agregan los planes 5.3 nuevos; la clave no lleva sufijo en Corriente |
 | Valores fijos en Siebel: `PROD_GLOBAL_UID='11042'`, `PROD_CLS_NUM='120'`, `UOM_CD='Por mes'`, `ATTRIB_04='120354'`, `target_high/low=300`, IDs `1,2,3` de `cx_add_ons_category` | Se tratarán como campos estáticos de parametrización; confirmar que no varían por plan |
 | Bloque `TBL_PROM_VARIABLES` (`plan_name='POSPAGO5'`, `cancelable_plan='NO'`) | Confirmar si son fijos o dependen del RQ |
 | "Es Retención" | Excluido del formulario por decisión del usuario |

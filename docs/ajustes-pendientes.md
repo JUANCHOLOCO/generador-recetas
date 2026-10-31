@@ -7,7 +7,7 @@ Orden acordado (actualizado 2026-10-29):
 
 ```
 6A+ tema visual ✅ → 6B parametrización ✅ → Ajustes A (robustez) ✅
-→ P1 propiedades (.properties en Conf/) → P2 panel "Propiedades para el MOP"
+→ P1 propiedades (.properties en Conf/) ✅ → P2 panel "Propiedades para el MOP"
 → Ajustes B (importador Excel genérico + uso diario)
 → Análisis de Alza de tarifas (3 módulos) → 8A base común + Alza ATP
 → 8B Alza planes pospago → 8C Alza paquetes → Ajustes C (pulido) → 7 portable

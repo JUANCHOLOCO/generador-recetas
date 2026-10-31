@@ -44,6 +44,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
 - Archivos de propiedades (`Conf/*.properties`) con los planes nuevos, incluida la línea de los
   planes 5.3 en `SiebelService.properties`, para todos los ambientes.
 - El nombre del plan y el código PCRF no admiten comas (separan los valores en las propiedades).
+- Diálogo "Propiedades para el MOP" al generar la receta, con un botón para copiar las líneas de
+  cada archivo.
+
 
 ### Corregido
 - Scoring modelado como dos listas independientes (SCORING_PLAN y CPL_SCORING_PLAN).

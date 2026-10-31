@@ -13,6 +13,7 @@ from recetas.modules.creacion_planes_pospago.application.generar_receta import R
 from recetas.modules.creacion_planes_pospago.application.ports import RegistroDePlanes
 from recetas.modules.creacion_planes_pospago.domain.advertencias import Advertencia
 from recetas.modules.creacion_planes_pospago.domain.plan import SolicitudReceta
+from recetas.modules.creacion_planes_pospago.domain.propiedades import ArchivoPropiedades
 
 
 @dataclass(frozen=True, slots=True)
@@ -80,6 +81,7 @@ class VistaFormulario(Protocol):
     def confirmar_sobrescritura(self, rutas: Sequence[str]) -> bool: ...
     def confirmar_registro(self, cantidad: int) -> bool: ...
     def mostrar_resultado(self, mensaje: str) -> None: ...
+    def mostrar_propiedades(self, archivos: Sequence[ArchivoPropiedades]) -> None: ...
     def mostrar_error(self, mensaje: str) -> None: ...
 
 
@@ -118,7 +120,7 @@ class FormularioPresenter:
         if raiz is None:
             return
         self._vista.mostrar_resultado(f"Receta generada en:\n{raiz}")
-
+        self._vista.mostrar_propiedades(receta.propiedades)
         if self._vista.confirmar_registro(len(solicitud.planes)):
             try:
                 registrados = self._registro.registrar(solicitud)
