@@ -14,10 +14,17 @@ from recetas.modules.creacion_planes_pospago.ui.formulario_presenter import (
     ErrorCampo,
     FormularioPresenter,
 )
+from recetas.modules.creacion_planes_pospago.domain.propiedades import (
+    ArchivoPropiedades,
+    Ubicacion,
+)
 from tests.factories import datos_plan
 
 # ---------- Dobles de prueba ----------
 
+PROPIEDADES = (
+    ArchivoPropiedades("promotions.properties", Ubicacion.WEBLOGIC, ("PLANSPOSPAGO5=,7751",)),
+)
 
 class VistaFalsa:
     def __init__(self, respuestas: bool = True) -> None:
@@ -58,7 +65,9 @@ class GeneradorFalso:
         self.solicitudes.append(solicitud)
         if self.falla:
             raise RecetasError("Faltan campos estáticos de PLANS: STATUS.")
-        return RecetaGenerada(RecipeBundle("TPFB-2753_Prod").add("a.sql", "x"), self.advertencias)
+        return RecetaGenerada(
+            RecipeBundle("TPFB-2753_Prod").add("a.sql", "x"), self.advertencias, PROPIEDADES
+        )
 
 
 class EscritorFalso:

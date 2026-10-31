@@ -16,6 +16,10 @@ from recetas.modules.creacion_planes_pospago.generators.base import (
     ContextoGeneracion,
     Generador,
 )
+from recetas.modules.creacion_planes_pospago.domain.propiedades import (
+    ArchivoPropiedades,
+    calcular_propiedades,
+)
 from recetas.modules.creacion_planes_pospago.generators.conf import PoolGenerator
 from recetas.modules.creacion_planes_pospago.generators.promotions import PromotionsGenerator
 from recetas.modules.creacion_planes_pospago.generators.propiedades import PropiedadesGenerator
@@ -28,6 +32,7 @@ logger = logging.getLogger(__name__)
 class RecetaGenerada:
     bundle: RecipeBundle
     advertencias: tuple[Advertencia, ...]
+    propiedades: tuple[ArchivoPropiedades, ...]
 
 
 class GenerarReceta:
@@ -63,4 +68,7 @@ class GenerarReceta:
             len(bundle),
             len(advertencias := calcular_advertencias(solicitud, parametrizacion)),
         )
-        return RecetaGenerada(bundle, advertencias)
+        propiedades = calcular_propiedades(
+            solicitud.planes, parametrizacion.planes_53, ctx.estrategia
+        )
+        return RecetaGenerada(bundle, advertencias, propiedades)
