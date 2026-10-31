@@ -21,12 +21,14 @@ from PySide6.QtWidgets import (
 from recetas.core.domain.ambiente import Ambiente
 from recetas.core.domain.billing import BillingType
 from recetas.modules.creacion_planes_pospago.domain.advertencias import Advertencia
+from recetas.modules.creacion_planes_pospago.domain.propiedades import ArchivoPropiedades
 from recetas.modules.creacion_planes_pospago.domain.valores import MAX_AUTOR, MAX_REQUERIMIENTO
 from recetas.modules.creacion_planes_pospago.ui.formulario_presenter import (
     COLUMNAS,
     DatosFormulario,
     ErrorCampo,
 )
+from recetas.modules.creacion_planes_pospago.ui.propiedades_dialog import PropiedadesDialog
 from recetas.ui.widgets.tabla_editable import TablaEditable, TablaEditableModel
 
 TITULO = "Creación de planes Pospago"
@@ -161,6 +163,9 @@ class FormularioView(QWidget):
 
     def mostrar_resultado(self, mensaje: str) -> None:
         QMessageBox.information(self, TITULO, mensaje)
+
+    def mostrar_propiedades(self, archivos: Sequence[ArchivoPropiedades]) -> None:
+        PropiedadesDialog(archivos, self).exec()
 
     def mostrar_error(self, mensaje: str) -> None:
         QMessageBox.critical(self, TITULO, mensaje)

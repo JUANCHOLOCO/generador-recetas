@@ -32,7 +32,6 @@ def test_el_modulo_genera_una_receta_con_dependencias_reales(tmp_path: Path) -> 
     ]
 
 
-
 def test_el_modulo_muestra_el_formulario(tmp_path: Path, qtbot: QtBot) -> None:
     modulo = CreacionPlanesPospagoModule(build_context(AppPaths(base=tmp_path)))
 

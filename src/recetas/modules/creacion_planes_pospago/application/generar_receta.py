@@ -11,14 +11,14 @@ from recetas.modules.creacion_planes_pospago.domain.advertencias import (
     calcular_advertencias,
 )
 from recetas.modules.creacion_planes_pospago.domain.plan import SolicitudReceta
+from recetas.modules.creacion_planes_pospago.domain.propiedades import (
+    ArchivoPropiedades,
+    calcular_propiedades,
+)
 from recetas.modules.creacion_planes_pospago.generators.activador import ActivadorGenerator
 from recetas.modules.creacion_planes_pospago.generators.base import (
     ContextoGeneracion,
     Generador,
-)
-from recetas.modules.creacion_planes_pospago.domain.propiedades import (
-    ArchivoPropiedades,
-    calcular_propiedades,
 )
 from recetas.modules.creacion_planes_pospago.generators.conf import PoolGenerator
 from recetas.modules.creacion_planes_pospago.generators.promotions import PromotionsGenerator

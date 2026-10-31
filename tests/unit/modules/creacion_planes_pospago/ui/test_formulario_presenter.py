@@ -8,15 +8,15 @@ from recetas.modules.creacion_planes_pospago.application.generar_receta import R
 from recetas.modules.creacion_planes_pospago.application.ports import PlanesRegistrados
 from recetas.modules.creacion_planes_pospago.domain.advertencias import Advertencia
 from recetas.modules.creacion_planes_pospago.domain.plan import SolicitudReceta
+from recetas.modules.creacion_planes_pospago.domain.propiedades import (
+    ArchivoPropiedades,
+    Ubicacion,
+)
 from recetas.modules.creacion_planes_pospago.ui.formulario_presenter import (
     COLUMNAS,
     DatosFormulario,
     ErrorCampo,
     FormularioPresenter,
-)
-from recetas.modules.creacion_planes_pospago.domain.propiedades import (
-    ArchivoPropiedades,
-    Ubicacion,
 )
 from tests.factories import datos_plan
 
@@ -26,12 +26,14 @@ PROPIEDADES = (
     ArchivoPropiedades("promotions.properties", Ubicacion.WEBLOGIC, ("PLANSPOSPAGO5=,7751",)),
 )
 
+
 class VistaFalsa:
     def __init__(self, respuestas: bool = True) -> None:
         self.respuestas = respuestas
         self.errores: list[ErrorCampo] = []
         self.mensajes: list[str] = []
         self.preguntas: list[str] = []
+        self.propiedades: list[ArchivoPropiedades] = []
 
     def mostrar_errores(self, errores: Sequence[ErrorCampo]) -> None:
         self.errores = list(errores)
@@ -53,6 +55,9 @@ class VistaFalsa:
 
     def mostrar_error(self, mensaje: str) -> None:
         self.mensajes.append(f"ERROR: {mensaje}")
+
+    def mostrar_propiedades(self, archivos: Sequence[ArchivoPropiedades]) -> None:
+        self.propiedades = list(archivos)
 
 
 class GeneradorFalso:
@@ -192,6 +197,7 @@ def test_camino_feliz_genera_escribe_y_registra() -> None:
     assert len(registro.registradas) == 1
     assert "Receta generada en" in vista.mensajes[0]
     assert "1 en la matriz" in vista.mensajes[1]
+    assert vista.propiedades == list(PROPIEDADES)
 
 
 def test_rechazar_advertencias_cancela_sin_escribir() -> None:
@@ -220,6 +226,7 @@ def test_no_sobrescribir_tampoco_registra() -> None:
 
     assert vista.preguntas == ["sobrescribir"]
     assert registro.registradas == []
+    assert vista.propiedades == []
 
 
 def test_error_de_negocio_se_muestra_sin_romper_la_app() -> None:
