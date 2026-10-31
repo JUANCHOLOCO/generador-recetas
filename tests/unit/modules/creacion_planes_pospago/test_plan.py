@@ -110,6 +110,7 @@ def test_ambiente_desconocido_falla() -> None:
 
     assert {e["loc"] for e in error.value.errors()} == {("ambiente",)}
 
+
 @pytest.mark.parametrize("campo", ["nombre", "codigo_pcrf"])
 def test_nombre_y_codigo_pcrf_no_admiten_comas(campo: str) -> None:
     with pytest.raises(ValidationError, match="comas"):

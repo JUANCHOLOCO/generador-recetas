@@ -44,6 +44,7 @@ def test_anticipada_advierte_nombres_con_fc() -> None:
     assert anticipada.advertencia_nombre("Pospago Conectados 5.1") is None
     assert "propio de Corriente" in (anticipada.advertencia_nombre("Plan 5.1 FC") or "")
 
+
 @pytest.mark.parametrize(
     ("tipo", "sufijo"), [(BillingType.CORRIENTE, "Corriente"), (BillingType.ANTICIPADA, "")]
 )

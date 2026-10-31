@@ -10,16 +10,15 @@ from recetas.modules.creacion_planes_pospago.domain.advertencias import (
     Advertencia,
     calcular_advertencias,
 )
-
 from recetas.modules.creacion_planes_pospago.domain.plan import SolicitudReceta
 from recetas.modules.creacion_planes_pospago.generators.activador import ActivadorGenerator
-from recetas.modules.creacion_planes_pospago.generators.propiedades import PropiedadesGenerator
 from recetas.modules.creacion_planes_pospago.generators.base import (
-    Generador,
     ContextoGeneracion,
+    Generador,
 )
 from recetas.modules.creacion_planes_pospago.generators.conf import PoolGenerator
 from recetas.modules.creacion_planes_pospago.generators.promotions import PromotionsGenerator
+from recetas.modules.creacion_planes_pospago.generators.propiedades import PropiedadesGenerator
 from recetas.modules.creacion_planes_pospago.generators.siebel import SiebelGenerator
 
 logger = logging.getLogger(__name__)
@@ -49,7 +48,6 @@ class GenerarReceta:
             PoolGenerator(),
             PropiedadesGenerator(),
         )
-        
 
     def ejecutar(self, solicitud: SolicitudReceta) -> RecetaGenerada:
         parametrizacion = self._parametrizacion.cargar(solicitud.tipo)

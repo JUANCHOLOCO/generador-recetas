@@ -8,7 +8,7 @@ from recetas.modules.creacion_planes_pospago.domain.estrategias import BillingSt
 from recetas.modules.creacion_planes_pospago.domain.parametrizacion import Plan53
 from recetas.modules.creacion_planes_pospago.domain.plan import PlanNuevo
 
-# Consulta de Siebel para los planes 5.3, copiada literal de la macro (crearSiebelServiceProperties).
+#Consulta de Siebel para los planes 5.3, copiada literal de la macro (crearSiebelServiceProperties).
 _CONSULTA_53 = (
     " as is5_3 from SIEBEL.S_ASSET a,  siebel.s_asset_x x, siebel.s_asset AP"
     " WHERE A.row_id  = x.row_id AND x.attrib_40 = ? AND A.status_cd = 'Activo'"

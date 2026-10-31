@@ -126,7 +126,14 @@ actual. Al terminar, la app pregunta si registrarlos en la parametrización:
 ```
 <carpeta>/<RQ>/
 ├── Anticipados/  (o Corriente/)
-│   ├── Conf/Pool-RQ-<RQ><suf>.txt
+│   ├── Conf/
+│   │   ├── Pool-RQ-<RQ><suf>.txt
+│   │   ├── InfranetService.properties
+│   │   ├── PCRFService.properties
+│   │   ├── PostSale.properties
+│   │   ├── promotions.properties
+│   │   ├── SiebelService.properties
+│   │   └── ussdGw.properties
 │   └── Script/
 │       ├── ACTIVADOR/
 │       │   ├── aplica-cambio.sql
@@ -219,6 +226,32 @@ Rollback: `DELETE` por `NAME_PACKAGE` en `TBL_PROM_POID_IDENTIFY` y por `NAME`/`
 
 Un nombre de plan por línea, en el orden del formulario.
 
+### 5.5 Conf — archivos `.properties`
+
+Seis archivos con los **planes nuevos** del RQ, que el operador **agrega** al final de la propiedad
+existente en el servidor. Por eso cada valor empieza con coma: `idPlansNintendo=,775,776`.
+Fuente: los archivos entregados en `TPFB-2753_UAT/*/Conf` (el MOP tiene errores de copia) y las
+funciones `crear*Properties` de la macro. Se generan para todos los ambientes, también Prod.
+
+| Archivo | Ubicación (MOP) | Clave (Anticipada / Corriente) | Valor por plan |
+|---|---|---|---|
+| `InfranetService.properties` | `%JBOSS4_PROP%` | `idPlansNintendo` / `idPlansNintendoCorriente` | Id_Plan |
+| `PCRFService.properties` | `%JBOSS4_PROP%` | `planCodeNintendo` / `planCodeNintendoCorriente` | Código perfil PCRF |
+| | | `idPlansNintendo` / `idPlansNintendoCorriente` | Svall Datos |
+| | | `idPlanNintendo` / `idPlanNintendoCorriente` | Id_Plan |
+| `PostSale.properties` | `%JBOSS4_PROP%` | `PARAM_DESCRIPTION_NINTENDO` (ambos) | Nombre del producto |
+| | | `PARAM_ID_NINTENDO` (ambos) | Id_Plan |
+| `promotions.properties` | `%WEBLOGIC_PROP%` | `PLANSPOSPAGO5` (ambos) | Id_Plan |
+| `SiebelService.properties` | `%JBOSS4_PROP%` | `idPlansNintendo` / `idPlansNintendoCorriente` | Id_Plan |
+| `ussdGw.properties` | `%USSD_PROP%` | `Activator.idPlansNintendo` / `Activator.idPlansNintendoCorriente` | Id_Plan |
+
+**Efecto de "Es 5.3 = S".** Si al menos un plan nuevo es 5.3, `SiebelService.properties` lleva
+antes una línea `SQL.ADD.ON.IS.NINTENDO = select decode(AP.sp_num,'<part_num>','1',…,'0') …` con:
+1. Los Part_num de la lista **5.3 OLDS** de la parametrización (del tipo de facturación elegido).
+2. Los Part_num de los planes nuevos marcados como 5.3 que todavía no estén en esa lista.
+
+El resto de la consulta se copia literal de la macro.
+
 ---
 
 ## 6. Validaciones de negocio
@@ -229,6 +262,9 @@ Un nombre de plan por línea, en el orden del formulario.
 - Valor sin IVA menor que el valor con IVA.
 - Al menos un plan.
 - No se repiten Id_Plan, Part_num ni Svall (de Datos y SMS juntos) dentro del formulario.
+- El nombre del plan y el código PCRF no tienen comas (separan los valores en los `.properties`).
+- Ningún texto tiene saltos de línea ni tabuladores, y cada campo respeta su longitud máxima
+  provisional (`domain/valores.py`).
 
 **Advertencias (no bloquean; el usuario decide).** Implementadas en `domain/advertencias.py`:
 
@@ -243,7 +279,7 @@ Un nombre de plan por línea, en el orden del formulario.
 
 | Tema | Situación actual |
 |---|---|
-| Efecto de "Es 5.3 = S" | Genera un **archivo de propiedades**. Se implementará en una entrega posterior, cuando la generación de scripts de BD funcione. Por ahora el campo solo se captura y se usa para registrar el plan en 5.3 OLDS |
+| Efecto de "Es 5.3 = S" | **Resuelto (2026-10-29):** agrega la línea `SQL.ADD.ON.IS.NINTENDO` a `SiebelService.properties` (sección 5.5). Por confirmar: si en Corriente esa clave también lleva sufijo; no hay ejemplo real con planes 5.3 |
 | Valores fijos en Siebel: `PROD_GLOBAL_UID='11042'`, `PROD_CLS_NUM='120'`, `UOM_CD='Por mes'`, `ATTRIB_04='120354'`, `target_high/low=300`, IDs `1,2,3` de `cx_add_ons_category` | Se tratarán como campos estáticos de parametrización; confirmar que no varían por plan |
 | Bloque `TBL_PROM_VARIABLES` (`plan_name='POSPAGO5'`, `cancelable_plan='NO'`) | Confirmar si son fijos o dependen del RQ |
 | "Es Retención" | Excluido del formulario por decisión del usuario |

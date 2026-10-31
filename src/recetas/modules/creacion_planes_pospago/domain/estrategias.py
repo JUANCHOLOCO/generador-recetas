@@ -67,6 +67,7 @@ class CorrienteStrategy(BillingStrategy):
     def sufijo_propiedades(self) -> str:
         return "Corriente"
 
+
 class AnticipadaStrategy(BillingStrategy):
     @property
     def tipo(self) -> BillingType:
@@ -94,7 +95,7 @@ class AnticipadaStrategy(BillingStrategy):
     @property
     def sufijo_propiedades(self) -> str:
         return ""
-    
+
 
 def estrategia_para(tipo: BillingType) -> BillingStrategy:
     match tipo:

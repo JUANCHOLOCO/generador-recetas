@@ -14,13 +14,13 @@ from recetas.modules.creacion_planes_pospago.domain.valores import (
     CodigoPcrf,
     IdPlan,
     Nombre,
+    NombrePlan,
     PartNum,
     Poid,
     Requerimiento,
     Svall,
     TarifGroup,
     Valor,
-    NombrePlan,
 )
 
 
