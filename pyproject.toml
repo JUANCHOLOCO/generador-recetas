@@ -13,6 +13,7 @@ dependencies = [
     "alembic>=1.14",
     "pydantic>=2.9",
     "Jinja2>=3.1",
+    "openpyxl>=3.1",
 ]
 
 [project.optional-dependencies]
@@ -22,7 +23,6 @@ dev = [
     "pytest-qt>=4.4",
     "ruff>=0.6",
     "mypy>=1.11",
-    "openpyxl>=3.1",
 ]
 
 [project.gui-scripts]
@@ -75,3 +75,9 @@ plugins = ["pydantic.mypy"]
 [tool.pydantic-mypy]
 init_forbid_extra = true
 init_typed = true
+
+
+# openpyxl no trae anotaciones de tipos: mypy lo trata como Any
+[[tool.mypy.overrides]]
+module = ["openpyxl", "openpyxl.*"]
+ignore_missing_imports = true
