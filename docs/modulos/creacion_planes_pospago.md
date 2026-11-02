@@ -72,6 +72,24 @@ Los IDs (ej. `775` frente a `7751`) los escribe siempre el usuario; la app no lo
 
 "Es 5.3" acepta `S`, `SI`, `X` (sí) o `N`, `NO`, vacío (no). Las filas completamente vacías se ignoran.
 
+**Importar desde Excel (U1).** El botón *Importar Excel…* carga los planes de un `.xlsx` con el
+formato de `PlanesAnticipados.xlsx` / `PlanesCorrientes.xlsx`:
+
+- Se lee la primera hoja. La fila 1 trae los títulos de grupo y se ignora. La fila 2 trae los
+  encabezados, que deben ser, en este orden: `Id_Plan`, `Part_num`, `Nombre del producto`,
+  `Valor Con Iva`, `Valor Sin Iva`, `Código Perfil PCRF`, `Tarif group`, `S/N`,
+  `Nombre paquete Datos`, `Svall Data`, `POID Datos`, `Nombre paquete SMS`, `Svall SMS` y
+  `POID SMS`. No importan las mayúsculas ni los espacios repetidos. Los datos van desde la fila 3.
+- Si un encabezado no coincide, se informa la celda (p. ej. `D2`) y el formulario no cambia.
+- Si el Excel no trae planes, se informa y el formulario no cambia.
+- Los planes importados **reemplazan** las filas del formulario. Si el formulario ya tenía datos,
+  se pide confirmación antes.
+- Lo importado pasa por la misma validación que lo escrito a mano, al pulsar *Generar receta*.
+
+La lectura de Excel está en el núcleo (`core/domain/importacion.py` y
+`core/infrastructure/files/excel.py`), para que la usen también los módulos de Alza de tarifas;
+cada módulo declara su `FormatoHoja`.
+
 Valores que calcula la app: subtipo Datos `DPI`, subtipo SMS `SMS`, textos `0.0.0.1 /product <POID> 1`
 y `0.0.0.1 /deal <POID> 0`, nombres de paquete para promociones, IDENTIFY.
 
