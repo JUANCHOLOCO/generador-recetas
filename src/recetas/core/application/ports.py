@@ -4,6 +4,7 @@ from datetime import date
 from pathlib import Path
 from typing import Protocol
 
+from recetas.core.domain.importacion import FormatoHoja
 from recetas.core.domain.recipe_bundle import RecipeBundle
 
 
@@ -24,4 +25,9 @@ class TemplateRenderer(Protocol):
 class BundleWriter(Protocol):
     def escribir(self, bundle: RecipeBundle, carpeta: Path, *, sobrescribir: bool = False) -> Path:
         """Escribe la receta dentro de `carpeta` y devuelve la ruta de su raíz."""
+        ...
+
+class LectorDeHojas(Protocol):
+    def leer(self, ruta: Path, formato: FormatoHoja) -> list[list[str]]:
+        """Filas de datos de la primera hoja, como texto. Lanza ImportacionError."""
         ...
