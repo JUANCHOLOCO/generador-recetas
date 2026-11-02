@@ -64,15 +64,6 @@ class CreacionPlanesPospagoModule(Module):
         mantenimiento.recargar_solicitado.connect(lambda: parametros.recargar())
         parametros.recargar()
 
-        tablas = tablas_de_parametrizacion(self._context.session_factory)
-        mantenimiento = ParametrizacionView([t.titulo for t in tablas])
-        parametros = ParametrizacionPresenter(mantenimiento, tablas)
-        mantenimiento.tabla_elegida.connect(lambda indice: parametros.abrir(indice))
-        mantenimiento.filtro_cambiado.connect(lambda tipo: parametros.filtrar(tipo))
-        mantenimiento.guardar_solicitado.connect(lambda: parametros.guardar())
-        mantenimiento.recargar_solicitado.connect(lambda: parametros.recargar())
-        parametros.recargar()
-
         pestanas = QTabWidget(parent)
         pestanas.addTab(vista, "Generar receta")
         pestanas.addTab(mantenimiento, "Parametrización")
