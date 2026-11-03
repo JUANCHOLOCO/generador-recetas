@@ -32,3 +32,11 @@ class LectorDeHojas(Protocol):
     def leer(self, ruta: Path, formato: FormatoHoja) -> list[list[str]]:
         """Filas de datos de la primera hoja, como texto. Lanza ImportacionError."""
         ...
+
+
+class Preferencias(Protocol):
+    """Valores que la app recuerda entre sesiones. No son críticos: si fallan, se usan los de
+    defecto y la app sigue funcionando."""
+
+    def leer(self, clave: str) -> str | None: ...
+    def guardar(self, clave: str, valor: str) -> None: ...

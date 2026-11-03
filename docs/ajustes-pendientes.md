@@ -44,7 +44,7 @@ Ordenados por impacto para el usuario / esfuerzo. Recomendados primero: **1, 2, 
 | # | Ajuste | Por qué | Esfuerzo | Estado |
 |---|---|---|---|---|
 | 1 | Botón **"Abrir carpeta"** al terminar de generar | Hoy hay que buscar la receta en el Explorador | Bajo | Pendiente |
-| 2 | **Recordar la última carpeta y el autor** (`QSettings`) | No escribirlos cada vez | Bajo | Pendiente |
+| 2 | **Recordar la última carpeta y el autor** (`preferencias.json` en la carpeta de la app, no el registro de Windows, para que la app siga siendo portable) | No escribirlos cada vez | Bajo | Pendiente |
 | 3 | **Tooltip en cada encabezado** de la tabla con el formato esperado (`PLCON####`, `SVALL####`…) | Evita errores antes de validar | Bajo | Pendiente |
 | 4 | **Columnas ajustadas al contenido** y primera columna fija al desplazarse | 14 columnas no caben en pantalla | Bajo | Pendiente |
 | 5 | Atajo **Ctrl+Enter** para generar y **Supr** para vaciar celdas | Más rápido con teclado | Bajo | Pendiente |

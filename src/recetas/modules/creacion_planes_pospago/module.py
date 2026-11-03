@@ -19,7 +19,11 @@ from recetas.modules.creacion_planes_pospago.infrastructure.repositories import 
 from recetas.modules.creacion_planes_pospago.infrastructure.seeds import (
     cargar_parametrizacion_inicial,
 )
-from recetas.modules.creacion_planes_pospago.ui.formulario_presenter import FormularioPresenter
+from recetas.modules.creacion_planes_pospago.ui.formulario_presenter import (
+    CLAVE_AUTOR,
+    CLAVE_CARPETA,
+    FormularioPresenter,
+)
 from recetas.modules.creacion_planes_pospago.ui.formulario_view import FormularioView
 from recetas.ui.parametrizacion.presenter import ParametrizacionPresenter
 from recetas.ui.parametrizacion.vista import ParametrizacionView
@@ -45,9 +49,10 @@ class CreacionPlanesPospagoModule(Module):
 
     def create_widget(self, parent: QWidget | None = None) -> QWidget:
         # Pestaña 1: formulario de generación (Fase 6A)
+        preferencias = self._context.preferencias
         vista = FormularioView(
-            autor_sugerido=self._context.usuario.nombre(),
-            carpeta_sugerida=str(self._context.paths.output),
+            autor_sugerido=preferencias.leer(CLAVE_AUTOR) or self._context.usuario.nombre(),
+            carpeta_sugerida=preferencias.leer(CLAVE_CARPETA) or str(self._context.paths.output),
         )
         presenter = FormularioPresenter(
             vista,
@@ -55,6 +60,7 @@ class CreacionPlanesPospagoModule(Module):
             EscritorDeRecetas(),
             SqlParametrizacionRepository(self._context.session_factory),
             LectorExcel(),
+            preferencias,
         )
         vista.generar_solicitado.connect(lambda: presenter.generar(vista.datos()))
         vista.importar_solicitado.connect(

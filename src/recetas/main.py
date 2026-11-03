@@ -10,6 +10,7 @@ from recetas.config import AppPaths
 from recetas.core.infrastructure.bitacora import configurar_bitacora
 from recetas.core.infrastructure.db.engine import create_session_factory, create_sqlite_engine
 from recetas.core.infrastructure.db.migrator import upgrade_database
+from recetas.core.infrastructure.preferencias import PreferenciasJson
 from recetas.core.infrastructure.sistema import RelojSistema, UsuarioSistemaOperativo
 from recetas.core.plugins import AppContext, ModuleRegistry
 from recetas.modules import installed_modules
@@ -28,6 +29,7 @@ def build_context(paths: AppPaths) -> AppContext:
         session_factory=create_session_factory(engine),
         reloj=RelojSistema(),
         usuario=UsuarioSistemaOperativo(),
+        preferencias=PreferenciasJson(paths.preferencias),
     )
 
 

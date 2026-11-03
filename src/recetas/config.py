@@ -41,3 +41,7 @@ class AppPaths:
     @classmethod
     def default(cls) -> AppPaths:
         return cls(base=_base_dir())
+
+    @property
+    def preferencias(self) -> Path:
+        return self.base / "preferencias.json"

@@ -7,7 +7,7 @@ from typing import Any, Protocol
 
 from pydantic import ValidationError
 
-from recetas.core.application.ports import BundleWriter, LectorDeHojas
+from recetas.core.application.ports import BundleWriter, LectorDeHojas, Preferencias
 from recetas.core.domain.billing import BillingType
 from recetas.core.domain.errors import RecetaExistenteError, RecetasError
 from recetas.core.domain.importacion import FormatoHoja
@@ -69,6 +69,8 @@ FORMATO_EXCEL = FormatoHoja(
         "POID SMS",
     ),
 )
+CLAVE_AUTOR = "autor"
+CLAVE_CARPETA = "carpeta_salida"
 _CAMPOS_NOMBRE = ("nombre", "datos.nombre", "sms.nombre")
 _MAX_AVISOS = 5
 _TRADUCCIONES = {
@@ -128,12 +130,14 @@ class FormularioPresenter:
         escritor: BundleWriter,
         registro: RegistroDePlanes,
         lector: LectorDeHojas,
+        preferencias: Preferencias,
     ) -> None:
         self._vista = vista
         self._generar_receta = generar_receta
         self._escritor = escritor
         self._registro = registro
         self._lector = lector
+        self._preferencias = preferencias
 
     def generar(self, datos: DatosFormulario) -> None:
         solicitud = self._validar(datos)
@@ -152,6 +156,8 @@ class FormularioPresenter:
         raiz = self._escribir(receta, Path(datos.carpeta))
         if raiz is None:
             return
+        self._preferencias.guardar(CLAVE_AUTOR, datos.autor.strip())
+        self._preferencias.guardar(CLAVE_CARPETA, datos.carpeta.strip())
         self._vista.mostrar_receta_generada(raiz)
         self._vista.mostrar_propiedades(receta.propiedades)
         if self._vista.confirmar_registro(len(solicitud.planes)):

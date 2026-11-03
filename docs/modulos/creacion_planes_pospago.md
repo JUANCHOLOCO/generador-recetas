@@ -90,6 +90,20 @@ La lectura de Excel está en el núcleo (`core/domain/importacion.py` y
 `core/infrastructure/files/excel.py`), para que la usen también los módulos de Alza de tarifas;
 cada módulo declara su `FormatoHoja`.
 
+**Ayudas del formulario (Ajustes B).**
+
+- **Limpiar formulario (U4):** vacía el número de requerimiento, el tipo de facturación y los
+  planes, y deja una fila vacía. Conserva el autor, el ambiente y la carpeta. Si hay datos, pide
+  confirmación.
+- **Aviso de FC al elegir el tipo (U2):** al elegir Corriente o Anticipada se revisan los nombres
+  de la tabla con la misma regla de las advertencias (sección 6). Los avisos aparecen bajo la tabla,
+  en color de advertencia, y no bloquean nada.
+- **Abrir carpeta:** el mensaje "Receta generada en…" tiene un botón para abrir la carpeta en el
+  Explorador.
+- **Recordar carpeta y autor:** después de generar, se guardan en `preferencias.json`, en la carpeta
+  de la app, y se proponen la próxima vez. Si el archivo falta o está dañado, se usan los valores
+  por defecto (usuario de Windows y carpeta `output`).
+
 Valores que calcula la app: subtipo Datos `DPI`, subtipo SMS `SMS`, textos `0.0.0.1 /product <POID> 1`
 y `0.0.0.1 /deal <POID> 0`, nombres de paquete para promociones, IDENTIFY.
 

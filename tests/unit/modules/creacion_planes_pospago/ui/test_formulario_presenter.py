@@ -19,6 +19,8 @@ from recetas.modules.creacion_planes_pospago.domain.propiedades import (
     Ubicacion,
 )
 from recetas.modules.creacion_planes_pospago.ui.formulario_presenter import (
+    CLAVE_AUTOR,
+    CLAVE_CARPETA,
     COLUMNAS,
     DatosFormulario,
     ErrorCampo,
@@ -139,6 +141,17 @@ class LectorFalso:
         return self.filas if self.filas is not None else [fila()]
 
 
+class PreferenciasEnMemoria:
+    def __init__(self) -> None:
+        self.valores: dict[str, str] = {}
+
+    def leer(self, clave: str) -> str | None:
+        return self.valores.get(clave)
+
+    def guardar(self, clave: str, valor: str) -> None:
+        self.valores[clave] = valor
+
+
 # ---------- Helpers ----------
 
 
@@ -171,6 +184,7 @@ def presenter(
     escritor: EscritorFalso | None = None,
     registro: RegistroFalso | None = None,
     lector: LectorFalso | None = None,
+    preferencias: PreferenciasEnMemoria | None = None,
 ) -> FormularioPresenter:
     return FormularioPresenter(
         vista,
@@ -178,6 +192,7 @@ def presenter(
         escritor or EscritorFalso(),
         registro or RegistroFalso(),
         lector or LectorFalso(),
+        preferencias or PreferenciasEnMemoria(),
     )
 
 
@@ -378,3 +393,25 @@ def test_limpiar_con_datos_pide_confirmacion_y_si_cancela_no_limpia() -> None:
 
     assert vista.preguntas == ["limpiar"]
     assert not vista.limpiado
+
+
+# ---------- Recordar carpeta y autor (visual 2) ----------
+
+
+def test_al_generar_recuerda_el_autor_y_la_carpeta() -> None:
+    preferencias = PreferenciasEnMemoria()
+
+    presenter(VistaFalsa(), preferencias=preferencias).generar(datos(carpeta="D:/recetas"))
+
+    assert preferencias.valores == {CLAVE_AUTOR: "Equipo Tecnico", CLAVE_CARPETA: "D:/recetas"}
+
+
+def test_si_no_se_escribe_la_receta_no_recuerda_nada() -> None:
+    preferencias = PreferenciasEnMemoria()
+    escritor = EscritorFalso(existe=True)
+
+    presenter(VistaFalsa(respuestas=False), escritor=escritor, preferencias=preferencias).generar(
+        datos()
+    )
+
+    assert preferencias.valores == {}
