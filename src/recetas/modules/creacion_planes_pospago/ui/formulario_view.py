@@ -38,6 +38,7 @@ class FormularioView(QWidget):
     generar_solicitado = Signal()
     importar_solicitado = Signal(str)  # ruta del Excel elegido
     tipo_cambiado = Signal()
+    limpiar_solicitado = Signal()
 
     def __init__(
         self, autor_sugerido: str, carpeta_sugerida: str, parent: QWidget | None = None
@@ -98,10 +99,14 @@ class FormularioView(QWidget):
         importar = QPushButton("Importar Excel…")
         importar.setProperty("variante", "secundario")
         importar.clicked.connect(self._elegir_excel)
+        limpiar = QPushButton("Limpiar formulario")
+        limpiar.setProperty("variante", "secundario")
+        limpiar.clicked.connect(self.limpiar_solicitado)
         botones = QHBoxLayout()
         botones.addWidget(importar)
         botones.addWidget(agregar)
         botones.addWidget(quitar)
+        botones.addWidget(limpiar)
         botones.addStretch()
         botones.addWidget(generar)
 
@@ -197,6 +202,22 @@ class FormularioView(QWidget):
 
     def mostrar_avisos(self, avisos: Sequence[str]) -> None:
         self._avisos.setText("\n".join(avisos))
+
+    def confirmar_limpieza(self) -> bool:
+        return self._preguntar(
+            "Limpiar formulario",
+            "Se borrarán el requerimiento, el tipo de facturación y los planes. ¿Desea continuar?",
+        )
+
+    def limpiar(self) -> None:
+        self._requerimiento.clear()
+        self._tipos.setExclusive(False)  # en un grupo exclusivo no se puede desmarcar todo
+        self._corriente.setChecked(False)
+        self._anticipada.setChecked(False)
+        self._tipos.setExclusive(True)
+        self.cargar_planes([[""] * len(COLUMNAS)])
+        self.mostrar_errores([])
+        self.mostrar_avisos([])
 
     # ---------- Internos ----------
 

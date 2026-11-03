@@ -111,6 +111,8 @@ class VistaFormulario(Protocol):
     def confirmar_reemplazo(self, cantidad: int) -> bool: ...
     def cargar_planes(self, filas: Sequence[Sequence[str]]) -> None: ...
     def mostrar_avisos(self, avisos: Sequence[str]) -> None: ...
+    def confirmar_limpieza(self) -> bool: ...
+    def limpiar(self) -> None: ...
 
 
 class CasoGenerarReceta(Protocol):
@@ -174,7 +176,7 @@ class FormularioPresenter:
             self._vista.mostrar_resultado(f"'{ruta.name}' no trae planes. El formulario no cambió.")
             return
 
-        hay_datos = any(valor.strip() for fila in filas_actuales for valor in fila)
+        hay_datos = _hay_planes(filas_actuales)
         if hay_datos and not self._vista.confirmar_reemplazo(len(filas)):
             return
 
@@ -186,6 +188,12 @@ class FormularioPresenter:
 
     def tipo_elegido(self, datos: DatosFormulario) -> None:
         self._vista.mostrar_avisos(avisos_de_tipo(datos))
+
+    def limpiar(self, datos: DatosFormulario) -> None:
+        hay_datos = bool(datos.requerimiento.strip() or datos.tipo) or _hay_planes(datos.filas)
+        if hay_datos and not self._vista.confirmar_limpieza():
+            return
+        self._vista.limpiar()
 
     def _validar(self, datos: DatosFormulario) -> SolicitudReceta | None:
         errores: list[ErrorCampo] = []
@@ -284,3 +292,7 @@ def avisos_de_tipo(datos: DatosFormulario) -> list[str]:
     if len(avisos) > _MAX_AVISOS:
         avisos = [*avisos[:_MAX_AVISOS], f"… y {len(avisos) - _MAX_AVISOS} avisos más."]
     return avisos
+
+
+def _hay_planes(filas: Sequence[Sequence[str]]) -> bool:
+    return any(valor.strip() for fila in filas for valor in fila)

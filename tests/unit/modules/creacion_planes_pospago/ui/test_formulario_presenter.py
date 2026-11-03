@@ -42,6 +42,7 @@ class VistaFalsa:
         self.propiedades: list[ArchivoPropiedades] = []
         self.cargadas: list[list[str]] | None = None
         self.avisos: list[str] = []
+        self.limpiado = False
 
     def mostrar_errores(self, errores: Sequence[ErrorCampo]) -> None:
         self.errores = list(errores)
@@ -76,6 +77,13 @@ class VistaFalsa:
 
     def mostrar_avisos(self, avisos: Sequence[str]) -> None:
         self.avisos = list(avisos)
+
+    def confirmar_limpieza(self) -> bool:
+        self.preguntas.append("limpiar")
+        return self.respuestas
+
+    def limpiar(self) -> None:
+        self.limpiado = True
 
 
 class GeneradorFalso:
@@ -346,3 +354,24 @@ def test_muchos_avisos_se_resumen() -> None:
 
     assert len(vista.avisos) == 6
     assert vista.avisos[-1] == "… y 4 avisos más."
+
+
+# ---------- Limpiar formulario (U4) ----------
+
+
+def test_limpiar_formulario_vacio_no_pregunta() -> None:
+    vista = VistaFalsa()
+
+    presenter(vista).limpiar(datos(filas=VACIO, requerimiento="", tipo=""))
+
+    assert vista.preguntas == []
+    assert vista.limpiado
+
+
+def test_limpiar_con_datos_pide_confirmacion_y_si_cancela_no_limpia() -> None:
+    vista = VistaFalsa(respuestas=False)
+
+    presenter(vista).limpiar(datos())
+
+    assert vista.preguntas == ["limpiar"]
+    assert not vista.limpiado

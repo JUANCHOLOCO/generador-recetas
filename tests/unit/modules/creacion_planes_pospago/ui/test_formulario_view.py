@@ -33,3 +33,17 @@ def test_cargar_planes_reemplaza_las_filas(qtbot: QtBot) -> None:
     vista.cargar_planes(filas)
 
     assert vista.datos().filas == filas
+
+
+def test_limpiar_vacia_requerimiento_tipo_y_planes_pero_conserva_el_autor(qtbot: QtBot) -> None:
+    vista = FormularioView("jbotero", "C:/recetas")
+    qtbot.addWidget(vista)
+    vista._requerimiento.setText("TPFB-1")
+    vista._corriente.setChecked(True)
+    vista.cargar_planes([["x"] * len(COLUMNAS)] * 2)
+
+    vista.limpiar()
+
+    datos = vista.datos()
+    assert (datos.requerimiento, datos.tipo, datos.autor) == ("", "", "jbotero")
+    assert datos.filas == [[""] * len(COLUMNAS)]
