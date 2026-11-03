@@ -41,6 +41,7 @@ class VistaFalsa:
         self.preguntas: list[str] = []
         self.propiedades: list[ArchivoPropiedades] = []
         self.cargadas: list[list[str]] | None = None
+        self.avisos: list[str] = []
 
     def mostrar_errores(self, errores: Sequence[ErrorCampo]) -> None:
         self.errores = list(errores)
@@ -73,6 +74,8 @@ class VistaFalsa:
     def cargar_planes(self, filas: Sequence[Sequence[str]]) -> None:
         self.cargadas = [list(f) for f in filas]
 
+    def mostrar_avisos(self, avisos: Sequence[str]) -> None:
+        self.avisos = list(avisos)
 
 class GeneradorFalso:
     def __init__(self, advertencias: tuple[Advertencia, ...] = (), falla: bool = False) -> None:
@@ -313,3 +316,32 @@ def test_error_al_leer_el_excel_se_muestra() -> None:
     presenter(vista, lector=LectorFalso(falla=True)).importar(Path("planes.xlsx"), VACIO)
 
     assert vista.mensajes == ["ERROR: No se pudo leer 'planes.xlsx'."]
+
+
+# ---------- Aviso de FC al elegir el tipo (U2) ----------
+
+
+def test_al_elegir_anticipada_avisa_los_nombres_que_terminan_en_fc() -> None:
+    vista = VistaFalsa()
+
+    presenter(vista).tipo_elegido(datos(tipo="ANTICIPADA"))
+
+    assert len(vista.avisos) == 3  # producto, paquete Datos y paquete SMS del plan 5.1 FC
+    assert vista.avisos[0].startswith("Fila 1: 'Pospago Conectados 5.1 FC' termina en 'FC'")
+
+
+def test_al_elegir_corriente_con_nombres_fc_no_hay_avisos() -> None:
+    vista = VistaFalsa()
+
+    presenter(vista).tipo_elegido(datos(tipo="CORRIENTE"))
+
+    assert vista.avisos == []
+
+
+def test_muchos_avisos_se_resumen() -> None:
+    vista = VistaFalsa()
+
+    presenter(vista).tipo_elegido(datos(filas=[fila()] * 3, tipo="ANTICIPADA"))
+
+    assert len(vista.avisos) == 6
+    assert vista.avisos[-1] == "… y 4 avisos más."

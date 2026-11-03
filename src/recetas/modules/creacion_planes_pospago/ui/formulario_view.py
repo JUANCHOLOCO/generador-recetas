@@ -37,6 +37,7 @@ TITULO = "Creación de planes Pospago"
 class FormularioView(QWidget):
     generar_solicitado = Signal()
     importar_solicitado = Signal(str)  # ruta del Excel elegido
+    tipo_cambiado = Signal()
 
     def __init__(
         self, autor_sugerido: str, carpeta_sugerida: str, parent: QWidget | None = None
@@ -55,9 +56,11 @@ class FormularioView(QWidget):
 
         self._corriente = QRadioButton(BillingType.CORRIENTE.label)
         self._anticipada = QRadioButton(BillingType.ANTICIPADA.label)
+        self._tipos = QButtonGroup(self)
         tipos = QButtonGroup(self)
-        tipos.addButton(self._corriente)
-        tipos.addButton(self._anticipada)
+        self._tipos.addButton(self._corriente)
+        self._tipos.addButton(self._anticipada)
+        self._tipos.buttonClicked.connect(lambda _boton: self.tipo_cambiado.emit())
         fila_tipos = QHBoxLayout()
         fila_tipos.addWidget(self._corriente)
         fila_tipos.addWidget(self._anticipada)
@@ -106,6 +109,10 @@ class FormularioView(QWidget):
         self._errores.setWordWrap(True)
         self._errores.setObjectName("Errores")
 
+        self._avisos = QLabel()
+        self._avisos.setWordWrap(True)
+        self._avisos.setObjectName("Avisos")
+
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
 
@@ -118,6 +125,7 @@ class FormularioView(QWidget):
         )
         layout.addWidget(self._tabla, stretch=1)
         layout.addLayout(botones)
+        layout.addWidget(self._avisos)
         layout.addWidget(self._errores)
 
     # ---------- Lo que el presenter lee ----------
@@ -186,6 +194,9 @@ class FormularioView(QWidget):
 
     def cargar_planes(self, filas: Sequence[Sequence[str]]) -> None:
         self._modelo.cargar([c.titulo for c in COLUMNAS], filas)
+
+    def mostrar_avisos(self, avisos: Sequence[str]) -> None:
+        self._avisos.setText("\n".join(avisos))
 
     # ---------- Internos ----------
 

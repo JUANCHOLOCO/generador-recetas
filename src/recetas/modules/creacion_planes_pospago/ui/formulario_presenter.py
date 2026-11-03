@@ -7,6 +7,8 @@ from typing import Any, Protocol
 
 from pydantic import ValidationError
 
+from recetas.core.domain.billing import BillingType
+from recetas.modules.creacion_planes_pospago.domain.estrategias import estrategia_para
 from recetas.core.application.ports import BundleWriter, LectorDeHojas
 from recetas.core.domain.errors import RecetaExistenteError, RecetasError
 from recetas.core.domain.importacion import FormatoHoja
@@ -67,6 +69,8 @@ FORMATO_EXCEL = FormatoHoja(
         "POID SMS",
     ),
 )
+_CAMPOS_NOMBRE = ("nombre", "datos.nombre", "sms.nombre")
+_MAX_AVISOS = 5
 _TRADUCCIONES = {
     "missing": "Es obligatorio.",
     "int_parsing": "Debe ser un número entero.",
@@ -106,6 +110,7 @@ class VistaFormulario(Protocol):
     def mostrar_error(self, mensaje: str) -> None: ...
     def confirmar_reemplazo(self, cantidad: int) -> bool: ...
     def cargar_planes(self, filas: Sequence[Sequence[str]]) -> None: ...
+    def mostrar_avisos(self, avisos: Sequence[str]) -> None: ...
 
 
 class CasoGenerarReceta(Protocol):
@@ -178,6 +183,9 @@ class FormularioPresenter:
         self._vista.mostrar_resultado(
             f"Se importaron {len(filas)} planes de '{ruta.name}'. Revíselos y pulse Generar receta."
         )
+
+    def tipo_elegido(self, datos: DatosFormulario) -> None:
+        self._vista.mostrar_avisos(avisos_de_tipo(datos))
 
     def _validar(self, datos: DatosFormulario) -> SolicitudReceta | None:
         errores: list[ErrorCampo] = []
@@ -259,3 +267,20 @@ def _a_booleano(valor: str) -> bool | str:
     if texto in _NO:
         return False
     return valor  # Pydantic lo rechazará con 'bool_parsing'
+
+
+def avisos_de_tipo(datos: DatosFormulario) -> list[str]:
+    """Avisos de FC para el tipo elegido, con los nombres tal como están en la tabla."""
+    try:
+        estrategia = estrategia_para(BillingType(datos.tipo))
+    except ValueError:  # todavía no se eligió el tipo
+        return []
+    avisos: list[str] = []
+    for indice, fila in enumerate(datos.filas):
+        for campo in _CAMPOS_NOMBRE:
+            nombre = fila[_INDICE_COLUMNA[campo]].strip()
+            if nombre and (mensaje := estrategia.advertencia_nombre(nombre)) is not None:
+                avisos.append(f"Fila {indice + 1}: {mensaje}")
+    if len(avisos) > _MAX_AVISOS:
+        avisos = [*avisos[:_MAX_AVISOS], f"… y {len(avisos) - _MAX_AVISOS} avisos más."]
+    return avisos

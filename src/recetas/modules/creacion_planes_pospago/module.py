@@ -60,6 +60,7 @@ class CreacionPlanesPospagoModule(Module):
         vista.importar_solicitado.connect(
             lambda ruta: presenter.importar(Path(ruta), vista.datos().filas)
         )
+        vista.tipo_cambiado.connect(lambda: presenter.tipo_elegido(vista.datos()))
         # Pestaña 2: mantenimiento de la parametrización (Fase 6B)
         tablas = tablas_de_parametrizacion(self._context.session_factory)
         mantenimiento = ParametrizacionView([t.titulo for t in tablas])
