@@ -5,6 +5,7 @@ from dataclasses import replace
 from typing import Any
 
 from recetas.core.domain.billing import BillingType
+from recetas.modules.alza_tarifas.domain.solicitud import SolicitudAlzaPlanes
 from recetas.modules.creacion_planes_pospago.domain.parametrizacion import Parametrizacion
 from recetas.modules.creacion_planes_pospago.domain.plan import PlanNuevo, SolicitudReceta
 
@@ -66,3 +67,28 @@ def crear_solicitud(
         "planes": list(planes) if planes is not None else [datos_plan()],
     }
     return SolicitudReceta.model_validate(datos | cambios)
+
+
+def datos_plan_alza(**cambios: Any) -> dict[str, Any]:
+    """Plan 'Pospago 5.1 Empresarial' del alza TPFB-1726."""
+    datos: dict[str, Any] = {
+        "id": "1208",
+        "part_num": "PLCON0335",
+        "nombre": "Pospago 5.1 Empresarial",
+        "precio_nuevo": "68083",
+        "prorrateo_nuevo": "56320",
+        "precio_actual": "61950",
+        "prorrateo_actual": "51246,3",
+    }
+    return datos | cambios
+
+
+def crear_solicitud_alza(*planes: dict[str, Any]) -> SolicitudAlzaPlanes:
+    return SolicitudAlzaPlanes.model_validate(
+        {
+            "requerimiento": "TPFB-1726",
+            "autor": "Equipo Tecnico",
+            "ambiente": "PROD",
+            "planes": list(planes) if planes else [datos_plan_alza()],
+        }
+    )
