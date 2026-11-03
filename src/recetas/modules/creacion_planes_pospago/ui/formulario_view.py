@@ -57,7 +57,7 @@ class FormularioView(QWidget):
         self._corriente = QRadioButton(BillingType.CORRIENTE.label)
         self._anticipada = QRadioButton(BillingType.ANTICIPADA.label)
         self._tipos = QButtonGroup(self)
-        tipos = QButtonGroup(self)
+        QButtonGroup(self)
         self._tipos.addButton(self._corriente)
         self._tipos.addButton(self._anticipada)
         self._tipos.buttonClicked.connect(lambda _boton: self.tipo_cambiado.emit())

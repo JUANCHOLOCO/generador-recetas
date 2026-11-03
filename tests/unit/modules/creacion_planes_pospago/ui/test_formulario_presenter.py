@@ -77,6 +77,7 @@ class VistaFalsa:
     def mostrar_avisos(self, avisos: Sequence[str]) -> None:
         self.avisos = list(avisos)
 
+
 class GeneradorFalso:
     def __init__(self, advertencias: tuple[Advertencia, ...] = (), falla: bool = False) -> None:
         self.advertencias = advertencias
