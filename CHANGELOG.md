@@ -46,7 +46,13 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
 - El nombre del plan y el código PCRF no admiten comas (separan los valores en las propiedades).
 - Diálogo "Propiedades para el MOP" al generar la receta, con un botón para copiar las líneas de
   cada archivo.
-
+- Importar los planes desde un Excel al formulario, con un importador genérico de tablas en el
+  núcleo (U1).
+- Aviso de nombres con o sin "FC" en el momento de elegir el tipo de facturación (U2).
+- Botón "Limpiar formulario", con confirmación si hay datos (U4).
+- Botón "Abrir carpeta" al terminar de generar la receta (visual 1).
+- La app recuerda el último autor y la carpeta de salida en `preferencias.json`, junto a la app
+  (visual 2).
 
 ### Corregido
 - Scoring modelado como dos listas independientes (SCORING_PLAN y CPL_SCORING_PLAN).
