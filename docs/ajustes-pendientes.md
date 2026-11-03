@@ -109,5 +109,6 @@ Recibidos el 2026-10-27 (el usuario puede agregar más).
 | Pendiente | Origen |
 |---|---|
 | Uso de la imagen `coloresDiseno.jpeg` en la pantalla de bienvenida | Solo si el área de comunicaciones/marca lo aprueba (docs/diseno-visual.md) |
+| Extraer al núcleo los validadores de texto que repiten los dos módulos (`Requerimiento`, `Autor`, `Nombre`, texto sin caracteres de control) | Fase 8A: se copiaron en `alza_tarifas/domain/valores.py` para cumplir la guía de módulos nuevos (sin tocar `core/`). Si aparece un tercer módulo, se mueven a `core/domain/` con un ADR |
 | Login de usuario (el autor pasaría a ser el usuario logueado) | Opcional; el diseño ya lo soporta con el puerto `UsuarioActual` |
 | **Generar el MOP desde una plantilla Excel** según la receta o el alza de tarifas | Pedido del usuario (2026-10-29), para analizar más adelante. Ojo: openpyxl elimina extensiones que no soporta (validaciones de datos) al guardar una plantilla existente |
