@@ -8,19 +8,23 @@ Orden acordado (actualizado 2026-10-29):
 ```
 6A+ tema visual ✅ → 6B parametrización ✅ → Ajustes A (robustez) ✅
 → P1 propiedades (.properties en Conf/) ✅ → P2 panel "Propiedades para el MOP" ✅
-→ Ajustes B (importador Excel genérico + uso diario)
-→ Análisis de Alza de tarifas (3 módulos) → 8A base común + Alza ATP
-→ 8B Alza planes pospago → 8C Alza paquetes → Ajustes C (pulido) → 7 portable
+→ Ajustes B (importador Excel genérico + uso diario) ✅
+→ Análisis de Alza de tarifas ✅ → 8A Alza de tarifas: planes pospago
+→ 8B Alza de tarifas: paquetes → Ajustes C (pulido) → 7 portable
 ```
+
+**Actualización (2026-11-03):** el alza queda en **un módulo con dos tipos** (planes pospago y
+paquetes), sin cálculos: los scripts llevan los valores que ingresa el usuario. Especificación en
+[modulos/alza_tarifas.md](modulos/alza_tarifas.md).
 
 **Decisiones del usuario sobre Alza de tarifas (2026-10-29):**
 
-- Son **tres módulos**: Alza de planes pospago, Alza de paquetes y Alza ATP. El usuario entregará
-  scripts de ejemplo de los tres.
+- ~~Son tres módulos~~ Actualizado el 2026-11-03: un módulo con dos tipos (planes pospago y paquetes).
+  Scripts de ejemplo en `D:\proyectosJuan\ScriptAlza`.
 - En **Alza ATP** (actualiza `SERVICES` y `ATP_CORP_PRECIOS_SERVICE`), `SERVICES.ITEM_PRICE`
   lleva siempre el precio **con IVA**. El aplica de TPFB-1726 lo tiene mal en 265 paquetes.
-- Los valores del rollback (tarifas actuales) los entrega el área comercial: van en el Excel de
-  entrada junto con los nuevos. El formato del Excel se define por módulo.
+- Los valores del rollback (tarifas actuales) los ingresa el usuario junto con los nuevos, en el
+  formulario o en un Excel (no hay Excel del área comercial).
 - Números sin comillas y con punto decimal (`10605.04`), ejecutables en Oracle con cualquier
   configuración regional.
 - Siempre BD **ACTIVATOR**; no aplica Corriente/Anticipada; mismo campo Ambiente (Dev/UAT/Prod).
@@ -34,7 +38,7 @@ Orden acordado (actualizado 2026-10-29):
 | Entrega | Contenido | Estado |
 |---|---|---|
 | **A. Robustez y datos** | S1, U3, S2, S3, T1 | ✅ Resuelto (2026-10-28) |
-| **B. Uso diario** | U1 importar Excel, U4 limpiar formulario, U2 aviso FC al elegir el tipo, visuales 1 (abrir carpeta) y 2 (recordar carpeta y autor) | Pendiente |
+| **B. Uso diario** | U1 importar Excel, U4 limpiar formulario, U2 aviso FC al elegir el tipo, visuales 1 (abrir carpeta) y 2 (recordar carpeta y autor) | ✅ Resuelto (2026-11-03) |
 | **C. Pulido** | Visuales 3, 4, 5, 6, 7 y 11; D1 glosario y guía de incorporación | Pendiente |
 
 ## Ajustes visuales recomendados
@@ -43,8 +47,8 @@ Ordenados por impacto para el usuario / esfuerzo. Recomendados primero: **1, 2, 
 
 | # | Ajuste | Por qué | Esfuerzo | Estado |
 |---|---|---|---|---|
-| 1 | Botón **"Abrir carpeta"** al terminar de generar | Hoy hay que buscar la receta en el Explorador | Bajo | Pendiente |
-| 2 | **Recordar la última carpeta y el autor** (`preferencias.json` en la carpeta de la app, no el registro de Windows, para que la app siga siendo portable) | No escribirlos cada vez | Bajo | Pendiente |
+| 1 | Botón **"Abrir carpeta"** al terminar de generar | Hoy hay que buscar la receta en el Explorador | Bajo | ✅ Resuelto (entrega B) |
+| 2 | **Recordar la última carpeta y el autor** (`preferencias.json` en la carpeta de la app, no el registro de Windows, para que la app siga siendo portable) | No escribirlos cada vez | Bajo | ✅ Resuelto (entrega B) |
 | 3 | **Tooltip en cada encabezado** de la tabla con el formato esperado (`PLCON####`, `SVALL####`…) | Evita errores antes de validar | Bajo | Pendiente |
 | 4 | **Columnas ajustadas al contenido** y primera columna fija al desplazarse | 14 columnas no caben en pantalla | Bajo | Pendiente |
 | 5 | Atajo **Ctrl+Enter** para generar y **Supr** para vaciar celdas | Más rápido con teclado | Bajo | Pendiente |
@@ -68,10 +72,10 @@ Recibidos el 2026-10-27 (el usuario puede agregar más).
 
 | # | Ajuste | Validación | Prioridad |
 |---|---|---|---|
-| U1 | **Cargar los planes desde un Excel** al formulario | Viable. Los ejemplos `D:\proyectosJuan\Receta\PlanesAnticipados.xlsx` y `PlanesCorrientes.xlsx` tienen las 14 columnas en el orden del formulario (encabezado en la fila 2, datos desde la 3) y sus datos coinciden al 100 % con TPFB-2753. Requiere mover `openpyxl` de `dev` a dependencias de ejecución | Alta |
-| U2 | **Aviso de "FC" al elegir Anticipada** (solo aviso) | Ya existe como advertencia al pulsar *Generar* (estrategia Anticipada, Fase 4). El ajuste es mostrarlo **en el momento** de elegir el tipo | Media |
+| U1 | **Cargar los planes desde un Excel** al formulario | Viable. Los ejemplos `D:\proyectosJuan\Receta\PlanesAnticipados.xlsx` y `PlanesCorrientes.xlsx` tienen las 14 columnas en el orden del formulario (encabezado en la fila 2, datos desde la 3) y sus datos coinciden al 100 % con TPFB-2753. Requiere mover `openpyxl` de `dev` a dependencias de ejecución | ✅ Resuelto (entrega B) |
+| U2 | **Aviso de "FC" al elegir Anticipada** (solo aviso) | Ya existe como advertencia al pulsar *Generar* (estrategia Anticipada, Fase 4). El ajuste es mostrarlo **en el momento** de elegir el tipo | ✅ Resuelto (entrega B) |
 | U3 | **Restricciones de longitud** en los campos | Hoy solo los formatos fijos (`PLCON####`, `SVALL####`) limitan la longitud; nombres, código PCRF, IDs, POIDs y tarif group no tienen máximo. Falta conocer las longitudes de las columnas Oracle de destino | ✅ Resuelto (entrega A, límites provisionales en `domain/valores.py`) |
-| U4 | **Botón "Limpiar formulario"** | Viable; con confirmación si hay datos | Media |
+| U4 | **Botón "Limpiar formulario"** | Viable; con confirmación si hay datos | ✅ Resuelto (entrega B) |
 
 **Decisiones del usuario (2026-10-27):**
 
