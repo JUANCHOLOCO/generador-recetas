@@ -20,6 +20,7 @@ logs/
 backups/
 output/*
 !output/.gitkeep
+preferencias.json
 
 # Editor / SO
 .vscode/

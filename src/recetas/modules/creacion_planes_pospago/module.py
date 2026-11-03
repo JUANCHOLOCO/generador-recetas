@@ -1,9 +1,12 @@
 """Registro del módulo Creación de planes Pospago."""
 
+from pathlib import Path
+
 from PySide6.QtWidgets import QTabWidget, QWidget
 
 from recetas import __version__
 from recetas.core.infrastructure.files.escritor import EscritorDeRecetas
+from recetas.core.infrastructure.files.excel import LectorExcel
 from recetas.core.infrastructure.templating.jinja import JinjaRenderer
 from recetas.core.plugins import AppContext, Module, ModuleInfo
 from recetas.modules.creacion_planes_pospago.application.generar_receta import GenerarReceta
@@ -16,7 +19,11 @@ from recetas.modules.creacion_planes_pospago.infrastructure.repositories import 
 from recetas.modules.creacion_planes_pospago.infrastructure.seeds import (
     cargar_parametrizacion_inicial,
 )
-from recetas.modules.creacion_planes_pospago.ui.formulario_presenter import FormularioPresenter
+from recetas.modules.creacion_planes_pospago.ui.formulario_presenter import (
+    CLAVE_AUTOR,
+    CLAVE_CARPETA,
+    FormularioPresenter,
+)
 from recetas.modules.creacion_planes_pospago.ui.formulario_view import FormularioView
 from recetas.ui.parametrizacion.presenter import ParametrizacionPresenter
 from recetas.ui.parametrizacion.vista import ParametrizacionView
@@ -42,28 +49,26 @@ class CreacionPlanesPospagoModule(Module):
 
     def create_widget(self, parent: QWidget | None = None) -> QWidget:
         # Pestaña 1: formulario de generación (Fase 6A)
+        preferencias = self._context.preferencias
         vista = FormularioView(
-            autor_sugerido=self._context.usuario.nombre(),
-            carpeta_sugerida=str(self._context.paths.output),
+            autor_sugerido=preferencias.leer(CLAVE_AUTOR) or self._context.usuario.nombre(),
+            carpeta_sugerida=preferencias.leer(CLAVE_CARPETA) or str(self._context.paths.output),
         )
         presenter = FormularioPresenter(
             vista,
             self.generar_receta(),
             EscritorDeRecetas(),
             SqlParametrizacionRepository(self._context.session_factory),
+            LectorExcel(),
+            preferencias,
         )
         vista.generar_solicitado.connect(lambda: presenter.generar(vista.datos()))
-
+        vista.importar_solicitado.connect(
+            lambda ruta: presenter.importar(Path(ruta), vista.datos().filas)
+        )
+        vista.tipo_cambiado.connect(lambda: presenter.tipo_elegido(vista.datos()))
+        vista.limpiar_solicitado.connect(lambda: presenter.limpiar(vista.datos()))
         # Pestaña 2: mantenimiento de la parametrización (Fase 6B)
-        tablas = tablas_de_parametrizacion(self._context.session_factory)
-        mantenimiento = ParametrizacionView([t.titulo for t in tablas])
-        parametros = ParametrizacionPresenter(mantenimiento, tablas)
-        mantenimiento.tabla_elegida.connect(lambda indice: parametros.abrir(indice))
-        mantenimiento.filtro_cambiado.connect(lambda tipo: parametros.filtrar(tipo))
-        mantenimiento.guardar_solicitado.connect(lambda: parametros.guardar())
-        mantenimiento.recargar_solicitado.connect(lambda: parametros.recargar())
-        parametros.recargar()
-
         tablas = tablas_de_parametrizacion(self._context.session_factory)
         mantenimiento = ParametrizacionView([t.titulo for t in tablas])
         parametros = ParametrizacionPresenter(mantenimiento, tablas)

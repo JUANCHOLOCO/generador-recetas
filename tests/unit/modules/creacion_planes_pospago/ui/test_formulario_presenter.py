@@ -2,7 +2,13 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
-from recetas.core.domain.errors import PersistenciaError, RecetaExistenteError, RecetasError
+from recetas.core.domain.errors import (
+    ImportacionError,
+    PersistenciaError,
+    RecetaExistenteError,
+    RecetasError,
+)
+from recetas.core.domain.importacion import FormatoHoja
 from recetas.core.domain.recipe_bundle import RecipeBundle
 from recetas.modules.creacion_planes_pospago.application.generar_receta import RecetaGenerada
 from recetas.modules.creacion_planes_pospago.application.ports import PlanesRegistrados
@@ -13,6 +19,8 @@ from recetas.modules.creacion_planes_pospago.domain.propiedades import (
     Ubicacion,
 )
 from recetas.modules.creacion_planes_pospago.ui.formulario_presenter import (
+    CLAVE_AUTOR,
+    CLAVE_CARPETA,
     COLUMNAS,
     DatosFormulario,
     ErrorCampo,
@@ -34,6 +42,9 @@ class VistaFalsa:
         self.mensajes: list[str] = []
         self.preguntas: list[str] = []
         self.propiedades: list[ArchivoPropiedades] = []
+        self.cargadas: list[list[str]] | None = None
+        self.avisos: list[str] = []
+        self.limpiado = False
 
     def mostrar_errores(self, errores: Sequence[ErrorCampo]) -> None:
         self.errores = list(errores)
@@ -58,6 +69,26 @@ class VistaFalsa:
 
     def mostrar_propiedades(self, archivos: Sequence[ArchivoPropiedades]) -> None:
         self.propiedades = list(archivos)
+
+    def confirmar_reemplazo(self, cantidad: int) -> bool:
+        self.preguntas.append("reemplazar")
+        return self.respuestas
+
+    def cargar_planes(self, filas: Sequence[Sequence[str]]) -> None:
+        self.cargadas = [list(f) for f in filas]
+
+    def mostrar_avisos(self, avisos: Sequence[str]) -> None:
+        self.avisos = list(avisos)
+
+    def confirmar_limpieza(self) -> bool:
+        self.preguntas.append("limpiar")
+        return self.respuestas
+
+    def limpiar(self) -> None:
+        self.limpiado = True
+
+    def mostrar_receta_generada(self, raiz: Path) -> None:
+        self.mensajes.append(f"Receta generada en:\n{raiz}")
 
 
 class GeneradorFalso:
@@ -99,6 +130,28 @@ class RegistroFalso:
         return PlanesRegistrados(cambio_plan=len(solicitud.planes), planes_53=0)
 
 
+class LectorFalso:
+    def __init__(self, filas: list[list[str]] | None = None, falla: bool = False) -> None:
+        self.filas = filas
+        self.falla = falla
+
+    def leer(self, ruta: Path, formato: FormatoHoja) -> list[list[str]]:
+        if self.falla:
+            raise ImportacionError("No se pudo leer 'planes.xlsx'.")
+        return self.filas if self.filas is not None else [fila()]
+
+
+class PreferenciasEnMemoria:
+    def __init__(self) -> None:
+        self.valores: dict[str, str] = {}
+
+    def leer(self, clave: str) -> str | None:
+        return self.valores.get(clave)
+
+    def guardar(self, clave: str, valor: str) -> None:
+        self.valores[clave] = valor
+
+
 # ---------- Helpers ----------
 
 
@@ -130,12 +183,16 @@ def presenter(
     generador: GeneradorFalso | None = None,
     escritor: EscritorFalso | None = None,
     registro: RegistroFalso | None = None,
+    lector: LectorFalso | None = None,
+    preferencias: PreferenciasEnMemoria | None = None,
 ) -> FormularioPresenter:
     return FormularioPresenter(
         vista,
         generador or GeneradorFalso(),
         escritor or EscritorFalso(),
         registro or RegistroFalso(),
+        lector or LectorFalso(),
+        preferencias or PreferenciasEnMemoria(),
     )
 
 
@@ -244,3 +301,117 @@ def test_error_al_registrar_se_informa_sin_perder_la_receta_generada() -> None:
 
     assert "Receta generada en" in vista.mensajes[0]
     assert vista.mensajes[1].startswith("ERROR: La receta se generó, pero no se pudieron registrar")
+
+
+# ---------- Importar Excel ----------
+
+VACIO = [["" for _ in COLUMNAS]]
+
+
+def test_importar_con_formulario_vacio_carga_sin_preguntar() -> None:
+    vista = VistaFalsa()
+    lector = LectorFalso([fila(), fila(id_plan="7761")])
+
+    presenter(vista, lector=lector).importar(Path("planes.xlsx"), VACIO)
+
+    assert vista.preguntas == []
+    assert vista.cargadas is not None and len(vista.cargadas) == 2
+    assert vista.mensajes[0].startswith("Se importaron 2 planes de 'planes.xlsx'")
+
+
+def test_importar_sobre_datos_pide_confirmacion_y_si_cancela_no_cambia_nada() -> None:
+    vista = VistaFalsa(respuestas=False)
+
+    presenter(vista).importar(Path("planes.xlsx"), [fila()])
+
+    assert vista.preguntas == ["reemplazar"]
+    assert vista.cargadas is None
+
+
+def test_excel_sin_planes_se_informa_y_no_cambia_nada() -> None:
+    vista = VistaFalsa()
+
+    presenter(vista, lector=LectorFalso([])).importar(Path("planes.xlsx"), [fila()])
+
+    assert vista.cargadas is None
+    assert vista.mensajes == ["'planes.xlsx' no trae planes. El formulario no cambió."]
+
+
+def test_error_al_leer_el_excel_se_muestra() -> None:
+    vista = VistaFalsa()
+
+    presenter(vista, lector=LectorFalso(falla=True)).importar(Path("planes.xlsx"), VACIO)
+
+    assert vista.mensajes == ["ERROR: No se pudo leer 'planes.xlsx'."]
+
+
+# ---------- Aviso de FC al elegir el tipo (U2) ----------
+
+
+def test_al_elegir_anticipada_avisa_los_nombres_que_terminan_en_fc() -> None:
+    vista = VistaFalsa()
+
+    presenter(vista).tipo_elegido(datos(tipo="ANTICIPADA"))
+
+    assert len(vista.avisos) == 3  # producto, paquete Datos y paquete SMS del plan 5.1 FC
+    assert vista.avisos[0].startswith("Fila 1: 'Pospago Conectados 5.1 FC' termina en 'FC'")
+
+
+def test_al_elegir_corriente_con_nombres_fc_no_hay_avisos() -> None:
+    vista = VistaFalsa()
+
+    presenter(vista).tipo_elegido(datos(tipo="CORRIENTE"))
+
+    assert vista.avisos == []
+
+
+def test_muchos_avisos_se_resumen() -> None:
+    vista = VistaFalsa()
+
+    presenter(vista).tipo_elegido(datos(filas=[fila()] * 3, tipo="ANTICIPADA"))
+
+    assert len(vista.avisos) == 6
+    assert vista.avisos[-1] == "… y 4 avisos más."
+
+
+# ---------- Limpiar formulario (U4) ----------
+
+
+def test_limpiar_formulario_vacio_no_pregunta() -> None:
+    vista = VistaFalsa()
+
+    presenter(vista).limpiar(datos(filas=VACIO, requerimiento="", tipo=""))
+
+    assert vista.preguntas == []
+    assert vista.limpiado
+
+
+def test_limpiar_con_datos_pide_confirmacion_y_si_cancela_no_limpia() -> None:
+    vista = VistaFalsa(respuestas=False)
+
+    presenter(vista).limpiar(datos())
+
+    assert vista.preguntas == ["limpiar"]
+    assert not vista.limpiado
+
+
+# ---------- Recordar carpeta y autor (visual 2) ----------
+
+
+def test_al_generar_recuerda_el_autor_y_la_carpeta() -> None:
+    preferencias = PreferenciasEnMemoria()
+
+    presenter(VistaFalsa(), preferencias=preferencias).generar(datos(carpeta="D:/recetas"))
+
+    assert preferencias.valores == {CLAVE_AUTOR: "Equipo Tecnico", CLAVE_CARPETA: "D:/recetas"}
+
+
+def test_si_no_se_escribe_la_receta_no_recuerda_nada() -> None:
+    preferencias = PreferenciasEnMemoria()
+    escritor = EscritorFalso(existe=True)
+
+    presenter(VistaFalsa(respuestas=False), escritor=escritor, preferencias=preferencias).generar(
+        datos()
+    )
+
+    assert preferencias.valores == {}

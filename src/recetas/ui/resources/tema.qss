@@ -28,6 +28,7 @@ QFrame#Tarjeta QLabel { color: #0B1660; }
 QLabel#TituloTarjeta { color: #08137A; font-size: 20px; font-weight: 700; }
 QLabel#Bienvenida { color: #08137A; font-size: 16px; }
 QLabel#Errores { color: #B00020; }
+QLabel#Avisos { color: #8A5A00; }
 
 /* ---------- Pestañas ---------- */
 QTabWidget::pane { border: none; }

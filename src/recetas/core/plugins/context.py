@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from sqlalchemy.orm import Session, sessionmaker
 
 from recetas.config import AppPaths
-from recetas.core.application.ports import Reloj, UsuarioActual
+from recetas.core.application.ports import Preferencias, Reloj, UsuarioActual
 
 
 @dataclass(frozen=True, slots=True)
@@ -14,3 +14,4 @@ class AppContext:
     session_factory: sessionmaker[Session]
     reloj: Reloj
     usuario: UsuarioActual
+    preferencias: Preferencias

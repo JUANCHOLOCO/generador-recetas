@@ -1,8 +1,10 @@
 """Formulario de creación de planes Pospago (vista pasiva del patrón MVP)."""
 
 from collections.abc import Sequence
+from pathlib import Path
 
-from PySide6.QtCore import Signal
+from PySide6.QtCore import QUrl, Signal
+from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (
     QButtonGroup,
     QComboBox,
@@ -36,6 +38,9 @@ TITULO = "Creación de planes Pospago"
 
 class FormularioView(QWidget):
     generar_solicitado = Signal()
+    importar_solicitado = Signal(str)  # ruta del Excel elegido
+    tipo_cambiado = Signal()
+    limpiar_solicitado = Signal()
 
     def __init__(
         self, autor_sugerido: str, carpeta_sugerida: str, parent: QWidget | None = None
@@ -54,9 +59,11 @@ class FormularioView(QWidget):
 
         self._corriente = QRadioButton(BillingType.CORRIENTE.label)
         self._anticipada = QRadioButton(BillingType.ANTICIPADA.label)
-        tipos = QButtonGroup(self)
-        tipos.addButton(self._corriente)
-        tipos.addButton(self._anticipada)
+        self._tipos = QButtonGroup(self)
+        QButtonGroup(self)
+        self._tipos.addButton(self._corriente)
+        self._tipos.addButton(self._anticipada)
+        self._tipos.buttonClicked.connect(lambda _boton: self.tipo_cambiado.emit())
         fila_tipos = QHBoxLayout()
         fila_tipos.addWidget(self._corriente)
         fila_tipos.addWidget(self._anticipada)
@@ -91,15 +98,27 @@ class FormularioView(QWidget):
         generar.setProperty("variante", "primario")
         generar.setDefault(True)
         generar.clicked.connect(self.generar_solicitado)
+        importar = QPushButton("Importar Excel…")
+        importar.setProperty("variante", "secundario")
+        importar.clicked.connect(self._elegir_excel)
+        limpiar = QPushButton("Limpiar formulario")
+        limpiar.setProperty("variante", "secundario")
+        limpiar.clicked.connect(self.limpiar_solicitado)
         botones = QHBoxLayout()
+        botones.addWidget(importar)
         botones.addWidget(agregar)
         botones.addWidget(quitar)
+        botones.addWidget(limpiar)
         botones.addStretch()
         botones.addWidget(generar)
 
         self._errores = QLabel()
         self._errores.setWordWrap(True)
         self._errores.setObjectName("Errores")
+
+        self._avisos = QLabel()
+        self._avisos.setWordWrap(True)
+        self._avisos.setObjectName("Avisos")
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -108,9 +127,12 @@ class FormularioView(QWidget):
         titulo.setObjectName("TituloTarjeta")
         layout.addWidget(titulo)
         layout.addLayout(cabecera)
-        layout.addWidget(QLabel("Planes (puede pegar filas copiadas de Excel con Ctrl+V):"))
+        layout.addWidget(
+            QLabel("Planes (importe un Excel o pegue filas copiadas de Excel con Ctrl+V):")
+        )
         layout.addWidget(self._tabla, stretch=1)
         layout.addLayout(botones)
+        layout.addWidget(self._avisos)
         layout.addWidget(self._errores)
 
     # ---------- Lo que el presenter lee ----------
@@ -170,6 +192,48 @@ class FormularioView(QWidget):
     def mostrar_error(self, mensaje: str) -> None:
         QMessageBox.critical(self, TITULO, mensaje)
 
+    def confirmar_reemplazo(self, cantidad: int) -> bool:
+        return self._preguntar(
+            "Importar Excel",
+            f"Los {cantidad} planes del Excel reemplazarán las filas del formulario. "
+            "¿Desea continuar?",
+        )
+
+    def cargar_planes(self, filas: Sequence[Sequence[str]]) -> None:
+        self._modelo.cargar([c.titulo for c in COLUMNAS], filas)
+
+    def mostrar_avisos(self, avisos: Sequence[str]) -> None:
+        self._avisos.setText("\n".join(avisos))
+
+    def confirmar_limpieza(self) -> bool:
+        return self._preguntar(
+            "Limpiar formulario",
+            "Se borrarán el requerimiento, el tipo de facturación y los planes. ¿Desea continuar?",
+        )
+
+    def limpiar(self) -> None:
+        self._requerimiento.clear()
+        self._tipos.setExclusive(False)  # en un grupo exclusivo no se puede desmarcar todo
+        self._corriente.setChecked(False)
+        self._anticipada.setChecked(False)
+        self._tipos.setExclusive(True)
+        self.cargar_planes([[""] * len(COLUMNAS)])
+        self.mostrar_errores([])
+        self.mostrar_avisos([])
+
+    def mostrar_receta_generada(self, raiz: Path) -> None:
+        caja = QMessageBox(
+            QMessageBox.Icon.Information,
+            TITULO,
+            f"Receta generada en:\n{raiz}",
+            QMessageBox.StandardButton.Ok,
+            self,
+        )
+        abrir = caja.addButton("Abrir carpeta", QMessageBox.ButtonRole.ActionRole)
+        caja.exec()
+        if caja.clickedButton() is abrir:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(raiz)))
+
     # ---------- Internos ----------
 
     def _preguntar(self, titulo: str, texto: str) -> bool:
@@ -183,3 +247,10 @@ class FormularioView(QWidget):
     def _quitar_seleccionadas(self) -> None:
         filas = {indice.row() for indice in self._tabla.selectionModel().selectedIndexes()}
         self._modelo.quitar_filas(sorted(filas))
+
+    def _elegir_excel(self) -> None:
+        ruta, _ = QFileDialog.getOpenFileName(
+            self, "Importar planes desde Excel", self._carpeta.text(), "Libros de Excel (*.xlsx)"
+        )
+        if ruta:
+            self.importar_solicitado.emit(ruta)

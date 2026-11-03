@@ -50,3 +50,7 @@ class RecetaExistenteError(RecetasError):
 
 class PersistenciaError(RecetasError):
     """La base de datos local no respondió como se esperaba (bloqueada, dañada, sin espacio…)."""
+
+
+class ImportacionError(RecetasError):
+    """El archivo a importar no se pudo leer o no tiene el formato esperado."""
