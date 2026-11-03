@@ -1,0 +1,10 @@
+{% import "_comun.sql.j2" as comun %}
+{{ comun.inicio_datos(cab) }}
+
+{{ comun.seccion(cab.objetivo ~ " (" ~ planes | length ~ " planes)") }}
+{% for plan in planes %}
+-- Plan: {{ plan.nombre }}
+UPDATE ACTIVATOR.PLANS SET ITEM_PRICE={{ plan.precio }}, VENDOR_VALUE={{ plan.precio }}, ITEM_PRICE_PRORRATE={{ plan.prorrateo }} WHERE ID={{ plan.id }} AND PART_NUM={{ plan.part_num }};
+{% endfor %}
+
+{{ comun.fin_datos() }}
