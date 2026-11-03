@@ -1,9 +1,12 @@
 """Registro del módulo Creación de planes Pospago."""
 
+from pathlib import Path
+
 from PySide6.QtWidgets import QTabWidget, QWidget
 
 from recetas import __version__
 from recetas.core.infrastructure.files.escritor import EscritorDeRecetas
+from recetas.core.infrastructure.files.excel import LectorExcel
 from recetas.core.infrastructure.templating.jinja import JinjaRenderer
 from recetas.core.plugins import AppContext, Module, ModuleInfo
 from recetas.modules.creacion_planes_pospago.application.generar_receta import GenerarReceta
@@ -51,9 +54,12 @@ class CreacionPlanesPospagoModule(Module):
             self.generar_receta(),
             EscritorDeRecetas(),
             SqlParametrizacionRepository(self._context.session_factory),
+            LectorExcel(),
         )
         vista.generar_solicitado.connect(lambda: presenter.generar(vista.datos()))
-
+        vista.importar_solicitado.connect(
+            lambda ruta: presenter.importar(Path(ruta), vista.datos().filas)
+        )
         # Pestaña 2: mantenimiento de la parametrización (Fase 6B)
         tablas = tablas_de_parametrizacion(self._context.session_factory)
         mantenimiento = ParametrizacionView([t.titulo for t in tablas])

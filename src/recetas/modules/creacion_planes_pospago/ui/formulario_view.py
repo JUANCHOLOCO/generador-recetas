@@ -36,6 +36,7 @@ TITULO = "Creación de planes Pospago"
 
 class FormularioView(QWidget):
     generar_solicitado = Signal()
+    importar_solicitado = Signal(str)  # ruta del Excel elegido
 
     def __init__(
         self, autor_sugerido: str, carpeta_sugerida: str, parent: QWidget | None = None
@@ -91,7 +92,11 @@ class FormularioView(QWidget):
         generar.setProperty("variante", "primario")
         generar.setDefault(True)
         generar.clicked.connect(self.generar_solicitado)
+        importar = QPushButton("Importar Excel…")
+        importar.setProperty("variante", "secundario")
+        importar.clicked.connect(self._elegir_excel)
         botones = QHBoxLayout()
+        botones.addWidget(importar)
         botones.addWidget(agregar)
         botones.addWidget(quitar)
         botones.addStretch()
@@ -108,7 +113,9 @@ class FormularioView(QWidget):
         titulo.setObjectName("TituloTarjeta")
         layout.addWidget(titulo)
         layout.addLayout(cabecera)
-        layout.addWidget(QLabel("Planes (puede pegar filas copiadas de Excel con Ctrl+V):"))
+        layout.addWidget(
+            QLabel("Planes (importe un Excel o pegue filas copiadas de Excel con Ctrl+V):")
+        )
         layout.addWidget(self._tabla, stretch=1)
         layout.addLayout(botones)
         layout.addWidget(self._errores)
@@ -170,6 +177,16 @@ class FormularioView(QWidget):
     def mostrar_error(self, mensaje: str) -> None:
         QMessageBox.critical(self, TITULO, mensaje)
 
+    def confirmar_reemplazo(self, cantidad: int) -> bool:
+        return self._preguntar(
+            "Importar Excel",
+            f"Los {cantidad} planes del Excel reemplazarán las filas del formulario. "
+            "¿Desea continuar?",
+        )
+
+    def cargar_planes(self, filas: Sequence[Sequence[str]]) -> None:
+        self._modelo.cargar([c.titulo for c in COLUMNAS], filas)
+
     # ---------- Internos ----------
 
     def _preguntar(self, titulo: str, texto: str) -> bool:
@@ -183,3 +200,10 @@ class FormularioView(QWidget):
     def _quitar_seleccionadas(self) -> None:
         filas = {indice.row() for indice in self._tabla.selectionModel().selectedIndexes()}
         self._modelo.quitar_filas(sorted(filas))
+
+    def _elegir_excel(self) -> None:
+        ruta, _ = QFileDialog.getOpenFileName(
+            self, "Importar planes desde Excel", self._carpeta.text(), "Libros de Excel (*.xlsx)"
+        )
+        if ruta:
+            self.importar_solicitado.emit(ruta)

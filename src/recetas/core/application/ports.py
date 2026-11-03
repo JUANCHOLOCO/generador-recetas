@@ -27,6 +27,7 @@ class BundleWriter(Protocol):
         """Escribe la receta dentro de `carpeta` y devuelve la ruta de su raíz."""
         ...
 
+
 class LectorDeHojas(Protocol):
     def leer(self, ruta: Path, formato: FormatoHoja) -> list[list[str]]:
         """Filas de datos de la primera hoja, como texto. Lanza ImportacionError."""

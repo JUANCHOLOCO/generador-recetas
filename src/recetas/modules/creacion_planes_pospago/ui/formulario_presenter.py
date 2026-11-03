@@ -7,8 +7,9 @@ from typing import Any, Protocol
 
 from pydantic import ValidationError
 
-from recetas.core.application.ports import BundleWriter
+from recetas.core.application.ports import BundleWriter, LectorDeHojas
 from recetas.core.domain.errors import RecetaExistenteError, RecetasError
+from recetas.core.domain.importacion import FormatoHoja
 from recetas.modules.creacion_planes_pospago.application.generar_receta import RecetaGenerada
 from recetas.modules.creacion_planes_pospago.application.ports import RegistroDePlanes
 from recetas.modules.creacion_planes_pospago.domain.advertencias import Advertencia
@@ -46,6 +47,26 @@ _ETIQUETAS = {
     "tipo": "Tipo de facturación",
     "planes": "Planes",
 }
+# Encabezados de PlanesAnticipados.xlsx / PlanesCorrientes.xlsx (fila 2), en el orden de COLUMNAS
+FORMATO_EXCEL = FormatoHoja(
+    fila_encabezado=2,
+    encabezados=(
+        "Id_Plan",
+        "Part_num",
+        "Nombre del producto",
+        "Valor Con Iva",
+        "Valor Sin Iva",
+        "Código Perfil PCRF",
+        "Tarif group",
+        "S/N",
+        "Nombre paquete Datos",
+        "Svall Data",
+        "POID Datos",
+        "Nombre paquete SMS",
+        "Svall SMS",
+        "POID SMS",
+    ),
+)
 _TRADUCCIONES = {
     "missing": "Es obligatorio.",
     "int_parsing": "Debe ser un número entero.",
@@ -83,6 +104,8 @@ class VistaFormulario(Protocol):
     def mostrar_resultado(self, mensaje: str) -> None: ...
     def mostrar_propiedades(self, archivos: Sequence[ArchivoPropiedades]) -> None: ...
     def mostrar_error(self, mensaje: str) -> None: ...
+    def confirmar_reemplazo(self, cantidad: int) -> bool: ...
+    def cargar_planes(self, filas: Sequence[Sequence[str]]) -> None: ...
 
 
 class CasoGenerarReceta(Protocol):
@@ -96,11 +119,13 @@ class FormularioPresenter:
         generar_receta: CasoGenerarReceta,
         escritor: BundleWriter,
         registro: RegistroDePlanes,
+        lector: LectorDeHojas,
     ) -> None:
         self._vista = vista
         self._generar_receta = generar_receta
         self._escritor = escritor
         self._registro = registro
+        self._lector = lector
 
     def generar(self, datos: DatosFormulario) -> None:
         solicitud = self._validar(datos)
@@ -133,6 +158,26 @@ class FormularioPresenter:
                 f"Planes registrados en la parametrización: {registrados.cambio_plan} en la "
                 f"matriz de cambios de plan y {registrados.planes_53} en 5.3 OLDS."
             )
+
+    def importar(self, ruta: Path, filas_actuales: Sequence[Sequence[str]]) -> None:
+        try:
+            filas = self._lector.leer(ruta, FORMATO_EXCEL)
+        except RecetasError as error:
+            self._vista.mostrar_error(str(error))
+            return
+        if not filas:
+            self._vista.mostrar_resultado(f"'{ruta.name}' no trae planes. El formulario no cambió.")
+            return
+
+        hay_datos = any(valor.strip() for fila in filas_actuales for valor in fila)
+        if hay_datos and not self._vista.confirmar_reemplazo(len(filas)):
+            return
+
+        self._vista.cargar_planes(filas)
+        self._vista.mostrar_errores([])
+        self._vista.mostrar_resultado(
+            f"Se importaron {len(filas)} planes de '{ruta.name}'. Revíselos y pulse Generar receta."
+        )
 
     def _validar(self, datos: DatosFormulario) -> SolicitudReceta | None:
         errores: list[ErrorCampo] = []

@@ -2,7 +2,13 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
-from recetas.core.domain.errors import PersistenciaError, RecetaExistenteError, RecetasError
+from recetas.core.domain.errors import (
+    ImportacionError,
+    PersistenciaError,
+    RecetaExistenteError,
+    RecetasError,
+)
+from recetas.core.domain.importacion import FormatoHoja
 from recetas.core.domain.recipe_bundle import RecipeBundle
 from recetas.modules.creacion_planes_pospago.application.generar_receta import RecetaGenerada
 from recetas.modules.creacion_planes_pospago.application.ports import PlanesRegistrados
@@ -34,6 +40,7 @@ class VistaFalsa:
         self.mensajes: list[str] = []
         self.preguntas: list[str] = []
         self.propiedades: list[ArchivoPropiedades] = []
+        self.cargadas: list[list[str]] | None = None
 
     def mostrar_errores(self, errores: Sequence[ErrorCampo]) -> None:
         self.errores = list(errores)
@@ -58,6 +65,13 @@ class VistaFalsa:
 
     def mostrar_propiedades(self, archivos: Sequence[ArchivoPropiedades]) -> None:
         self.propiedades = list(archivos)
+
+    def confirmar_reemplazo(self, cantidad: int) -> bool:
+        self.preguntas.append("reemplazar")
+        return self.respuestas
+
+    def cargar_planes(self, filas: Sequence[Sequence[str]]) -> None:
+        self.cargadas = [list(f) for f in filas]
 
 
 class GeneradorFalso:
@@ -99,6 +113,17 @@ class RegistroFalso:
         return PlanesRegistrados(cambio_plan=len(solicitud.planes), planes_53=0)
 
 
+class LectorFalso:
+    def __init__(self, filas: list[list[str]] | None = None, falla: bool = False) -> None:
+        self.filas = filas
+        self.falla = falla
+
+    def leer(self, ruta: Path, formato: FormatoHoja) -> list[list[str]]:
+        if self.falla:
+            raise ImportacionError("No se pudo leer 'planes.xlsx'.")
+        return self.filas if self.filas is not None else [fila()]
+
+
 # ---------- Helpers ----------
 
 
@@ -130,12 +155,14 @@ def presenter(
     generador: GeneradorFalso | None = None,
     escritor: EscritorFalso | None = None,
     registro: RegistroFalso | None = None,
+    lector: LectorFalso | None = None,
 ) -> FormularioPresenter:
     return FormularioPresenter(
         vista,
         generador or GeneradorFalso(),
         escritor or EscritorFalso(),
         registro or RegistroFalso(),
+        lector or LectorFalso(),
     )
 
 
@@ -244,3 +271,45 @@ def test_error_al_registrar_se_informa_sin_perder_la_receta_generada() -> None:
 
     assert "Receta generada en" in vista.mensajes[0]
     assert vista.mensajes[1].startswith("ERROR: La receta se generó, pero no se pudieron registrar")
+
+
+# ---------- Importar Excel ----------
+
+VACIO = [["" for _ in COLUMNAS]]
+
+
+def test_importar_con_formulario_vacio_carga_sin_preguntar() -> None:
+    vista = VistaFalsa()
+    lector = LectorFalso([fila(), fila(id_plan="7761")])
+
+    presenter(vista, lector=lector).importar(Path("planes.xlsx"), VACIO)
+
+    assert vista.preguntas == []
+    assert vista.cargadas is not None and len(vista.cargadas) == 2
+    assert vista.mensajes[0].startswith("Se importaron 2 planes de 'planes.xlsx'")
+
+
+def test_importar_sobre_datos_pide_confirmacion_y_si_cancela_no_cambia_nada() -> None:
+    vista = VistaFalsa(respuestas=False)
+
+    presenter(vista).importar(Path("planes.xlsx"), [fila()])
+
+    assert vista.preguntas == ["reemplazar"]
+    assert vista.cargadas is None
+
+
+def test_excel_sin_planes_se_informa_y_no_cambia_nada() -> None:
+    vista = VistaFalsa()
+
+    presenter(vista, lector=LectorFalso([])).importar(Path("planes.xlsx"), [fila()])
+
+    assert vista.cargadas is None
+    assert vista.mensajes == ["'planes.xlsx' no trae planes. El formulario no cambió."]
+
+
+def test_error_al_leer_el_excel_se_muestra() -> None:
+    vista = VistaFalsa()
+
+    presenter(vista, lector=LectorFalso(falla=True)).importar(Path("planes.xlsx"), VACIO)
+
+    assert vista.mensajes == ["ERROR: No se pudo leer 'planes.xlsx'."]
