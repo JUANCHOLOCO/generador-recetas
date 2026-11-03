@@ -1,8 +1,10 @@
 """Formulario de creación de planes Pospago (vista pasiva del patrón MVP)."""
 
 from collections.abc import Sequence
+from pathlib import Path
 
-from PySide6.QtCore import Signal
+from PySide6.QtCore import QUrl, Signal
+from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (
     QButtonGroup,
     QComboBox,
@@ -218,6 +220,19 @@ class FormularioView(QWidget):
         self.cargar_planes([[""] * len(COLUMNAS)])
         self.mostrar_errores([])
         self.mostrar_avisos([])
+
+    def mostrar_receta_generada(self, raiz: Path) -> None:
+        caja = QMessageBox(
+            QMessageBox.Icon.Information,
+            TITULO,
+            f"Receta generada en:\n{raiz}",
+            QMessageBox.StandardButton.Ok,
+            self,
+        )
+        abrir = caja.addButton("Abrir carpeta", QMessageBox.ButtonRole.ActionRole)
+        caja.exec()
+        if caja.clickedButton() is abrir:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(raiz)))
 
     # ---------- Internos ----------
 

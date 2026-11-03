@@ -85,6 +85,9 @@ class VistaFalsa:
     def limpiar(self) -> None:
         self.limpiado = True
 
+    def mostrar_receta_generada(self, raiz: Path) -> None:
+        self.mensajes.append(f"Receta generada en:\n{raiz}")
+
 
 class GeneradorFalso:
     def __init__(self, advertencias: tuple[Advertencia, ...] = (), falla: bool = False) -> None:

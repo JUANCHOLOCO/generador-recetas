@@ -113,6 +113,7 @@ class VistaFormulario(Protocol):
     def mostrar_avisos(self, avisos: Sequence[str]) -> None: ...
     def confirmar_limpieza(self) -> bool: ...
     def limpiar(self) -> None: ...
+    def mostrar_receta_generada(self, raiz: Path) -> None: ...
 
 
 class CasoGenerarReceta(Protocol):
@@ -151,7 +152,7 @@ class FormularioPresenter:
         raiz = self._escribir(receta, Path(datos.carpeta))
         if raiz is None:
             return
-        self._vista.mostrar_resultado(f"Receta generada en:\n{raiz}")
+        self._vista.mostrar_receta_generada(raiz)
         self._vista.mostrar_propiedades(receta.propiedades)
         if self._vista.confirmar_registro(len(solicitud.planes)):
             try:
