@@ -1,7 +1,8 @@
-"""Formulario del alza de planes pospago (vista pasiva del patrón MVP)."""
+"""Formulario del alza de tarifas, uno por pestaña (vista pasiva del patrón MVP)."""
 
 from collections.abc import Sequence
 from pathlib import Path
+from typing import Any
 
 from PySide6.QtCore import QUrl, Signal
 from PySide6.QtGui import QDesktopServices
@@ -20,13 +21,9 @@ from PySide6.QtWidgets import (
 
 from recetas.core.domain.ambiente import Ambiente
 from recetas.modules.alza_tarifas.domain.valores import MAX_AUTOR, MAX_REQUERIMIENTO
-from recetas.modules.alza_tarifas.ui.formulario_presenter import COLUMNAS, DatosAlza, ErrorCampo
+from recetas.modules.alza_tarifas.ui.formulario_presenter import DatosAlza, ErrorCampo
+from recetas.modules.alza_tarifas.ui.tipos_formulario import TipoFormulario
 from recetas.ui.widgets.tabla_editable import TablaEditable, TablaEditableModel
-
-TITULO = "Alza de tarifas: planes pospago"
-_TITULOS = [c.titulo for c in COLUMNAS]
-_AYUDAS = [c.ayuda for c in COLUMNAS]
-_FILA_VACIA = [""] * len(COLUMNAS)
 
 
 class FormularioAlzaView(QWidget):
@@ -35,9 +32,17 @@ class FormularioAlzaView(QWidget):
     limpiar_solicitado = Signal()
 
     def __init__(
-        self, autor_sugerido: str, carpeta_sugerida: str, parent: QWidget | None = None
+        self,
+        tipo: TipoFormulario[Any],
+        autor_sugerido: str,
+        carpeta_sugerida: str,
+        parent: QWidget | None = None,
     ) -> None:
         super().__init__(parent)
+        self._tipo = tipo
+        self._titulos = [c.titulo for c in tipo.columnas]
+        self._ayudas = [c.ayuda for c in tipo.columnas]
+        self._fila_vacia = [""] * len(tipo.columnas)
 
         self._requerimiento = QLineEdit()
         self._requerimiento.setPlaceholderText("TPFB-1726")
@@ -63,9 +68,9 @@ class FormularioAlzaView(QWidget):
         cabecera.addRow("Ambiente:", self._ambiente)
         cabecera.addRow("Carpeta de salida:", fila_carpeta)
 
-        self._modelo = TablaEditableModel(_TITULOS, self)
+        self._modelo = TablaEditableModel(self._titulos, self)
         self._tabla = TablaEditable(self._modelo)
-        self.cargar_planes([_FILA_VACIA])
+        self.cargar_filas([self._fila_vacia])
 
         importar = QPushButton("Importar Excel…")
         importar.setProperty("variante", "secundario")
@@ -95,7 +100,7 @@ class FormularioAlzaView(QWidget):
         self._errores.setWordWrap(True)
         self._errores.setObjectName("Errores")
 
-        titulo = QLabel(TITULO)
+        titulo = QLabel(tipo.titulo)
         titulo.setObjectName("TituloTarjeta")
 
         layout = QVBoxLayout(self)
@@ -104,8 +109,8 @@ class FormularioAlzaView(QWidget):
         layout.addLayout(cabecera)
         layout.addWidget(
             QLabel(
-                "Planes (importe un Excel o pegue filas con Ctrl+V). Precios con coma o punto, "
-                "máximo 2 decimales:"
+                f"{tipo.lista.capitalize()} (importe un Excel o pegue filas con Ctrl+V). "
+                "Precios con coma o punto, máximo 2 decimales:"
             )
         )
         layout.addWidget(self._tabla, stretch=1)
@@ -146,35 +151,36 @@ class FormularioAlzaView(QWidget):
         )
 
     def mostrar_resultado(self, mensaje: str) -> None:
-        QMessageBox.information(self, TITULO, mensaje)
+        QMessageBox.information(self, self._tipo.titulo, mensaje)
 
     def mostrar_error(self, mensaje: str) -> None:
-        QMessageBox.critical(self, TITULO, mensaje)
+        QMessageBox.critical(self, self._tipo.titulo, mensaje)
 
     def confirmar_reemplazo(self, cantidad: int) -> bool:
         return self._preguntar(
             "Importar Excel",
-            f"Los {cantidad} planes del Excel reemplazarán las filas del formulario. "
-            "¿Desea continuar?",
+            f"Los {cantidad} {self._tipo.lista} del Excel reemplazarán las filas del "
+            "formulario. ¿Desea continuar?",
         )
 
-    def cargar_planes(self, filas: Sequence[Sequence[str]]) -> None:
-        self._modelo.cargar(_TITULOS, filas, ayudas=_AYUDAS)
+    def cargar_filas(self, filas: Sequence[Sequence[str]]) -> None:
+        self._modelo.cargar(self._titulos, filas, ayudas=self._ayudas)
 
     def confirmar_limpieza(self) -> bool:
         return self._preguntar(
-            "Limpiar formulario", "Se borrarán el requerimiento y los planes. ¿Desea continuar?"
+            "Limpiar formulario",
+            f"Se borrarán el requerimiento y los {self._tipo.lista}. ¿Desea continuar?",
         )
 
     def limpiar(self) -> None:
         self._requerimiento.clear()
-        self.cargar_planes([_FILA_VACIA])
+        self.cargar_filas([self._fila_vacia])
         self.mostrar_errores([])
 
     def mostrar_receta_generada(self, raiz: Path) -> None:
         caja = QMessageBox(
             QMessageBox.Icon.Information,
-            TITULO,
+            self._tipo.titulo,
             f"Receta generada en:\n{raiz}",
             QMessageBox.StandardButton.Ok,
             self,
@@ -200,7 +206,10 @@ class FormularioAlzaView(QWidget):
 
     def _elegir_excel(self) -> None:
         ruta, _ = QFileDialog.getOpenFileName(
-            self, "Importar planes desde Excel", self._carpeta.text(), "Libros de Excel (*.xlsx)"
+            self,
+            f"Importar {self._tipo.lista} desde Excel",
+            self._carpeta.text(),
+            "Libros de Excel (*.xlsx)",
         )
         if ruta:
             self.importar_solicitado.emit(ruta)

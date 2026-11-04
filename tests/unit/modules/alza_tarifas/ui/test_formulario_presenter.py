@@ -2,20 +2,21 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
+from pydantic import BaseModel
+
 from recetas.core.domain.errors import ImportacionError, RecetaExistenteError, RecetasError
 from recetas.core.domain.importacion import FormatoHoja
 from recetas.core.domain.recipe_bundle import RecipeBundle
 from recetas.modules.alza_tarifas.application.generar_alza import AlzaGenerada
 from recetas.modules.alza_tarifas.domain.advertencias import Advertencia
-from recetas.modules.alza_tarifas.domain.solicitud import SolicitudAlzaPlanes
 from recetas.modules.alza_tarifas.ui.formulario_presenter import (
     CLAVE_AUTOR,
     CLAVE_CARPETA,
-    COLUMNAS,
     DatosAlza,
     ErrorCampo,
     FormularioAlzaPresenter,
 )
+from recetas.modules.alza_tarifas.ui.tipos_formulario import PLANES, TipoFormulario
 from tests.factories import datos_plan_alza
 
 # ---------- Dobles de prueba ----------
@@ -53,7 +54,7 @@ class VistaFalsa:
         self.preguntas.append("reemplazar")
         return self.respuestas
 
-    def cargar_planes(self, filas: Sequence[Sequence[str]]) -> None:
+    def cargar_filas(self, filas: Sequence[Sequence[str]]) -> None:
         self.cargadas = [list(f) for f in filas]
 
     def confirmar_limpieza(self) -> bool:
@@ -71,9 +72,9 @@ class GeneradorFalso:
     def __init__(self, advertencias: tuple[Advertencia, ...] = (), falla: bool = False) -> None:
         self.advertencias = advertencias
         self.falla = falla
-        self.solicitudes: list[SolicitudAlzaPlanes] = []
+        self.solicitudes: list[BaseModel] = []
 
-    def ejecutar(self, solicitud: SolicitudAlzaPlanes) -> AlzaGenerada:
+    def ejecutar(self, solicitud: BaseModel) -> AlzaGenerada:
         self.solicitudes.append(solicitud)
         if self.falla:
             raise RecetasError("No se pudo generar el alza.")
@@ -96,8 +97,10 @@ class LectorFalso:
     def __init__(self, filas: list[list[str]] | None = None, falla: bool = False) -> None:
         self.filas = filas
         self.falla = falla
+        self.formatos: list[FormatoHoja] = []
 
     def leer(self, ruta: Path, formato: FormatoHoja) -> list[list[str]]:
+        self.formatos.append(formato)
         if self.falla:
             raise ImportacionError("No se pudo leer 'alza.xlsx'.")
         return self.filas if self.filas is not None else [fila()]
@@ -116,13 +119,13 @@ class PreferenciasEnMemoria:
 
 # ---------- Helpers ----------
 
-VACIO = [[""] * len(COLUMNAS)]
+VACIO = [[""] * len(PLANES.columnas)]
 
 
 def fila(**cambios: Any) -> list[str]:
     """Una fila de la tabla con el plan 'Pospago 5.1 Empresarial' de TPFB-1726."""
     plano = datos_plan_alza(**cambios)
-    return [str(plano[c.campo]) for c in COLUMNAS]
+    return [str(plano[c.campo]) for c in PLANES.columnas]
 
 
 def datos(filas: list[list[str]] | None = None, **cambios: Any) -> DatosAlza:
@@ -142,8 +145,10 @@ def presenter(
     escritor: EscritorFalso | None = None,
     lector: LectorFalso | None = None,
     preferencias: PreferenciasEnMemoria | None = None,
-) -> FormularioAlzaPresenter:
+    tipo: TipoFormulario[Any] = PLANES,
+) -> FormularioAlzaPresenter[Any]:
     return FormularioAlzaPresenter(
+        tipo,
         vista,
         generador or GeneradorFalso(),
         escritor or EscritorFalso(),

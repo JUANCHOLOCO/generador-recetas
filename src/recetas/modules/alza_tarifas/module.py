@@ -16,6 +16,7 @@ from recetas.modules.alza_tarifas.ui.formulario_presenter import (
     FormularioAlzaPresenter,
 )
 from recetas.modules.alza_tarifas.ui.formulario_view import FormularioAlzaView
+from recetas.modules.alza_tarifas.ui.tipos_formulario import PLANES
 
 INFO = ModuleInfo(
     id="alza_tarifas",
@@ -36,11 +37,12 @@ class AlzaTarifasModule(Module):
     def create_widget(self, parent: QWidget | None = None) -> QWidget:
         preferencias = self._context.preferencias
         vista = FormularioAlzaView(
+            PLANES,
             autor_sugerido=preferencias.leer(CLAVE_AUTOR) or self._context.usuario.nombre(),
             carpeta_sugerida=preferencias.leer(CLAVE_CARPETA) or str(self._context.paths.output),
         )
         presenter = FormularioAlzaPresenter(
-            vista, self.generar_alza(), EscritorDeRecetas(), LectorExcel(), preferencias
+            PLANES, vista, self.generar_alza(), EscritorDeRecetas(), LectorExcel(), preferencias
         )
         vista.generar_solicitado.connect(lambda: presenter.generar(vista.datos()))
         vista.importar_solicitado.connect(

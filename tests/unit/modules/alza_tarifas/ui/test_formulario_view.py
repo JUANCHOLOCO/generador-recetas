@@ -2,14 +2,15 @@ import pytest
 from PySide6.QtCore import Qt
 from pytestqt.qtbot import QtBot
 
-from recetas.modules.alza_tarifas.ui.formulario_presenter import COLUMNAS, ErrorCampo
+from recetas.modules.alza_tarifas.ui.formulario_presenter import ErrorCampo
 from recetas.modules.alza_tarifas.ui.formulario_view import FormularioAlzaView
+from recetas.modules.alza_tarifas.ui.tipos_formulario import PLANES
 
 pytestmark = pytest.mark.ui
 
 
 def test_lee_lo_escrito_y_marca_errores_en_la_tabla(qtbot: QtBot) -> None:
-    vista = FormularioAlzaView("jbotero", "C:/recetas")
+    vista = FormularioAlzaView(PLANES, "jbotero", "C:/recetas")
     qtbot.addWidget(vista)
 
     datos = vista.datos()
@@ -21,13 +22,13 @@ def test_lee_lo_escrito_y_marca_errores_en_la_tabla(qtbot: QtBot) -> None:
         "PROD",
         "C:/recetas",
     )
-    assert datos.filas == [[""] * len(COLUMNAS)]
+    assert datos.filas == [[""] * len(PLANES.columnas)]
     celda = vista._modelo.index(0, 1)
     assert vista._modelo.data(celda, Qt.ItemDataRole.ToolTipRole) == "Fila 1 › Part_num: formato"
 
 
 def test_los_encabezados_explican_el_formato(qtbot: QtBot) -> None:
-    vista = FormularioAlzaView("jbotero", "C:/recetas")
+    vista = FormularioAlzaView(PLANES, "jbotero", "C:/recetas")
     qtbot.addWidget(vista)
 
     ayuda = vista._modelo.headerData(1, Qt.Orientation.Horizontal, Qt.ItemDataRole.ToolTipRole)
@@ -36,13 +37,13 @@ def test_los_encabezados_explican_el_formato(qtbot: QtBot) -> None:
 
 
 def test_limpiar_vacia_requerimiento_y_planes_pero_conserva_el_autor(qtbot: QtBot) -> None:
-    vista = FormularioAlzaView("jbotero", "C:/recetas")
+    vista = FormularioAlzaView(PLANES, "jbotero", "C:/recetas")
     qtbot.addWidget(vista)
     vista._requerimiento.setText("TPFB-1726")
-    vista.cargar_planes([["x"] * len(COLUMNAS)] * 2)
+    vista.cargar_filas([["x"] * len(PLANES.columnas)] * 2)
 
     vista.limpiar()
 
     datos = vista.datos()
     assert (datos.requerimiento, datos.autor) == ("", "jbotero")
-    assert datos.filas == [[""] * len(COLUMNAS)]
+    assert datos.filas == [[""] * len(PLANES.columnas)]

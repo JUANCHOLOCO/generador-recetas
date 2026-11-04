@@ -10,8 +10,8 @@ from recetas.core.infrastructure.files.escritor import EscritorDeRecetas
 from recetas.core.infrastructure.files.excel import LectorExcel
 from recetas.main import build_context
 from recetas.modules.alza_tarifas.module import AlzaTarifasModule
-from recetas.modules.alza_tarifas.ui.formulario_presenter import FORMATO_EXCEL
 from recetas.modules.alza_tarifas.ui.formulario_view import FormularioAlzaView
+from recetas.modules.alza_tarifas.ui.tipos_formulario import PLANES
 from tests.factories import crear_solicitud_alza
 
 pytestmark = pytest.mark.integration
@@ -42,11 +42,11 @@ def test_el_modulo_muestra_la_pestana_de_planes_pospago(tmp_path: Path, qtbot: Q
 def test_importa_un_excel_con_los_titulos_de_la_tabla(tmp_path: Path) -> None:
     libro = Workbook()
     hoja = libro.active
-    hoja.append(list(FORMATO_EXCEL.encabezados))
+    hoja.append(list(PLANES.formato_excel.encabezados))
     hoja.append([1208, "PLCON0335", "Pospago 5.1 Empresarial", 68083, 56320, 61950, 51246.3])
     ruta = tmp_path / "alza.xlsx"
     libro.save(ruta)
 
-    assert LectorExcel().leer(ruta, FORMATO_EXCEL) == [
+    assert LectorExcel().leer(ruta, PLANES.formato_excel) == [
         ["1208", "PLCON0335", "Pospago 5.1 Empresarial", "68083", "56320", "61950", "51246.3"]
     ]

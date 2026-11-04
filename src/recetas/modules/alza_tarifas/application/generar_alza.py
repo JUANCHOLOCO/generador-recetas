@@ -1,4 +1,4 @@
-"""Caso de uso: generar la receta del alza de planes pospago."""
+"""Casos de uso: generar la receta del alza de planes pospago y de paquetes."""
 
 import logging
 from dataclasses import dataclass
