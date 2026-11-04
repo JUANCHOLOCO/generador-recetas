@@ -4,7 +4,7 @@ from pytestqt.qtbot import QtBot
 
 from recetas.modules.alza_tarifas.ui.formulario_presenter import ErrorCampo
 from recetas.modules.alza_tarifas.ui.formulario_view import FormularioAlzaView
-from recetas.modules.alza_tarifas.ui.tipos_formulario import PLANES
+from recetas.modules.alza_tarifas.ui.tipos_formulario import PAQUETES, PLANES
 
 pytestmark = pytest.mark.ui
 
@@ -47,3 +47,18 @@ def test_limpiar_vacia_requerimiento_y_planes_pero_conserva_el_autor(qtbot: QtBo
     datos = vista.datos()
     assert (datos.requerimiento, datos.autor) == ("", "jbotero")
     assert datos.filas == [[""] * len(PLANES.columnas)]
+
+
+def test_la_pestana_de_paquetes_muestra_sus_columnas(qtbot: QtBot) -> None:
+    vista = FormularioAlzaView(PAQUETES, "jbotero", "C:/recetas")
+    qtbot.addWidget(vista)
+    horizontal = Qt.Orientation.Horizontal
+
+    titulos = [
+        vista._modelo.headerData(i, horizontal, Qt.ItemDataRole.DisplayRole)
+        for i in range(len(PAQUETES.columnas))
+    ]
+
+    assert titulos == [c.titulo for c in PAQUETES.columnas]
+    ayuda = vista._modelo.headerData(1, horizontal, Qt.ItemDataRole.ToolTipRole)
+    assert ayuda == "SVALL#### (ej. SVALL2322)"

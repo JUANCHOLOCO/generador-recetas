@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
@@ -9,6 +10,7 @@ from recetas.core.domain.importacion import FormatoHoja
 from recetas.core.domain.recipe_bundle import RecipeBundle
 from recetas.modules.alza_tarifas.application.generar_alza import AlzaGenerada
 from recetas.modules.alza_tarifas.domain.advertencias import Advertencia
+from recetas.modules.alza_tarifas.domain.solicitud import SolicitudAlzaPaquetes
 from recetas.modules.alza_tarifas.ui.formulario_presenter import (
     CLAVE_AUTOR,
     CLAVE_CARPETA,
@@ -16,8 +18,8 @@ from recetas.modules.alza_tarifas.ui.formulario_presenter import (
     ErrorCampo,
     FormularioAlzaPresenter,
 )
-from recetas.modules.alza_tarifas.ui.tipos_formulario import PLANES, TipoFormulario
-from tests.factories import datos_plan_alza
+from recetas.modules.alza_tarifas.ui.tipos_formulario import PAQUETES, PLANES, TipoFormulario
+from tests.factories import datos_paquete_alza, datos_plan_alza
 
 # ---------- Dobles de prueba ----------
 
@@ -313,3 +315,49 @@ def test_limpiar_con_datos_pide_confirmacion_y_si_cancela_no_limpia() -> None:
 
     assert vista.preguntas == ["limpiar"]
     assert not vista.limpiado
+
+
+# ---------- Paquetes ----------
+
+
+def fila_paquete(**cambios: Any) -> list[str]:
+    """Una fila de la tabla con el paquete 'Paquete Datos Corporativo 4.0 Plus'."""
+    paquete = datos_paquete_alza(**cambios)
+    return [str(paquete[c.campo]) for c in PAQUETES.columnas]
+
+
+def test_paquete_valido_llega_al_caso_de_uso_como_solicitud_de_paquetes() -> None:
+    vista, generador = VistaFalsa(), GeneradorFalso()
+
+    presenter(vista, generador, tipo=PAQUETES).generar(datos(filas=[fila_paquete()]))
+
+    [solicitud] = generador.solicitudes
+    assert isinstance(solicitud, SolicitudAlzaPaquetes)
+    assert solicitud.paquetes[0].sin_iva_actual == Decimal("10605.04")
+
+
+def test_paquetes_validan_su_propio_part_num() -> None:
+    vista = VistaFalsa()
+
+    presenter(vista, tipo=PAQUETES).generar(datos(filas=[fila_paquete(part_num="PLCON0335")]))
+
+    [error] = vista.errores
+    assert (error.fila, error.columna) == (0, 1)
+    assert error.mensaje.startswith("Fila 1 › Part_num: Debe tener el formato SVALL####")
+
+
+def test_paquetes_sin_filas_piden_al_menos_un_paquete() -> None:
+    vista = VistaFalsa()
+
+    presenter(vista, tipo=PAQUETES).generar(datos(filas=VACIO))
+
+    assert [e.mensaje for e in vista.errores] == ["Paquetes: Debe agregar al menos un paquete."]
+
+
+def test_importar_paquetes_lee_el_excel_con_los_titulos_de_paquetes() -> None:
+    vista, lector = VistaFalsa(), LectorFalso([fila_paquete()])
+
+    presenter(vista, lector=lector, tipo=PAQUETES).importar(Path("paquetes.xlsx"), VACIO)
+
+    assert lector.formatos == [PAQUETES.formato_excel]
+    assert vista.mensajes[0].startswith("Se importaron 1 paquetes de 'paquetes.xlsx'")
