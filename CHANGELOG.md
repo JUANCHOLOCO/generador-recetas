@@ -53,6 +53,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
 - Botón "Abrir carpeta" al terminar de generar la receta (visual 1).
 - La app recuerda el último autor y la carpeta de salida en `preferencias.json`, junto a la app
   (visual 2).
+- Módulo "Alza de tarifas", pestaña "Planes pospago": aplica y rollback de `ACTIVATOR.PLANS` con
+  los valores que ingresa el usuario (formulario o Excel), sin cálculos, con advertencias de
+  precio menor que el actual o en 0, y golden contra TPFB-1726 (Fase 8A).
 
 ### Corregido
 - Scoring modelado como dos listas independientes (SCORING_PLAN y CPL_SCORING_PLAN).

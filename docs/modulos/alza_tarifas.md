@@ -18,9 +18,9 @@ tampoco sigue una sola fórmula.
 
 ## 1. Tipos de alza
 
-Un solo módulo en el menú ("Alza de tarifas") con un selector del tipo. Los dos tipos comparten la
-cabecera, la estructura de carpetas y los lanzadores. Cambian las columnas de la tabla y la
-plantilla SQL.
+Un solo módulo en el menú ("Alza de tarifas") con **una pestaña por tipo** ("Planes pospago" y
+"Paquetes"). Los dos tipos comparten la cabecera, la estructura de carpetas y los lanzadores.
+Cambian las columnas de la tabla y la plantilla SQL.
 
 | Tipo | Tablas que actualiza |
 |---|---|
@@ -33,11 +33,10 @@ No aplica Corriente/Anticipada.
 
 ## 2. Formulario
 
-### Cabecera
+### Cabecera (en cada pestaña)
 
 | Campo | Regla |
 |---|---|
-| Tipo de alza | Planes pospago / Paquetes |
 | Número de requerimiento | Igual que en Creación de planes (`TPFB-####`, máx. 30) |
 | Autor | Igual que en Creación de planes (recordado en `preferencias.json`) |
 | Ambiente | Dev / UAT / Prod: define la carpeta raíz `<RQ>_<Ambiente>` |
