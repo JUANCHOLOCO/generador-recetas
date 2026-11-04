@@ -5,8 +5,16 @@ from dataclasses import dataclass
 
 from recetas.core.application.ports import Reloj, TemplateRenderer
 from recetas.core.domain.recipe_bundle import RecipeBundle
-from recetas.modules.alza_tarifas.domain.advertencias import Advertencia, advertencias_planes
-from recetas.modules.alza_tarifas.domain.solicitud import SolicitudAlzaPlanes
+from recetas.modules.alza_tarifas.domain.advertencias import (
+    Advertencia,
+    advertencias_paquetes,
+    advertencias_planes,
+)
+from recetas.modules.alza_tarifas.domain.solicitud import (
+    SolicitudAlzaPaquetes,
+    SolicitudAlzaPlanes,
+)
+from recetas.modules.alza_tarifas.generators.paquetes import AlzaPaquetesGenerator
 from recetas.modules.alza_tarifas.generators.planes import AlzaPlanesGenerator
 
 logger = logging.getLogger(__name__)
@@ -32,6 +40,25 @@ class GenerarAlzaPlanes:
             "Alza de planes %s: %d planes, %d advertencias",
             bundle.root,
             len(solicitud.planes),
+            len(advertencias),
+        )
+        return AlzaGenerada(bundle, advertencias)
+
+
+class GenerarAlzaPaquetes:
+    def __init__(self, renderer: TemplateRenderer, reloj: Reloj, version: str) -> None:
+        self._generador = AlzaPaquetesGenerator(renderer)
+        self._reloj = reloj
+        self._version = version
+
+    def ejecutar(self, solicitud: SolicitudAlzaPaquetes) -> AlzaGenerada:
+        bundle = RecipeBundle(f"{solicitud.requerimiento}_{solicitud.ambiente.sufijo}")
+        self._generador.generar(solicitud, self._reloj.hoy(), self._version, bundle)
+        advertencias = advertencias_paquetes(solicitud)
+        logger.info(
+            "Alza de paquetes %s: %d paquetes, %d advertencias",
+            bundle.root,
+            len(solicitud.paquetes),
             len(advertencias),
         )
         return AlzaGenerada(bundle, advertencias)
