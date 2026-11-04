@@ -78,9 +78,9 @@ aplica de TPFB-1726 lo tiene mal en 265 de 283 paquetes; el golden lo declara co
 ### Importar Excel
 
 Botón "Importar Excel" igual al de Creación de planes (importador genérico del núcleo,
-`FormatoHoja`). Primera hoja, encabezados en la **fila 1** con los títulos de la tabla del tipo
-elegido, datos desde la fila 2. Los planes importados reemplazan las filas (con confirmación si ya
-había datos) y pasan por la misma validación.
+`FormatoHoja`). Primera hoja, encabezados en la **fila 1** con los títulos de la tabla de la
+pestaña, datos desde la fila 2. Las filas importadas reemplazan las del formulario (con
+confirmación si ya había datos) y pasan por la misma validación.
 
 ---
 

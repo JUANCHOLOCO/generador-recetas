@@ -1,0 +1,11 @@
+{% import "_comun.sql.j2" as comun %}
+{{ comun.inicio_datos(cab) }}
+
+{{ comun.seccion(cab.objetivo ~ " (" ~ filas | length ~ " paquetes)") }}
+{% for paquete in filas %}
+-- Paquete: {{ paquete.nombre }}
+UPDATE ACTIVATOR.SERVICES SET ITEM_PRICE={{ paquete.con_iva }} WHERE ID={{ paquete.id }} AND PART_NUM={{ paquete.part_num }};
+UPDATE ACTIVATOR.ATP_CORP_PRECIOS_SERVICE SET ITEM_PRICE={{ paquete.sin_iva }}, ITEM_PRICE_IVA={{ paquete.con_iva }} WHERE PART_NUM={{ paquete.part_num }};
+{% endfor %}
+
+{{ comun.fin_datos() }}

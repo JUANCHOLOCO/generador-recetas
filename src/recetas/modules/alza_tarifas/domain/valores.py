@@ -85,6 +85,7 @@ Autor = Annotated[TextoObligatorio, _maximo(MAX_AUTOR)]
 Nombre = Annotated[TextoObligatorio, _maximo(MAX_NOMBRE)]
 IdNumerico = Annotated[TextoObligatorio, _maximo(MAX_ID), _formato(r"\d+", "numérico (ej. 1208)")]
 PartNumPlan = Annotated[TextoObligatorio, _formato(r"PLCON\d{4}", "PLCON#### (ej. PLCON0335)")]
+PartNumPaquete = Annotated[TextoObligatorio, _formato(r"SVALL\d{4}", "SVALL#### (ej. SVALL2322)")]
 Precio = Annotated[Decimal, BeforeValidator(_a_precio)]
 
 

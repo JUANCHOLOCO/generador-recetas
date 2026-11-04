@@ -5,7 +5,7 @@ from dataclasses import replace
 from typing import Any
 
 from recetas.core.domain.billing import BillingType
-from recetas.modules.alza_tarifas.domain.solicitud import SolicitudAlzaPlanes
+from recetas.modules.alza_tarifas.domain.solicitud import SolicitudAlzaPaquetes, SolicitudAlzaPlanes
 from recetas.modules.creacion_planes_pospago.domain.parametrizacion import Parametrizacion
 from recetas.modules.creacion_planes_pospago.domain.plan import PlanNuevo, SolicitudReceta
 
@@ -90,5 +90,30 @@ def crear_solicitud_alza(*planes: dict[str, Any]) -> SolicitudAlzaPlanes:
             "autor": "Equipo Tecnico",
             "ambiente": "PROD",
             "planes": list(planes) if planes else [datos_plan_alza()],
+        }
+    )
+
+
+def datos_paquete_alza(**cambios: Any) -> dict[str, Any]:
+    """Paquete 'Paquete Datos Corporativo 4.0 Plus' del alza TPFB-1726."""
+    datos: dict[str, Any] = {
+        "id": "28708",
+        "part_num": "SVALL2322",
+        "nombre": "Paquete Datos Corporativo 4.0 Plus",
+        "con_iva_nuevo": "13990",
+        "sin_iva_nuevo": "11756",
+        "con_iva_actual": "12620",
+        "sin_iva_actual": "10605,04",
+    }
+    return datos | cambios
+
+
+def crear_solicitud_paquetes(*paquetes: dict[str, Any]) -> SolicitudAlzaPaquetes:
+    return SolicitudAlzaPaquetes.model_validate(
+        {
+            "requerimiento": "TPFB-1726",
+            "autor": "Equipo Tecnico",
+            "ambiente": "PROD",
+            "paquetes": list(paquetes) if paquetes else [datos_paquete_alza()],
         }
     )
