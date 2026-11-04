@@ -9,7 +9,7 @@ Orden acordado (actualizado 2026-10-29):
 6A+ tema visual ✅ → 6B parametrización ✅ → Ajustes A (robustez) ✅
 → P1 propiedades (.properties en Conf/) ✅ → P2 panel "Propiedades para el MOP" ✅
 → Ajustes B (importador Excel genérico + uso diario) ✅
-→ Análisis de Alza de tarifas ✅ → 8A Alza de tarifas: planes pospago
+→ Análisis de Alza de tarifas ✅ → 8A Alza de tarifas: planes pospago ✅
 → 8B Alza de tarifas: paquetes → Ajustes C (pulido) → 7 portable
 ```
 
