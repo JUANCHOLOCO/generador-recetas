@@ -47,3 +47,13 @@ def test_limpiar_vacia_requerimiento_tipo_y_planes_pero_conserva_el_autor(qtbot:
     datos = vista.datos()
     assert (datos.requerimiento, datos.tipo, datos.autor) == ("", "", "jbotero")
     assert datos.filas == [[""] * len(COLUMNAS)]
+
+
+def test_los_encabezados_explican_el_formato(qtbot: QtBot) -> None:
+    vista = FormularioView("jbotero", "C:/recetas")
+    qtbot.addWidget(vista)
+
+    ayuda = vista._modelo.headerData(1, Qt.Orientation.Horizontal, Qt.ItemDataRole.ToolTipRole)
+
+    assert ayuda == "PLCON#### (ej. PLCON0454)"
+    assert all(c.ayuda for c in COLUMNAS)
