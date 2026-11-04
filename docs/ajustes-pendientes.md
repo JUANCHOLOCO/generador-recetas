@@ -9,7 +9,7 @@ Orden acordado (actualizado 2026-10-29):
 6A+ tema visual ✅ → 6B parametrización ✅ → Ajustes A (robustez) ✅
 → P1 propiedades (.properties en Conf/) ✅ → P2 panel "Propiedades para el MOP" ✅
 → Ajustes B (importador Excel genérico + uso diario) ✅
-→ Análisis de Alza de tarifas ✅ → 8A Alza de tarifas: planes pospago
+→ Análisis de Alza de tarifas ✅ → 8A Alza de tarifas: planes pospago ✅
 → 8B Alza de tarifas: paquetes → Ajustes C (pulido) → 7 portable
 ```
 
@@ -109,5 +109,7 @@ Recibidos el 2026-10-27 (el usuario puede agregar más).
 | Pendiente | Origen |
 |---|---|
 | Uso de la imagen `coloresDiseno.jpeg` en la pantalla de bienvenida | Solo si el área de comunicaciones/marca lo aprueba (docs/diseno-visual.md) |
+| Extraer al núcleo los validadores de texto que repiten los dos módulos (`Requerimiento`, `Autor`, `Nombre`, texto sin caracteres de control) | Fase 8A: se copiaron en `alza_tarifas/domain/valores.py` para cumplir la guía de módulos nuevos (sin tocar `core/`). Si aparece un tercer módulo, se mueven a `core/domain/` con un ADR |
+| Quitar la línea suelta `QButtonGroup(self)` en `creacion_planes_pospago/ui/formulario_view.py` (crea un grupo que no se usa) | Revisión de la Fase 8A; va con la entrega C |
 | Login de usuario (el autor pasaría a ser el usuario logueado) | Opcional; el diseño ya lo soporta con el puerto `UsuarioActual` |
 | **Generar el MOP desde una plantilla Excel** según la receta o el alza de tarifas | Pedido del usuario (2026-10-29), para analizar más adelante. Ojo: openpyxl elimina extensiones que no soporta (validaciones de datos) al guardar una plantilla existente |

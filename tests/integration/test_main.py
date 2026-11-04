@@ -14,8 +14,10 @@ def test_build_context_crea_y_migra_la_base(tmp_path: Path) -> None:
     assert (tmp_path / "recetas.db").is_file()
 
 
-def test_el_modulo_pospago_queda_registrado(tmp_path: Path) -> None:
+def test_los_modulos_quedan_registrados_en_orden(tmp_path: Path) -> None:
     registry = build_registry(build_context(AppPaths(base=tmp_path)))
 
-    assert "creacion_planes_pospago" in registry
-    assert registry.modules()[0].info.name == "Creación de planes Pospago"
+    assert [m.info.name for m in registry.modules()] == [
+        "Creación de planes Pospago",
+        "Alza de tarifas",
+    ]

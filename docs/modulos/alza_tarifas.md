@@ -4,7 +4,7 @@ Genera los scripts de actualización de tarifas (aplica y rollback) en la BD **A
 tipos de alza: **planes pospago** y **paquetes**. Reemplaza la edición manual de los scripts.
 
 Recetas de referencia para las pruebas golden: **TPFB-1726** (`D:\proyectosJuan\ScriptAlza`):
-`pospago/` (28 planes) y `paquetes/` (283 paquetes).
+`pospago/` (27 planes) y `paquetes/` (283 paquetes).
 
 **Regla principal (decisión del usuario, 2026-11-03):** el módulo **no calcula** precios. Escribe en
 los scripts exactamente los valores que el usuario ingresa en el formulario o importa desde un
@@ -18,9 +18,9 @@ tampoco sigue una sola fórmula.
 
 ## 1. Tipos de alza
 
-Un solo módulo en el menú ("Alza de tarifas") con un selector del tipo. Los dos tipos comparten la
-cabecera, la estructura de carpetas y los lanzadores. Cambian las columnas de la tabla y la
-plantilla SQL.
+Un solo módulo en el menú ("Alza de tarifas") con **una pestaña por tipo** ("Planes pospago" y
+"Paquetes"). Los dos tipos comparten la cabecera, la estructura de carpetas y los lanzadores.
+Cambian las columnas de la tabla y la plantilla SQL.
 
 | Tipo | Tablas que actualiza |
 |---|---|
@@ -33,11 +33,10 @@ No aplica Corriente/Anticipada.
 
 ## 2. Formulario
 
-### Cabecera
+### Cabecera (en cada pestaña)
 
 | Campo | Regla |
 |---|---|
-| Tipo de alza | Planes pospago / Paquetes |
 | Número de requerimiento | Igual que en Creación de planes (`TPFB-####`, máx. 30) |
 | Autor | Igual que en Creación de planes (recordado en `preferencias.json`) |
 | Ambiente | Dev / UAT / Prod: define la carpeta raíz `<RQ>_<Ambiente>` |
@@ -89,16 +88,23 @@ había datos) y pasan por la misma validación.
 
 ```
 <carpeta>/<RQ>_<Ambiente>/
-└── Script/
-    └── ACTIVADOR/
-        ├── aplica-cambio.sql
-        ├── rollback-cambio.sql
-        ├── SQL/1_UPDATE_<RQ>_<TIPO>_SCRIPT.SQL
-        └── ROLLBACK/1_ROLLBACK_UPDATE_<RQ>_<TIPO>_SCRIPT.SQL
+└── <Carpeta del tipo>/            (AlzaPlanesPospago/ o AlzaPaquetes/)
+    └── Script/
+        └── ACTIVADOR/
+            ├── aplica-cambio.sql
+            ├── rollback-cambio.sql
+            ├── SQL/1_UPDATE_<RQ>_<TIPO>_SCRIPT.SQL
+            └── ROLLBACK/1_ROLLBACK_UPDATE_<RQ>_<TIPO>_SCRIPT.SQL
 ```
 
 `<TIPO>` = `PLANES_POSPAGO` o `PAQUETES`. Windows-1252, CRLF, cabecera según
 [estandar-scripts.md](../estandar-scripts.md). Los nombres no llevan tildes ni espacios.
+
+Cada tipo tiene su carpeta porque el escritor reemplaza la carpeta de primer nivel: así, el alza
+de planes y la de paquetes de un mismo requerimiento conviven sin borrarse.
+
+Los `ID` y `PART_NUM` van entre comillas (`WHERE ID='1208'`), igual que en Creación de planes y en
+los scripts de referencia; los precios van sin comillas.
 
 ---
 
@@ -108,14 +114,14 @@ había datos) y pasan por la misma validación.
 
 ```sql
 -- Plan: Pospago 5.1 Empresarial
-UPDATE ACTIVATOR.PLANS SET ITEM_PRICE=68083, VENDOR_VALUE=68083, ITEM_PRICE_PRORRATE=56320 WHERE ID=1208 AND PART_NUM='PLCON0335';
+UPDATE ACTIVATOR.PLANS SET ITEM_PRICE=68083, VENDOR_VALUE=68083, ITEM_PRICE_PRORRATE=56320 WHERE ID='1208' AND PART_NUM='PLCON0335';
 ```
 
 **Aplica, paquetes** (tres líneas por paquete):
 
 ```sql
 -- Paquete: Paquete Datos Corporativo 4.0 Plus
-UPDATE ACTIVATOR.SERVICES SET ITEM_PRICE=13990 WHERE ID=28708 AND PART_NUM='SVALL2322';
+UPDATE ACTIVATOR.SERVICES SET ITEM_PRICE=13990 WHERE ID='28708' AND PART_NUM='SVALL2322';
 UPDATE ACTIVATOR.ATP_CORP_PRECIOS_SERVICE SET ITEM_PRICE=11756, ITEM_PRICE_IVA=13990 WHERE PART_NUM='SVALL2322';
 ```
 
