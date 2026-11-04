@@ -1,11 +1,17 @@
 """Tabla tipo hoja de cálculo: edición, pegado desde Excel y errores marcados por celda."""
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from typing import override
 
 from PySide6.QtCore import QAbstractTableModel, QModelIndex, QObject, QPersistentModelIndex, Qt
 from PySide6.QtGui import QBrush, QColor, QGuiApplication, QKeyEvent, QKeySequence
-from PySide6.QtWidgets import QTableView, QWidget
+from PySide6.QtWidgets import (
+    QAbstractItemDelegate,
+    QAbstractItemView,
+    QApplication,
+    QTableView,
+    QWidget,
+)
 
 Indice = QModelIndex | QPersistentModelIndex
 Celda = tuple[int, int]
@@ -106,6 +112,13 @@ class TablaEditableModel(QAbstractTableModel):
             ultima = self.index(len(self._filas) - 1, len(self._titulos) - 1)
             self.dataChanged.emit(self.index(0, 0), ultima)
 
+    def vaciar(self, celdas: Iterable[Celda]) -> None:
+        """Deja en blanco las celdas (tecla Supr) y quita sus errores; los demás se conservan."""
+        for fila, columna in celdas:
+            self._filas[fila][columna] = ""
+            self._errores.pop((fila, columna), None)
+        self.marcar_errores(self._errores)
+
     def cargar(
         self,
         titulos: Sequence[str],
@@ -127,7 +140,7 @@ class TablaEditableModel(QAbstractTableModel):
 
 
 class TablaEditable(QTableView):
-    """Vista de la tabla que entiende Ctrl+V con datos copiados de Excel."""
+    """Tabla tipo Excel: Ctrl+V pega, Supr vacía y las columnas se ajustan al contenido."""
 
     def __init__(self, modelo: TablaEditableModel, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -136,6 +149,17 @@ class TablaEditable(QTableView):
         self.horizontalHeader().setStretchLastSection(True)
         self.setAlternatingRowColors(True)
         self.verticalHeader().setDefaultSectionSize(30)
+        modelo.modelReset.connect(self.resizeColumnsToContents)
+        self.resizeColumnsToContents()
+
+    def confirmar_edicion(self) -> None:
+        """Guarda la celda que se está escribiendo (un atajo de teclado no le quita el foco)."""
+        if self.state() != QAbstractItemView.State.EditingState:
+            return
+        editor = QApplication.focusWidget()
+        if editor is not None:
+            self.commitData(editor)
+            self.closeEditor(editor, QAbstractItemDelegate.EndEditHint.NoHint)
 
     @override
     def keyPressEvent(self, event: QKeyEvent) -> None:
@@ -143,5 +167,9 @@ class TablaEditable(QTableView):
             actual = self.currentIndex()
             texto = QGuiApplication.clipboard().text()
             self._modelo.pegar(texto, max(actual.row(), 0), max(actual.column(), 0))
+            self.resizeColumnsToContents()
+            return
+        if event.matches(QKeySequence.StandardKey.Delete):
+            self._modelo.vaciar((i.row(), i.column()) for i in self.selectedIndexes())
             return
         super().keyPressEvent(event)
