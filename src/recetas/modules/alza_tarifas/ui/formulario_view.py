@@ -23,6 +23,7 @@ from recetas.core.domain.ambiente import Ambiente
 from recetas.modules.alza_tarifas.domain.valores import MAX_AUTOR, MAX_REQUERIMIENTO
 from recetas.modules.alza_tarifas.ui.formulario_presenter import DatosAlza, ErrorCampo
 from recetas.modules.alza_tarifas.ui.tipos_formulario import TipoFormulario
+from recetas.ui.widgets.atajos import conectar_generar
 from recetas.ui.widgets.tabla_editable import TablaEditable, TablaEditableModel
 
 
@@ -87,6 +88,7 @@ class FormularioAlzaView(QWidget):
         generar = QPushButton("Generar receta")
         generar.setProperty("variante", "primario")
         generar.setDefault(True)
+        generar.setToolTip("Ctrl+Enter")
         generar.clicked.connect(self.generar_solicitado)
         botones = QHBoxLayout()
         botones.addWidget(importar)
@@ -116,6 +118,7 @@ class FormularioAlzaView(QWidget):
         layout.addWidget(self._tabla, stretch=1)
         layout.addLayout(botones)
         layout.addWidget(self._errores)
+        conectar_generar(self, self._tabla, self.generar_solicitado.emit)
 
     # ---------- Lo que el presenter lee ----------
 

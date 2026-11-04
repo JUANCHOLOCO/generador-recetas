@@ -31,6 +31,7 @@ from recetas.modules.creacion_planes_pospago.ui.formulario_presenter import (
     ErrorCampo,
 )
 from recetas.modules.creacion_planes_pospago.ui.propiedades_dialog import PropiedadesDialog
+from recetas.ui.widgets.atajos import conectar_generar
 from recetas.ui.widgets.tabla_editable import TablaEditable, TablaEditableModel
 
 TITULO = "Creación de planes Pospago"
@@ -98,6 +99,7 @@ class FormularioView(QWidget):
         generar = QPushButton("Generar receta")
         generar.setProperty("variante", "primario")
         generar.setDefault(True)
+        generar.setToolTip("Ctrl+Enter")
         generar.clicked.connect(self.generar_solicitado)
         importar = QPushButton("Importar Excel…")
         importar.setProperty("variante", "secundario")
@@ -135,6 +137,7 @@ class FormularioView(QWidget):
         layout.addLayout(botones)
         layout.addWidget(self._avisos)
         layout.addWidget(self._errores)
+        conectar_generar(self, self._tabla, self.generar_solicitado.emit)
 
     # ---------- Lo que el presenter lee ----------
 
