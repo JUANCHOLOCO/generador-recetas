@@ -1,5 +1,6 @@
 """Punto de entrada y composition root de la aplicación."""
 
+import ctypes
 import logging
 import sys
 
@@ -40,7 +41,14 @@ def build_registry(context: AppContext) -> ModuleRegistry:
     return registry
 
 
+def _identificar_en_windows() -> None:
+    """Sin esto Windows agrupa la ventana con python.exe y muestra su ícono en la barra de tareas"""
+    if sys.platform == "win32":
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("GeneradorRecetas")
+
+
 def main() -> int:
+    _identificar_en_windows()
     app = QApplication(sys.argv)
     aplicar_tema(app)
     paths = AppPaths.default()
