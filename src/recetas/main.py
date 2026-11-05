@@ -3,6 +3,7 @@
 import ctypes
 import logging
 import sys
+from datetime import datetime
 
 from PySide6.QtWidgets import QApplication
 
@@ -11,6 +12,7 @@ from recetas.config import AppPaths
 from recetas.core.infrastructure.bitacora import configurar_bitacora
 from recetas.core.infrastructure.db.engine import create_session_factory, create_sqlite_engine
 from recetas.core.infrastructure.db.migrator import upgrade_database
+from recetas.core.infrastructure.db.respaldo import respaldar
 from recetas.core.infrastructure.preferencias import PreferenciasJson
 from recetas.core.infrastructure.sistema import RelojSistema, UsuarioSistemaOperativo
 from recetas.core.plugins import AppContext, ModuleRegistry
@@ -23,6 +25,9 @@ logger = logging.getLogger(__name__)
 
 
 def build_context(paths: AppPaths) -> AppContext:
+    respaldo = respaldar(paths.database, paths.backups, datetime.now())
+    if respaldo:
+        logger.info("Respaldo de la base en %s", respaldo)
     upgrade_database(paths.database)
     engine = create_sqlite_engine(paths.database)
     return AppContext(
