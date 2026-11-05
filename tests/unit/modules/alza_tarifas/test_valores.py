@@ -1,7 +1,14 @@
 import pytest
+from typing import Any
 from pydantic import TypeAdapter, ValidationError
 
-from recetas.modules.alza_tarifas.domain.valores import Precio, sql_numero
+from recetas.modules.alza_tarifas.domain.valores import (
+    Autor,
+    Nombre,
+    Precio,
+    Requerimiento,
+    sql_numero,
+)
 
 PRECIO: TypeAdapter[Precio] = TypeAdapter(Precio)
 
@@ -25,3 +32,9 @@ def test_precio_acepta_coma_o_punto_y_se_escribe_con_punto(texto: str, esperado:
 def test_precio_invalido(texto: str) -> None:
     with pytest.raises(ValidationError):
         PRECIO.validate_python(texto)
+
+
+@pytest.mark.parametrize("tipo", [Nombre, Autor, Requerimiento])
+def test_rechaza_caracteres_que_el_script_no_admite(tipo: Any) -> None:
+    with pytest.raises(ValidationError, match="no admite: '\u2192'"):
+        TypeAdapter(tipo).validate_python("TPFB\u21922753")

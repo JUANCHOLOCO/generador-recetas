@@ -75,6 +75,12 @@ def test_rechaza_saltos_de_linea_y_tabuladores(tipo: Any) -> None:
             validar(tipo, valor)
 
 
+@pytest.mark.parametrize("tipo", [TextoObligatorio, Nombre, CodigoPcrf, Requerimiento, Autor])
+def test_rechaza_caracteres_que_el_script_no_admite(tipo: Any) -> None:
+    with pytest.raises(ValidationError, match="no admite: '\u200b' \\(U\\+200B\\)"):
+        validar(tipo, "TPFB\u200b2753")
+
+
 @pytest.mark.parametrize(
     ("tipo", "maximo"),
     [

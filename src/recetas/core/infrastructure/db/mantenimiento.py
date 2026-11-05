@@ -15,7 +15,7 @@ from recetas.core.application.mantenimiento import (
     FilaParametro,
     ParametrizacionInvalidaError,
 )
-from recetas.core.domain.texto import tiene_caracteres_de_control
+from recetas.core.domain.texto import caracteres_fuera_de_cp1252, tiene_caracteres_de_control
 from recetas.core.infrastructure.db.base import Base
 from recetas.core.infrastructure.db.errores import traducir_errores_de_bd
 
@@ -186,6 +186,8 @@ def _desde_texto(columna: Column[Any], texto: str) -> object:
         raise ValueError("Es obligatorio.")
     if tiene_caracteres_de_control(texto):
         raise ValueError("No puede contener saltos de línea ni tabuladores.")
+    if fuera := caracteres_fuera_de_cp1252(texto):
+        raise ValueError(f"Tiene caracteres que el script no admite: {fuera}.")
     tipo = columna.type
     if isinstance(tipo, Boolean):
         if texto.upper() in _SI:

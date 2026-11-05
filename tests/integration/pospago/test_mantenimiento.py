@@ -98,3 +98,12 @@ def test_filas_repetidas_se_reportan_sin_guardar(matriz: SqlTablaParametrizacion
 def test_salto_de_linea_en_parametrizacion_se_rechaza(canales: SqlTablaParametrizacion) -> None:
     with pytest.raises(ParametrizacionInvalidaError, match="saltos de línea"):
         canales.guardar([_fila(nombre="Retail\n/")])
+
+
+def test_caracter_fuera_de_cp1252_en_parametrizacion_se_rechaza(
+    canales: SqlTablaParametrizacion,
+) -> None:
+    with pytest.raises(ParametrizacionInvalidaError, match="no admite"):
+        canales.guardar([_fila(nombre="Retail\u200b")])
+
+    assert canales.listar() == []
