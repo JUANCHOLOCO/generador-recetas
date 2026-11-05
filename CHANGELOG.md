@@ -64,6 +64,11 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
 - Tooltips con el formato esperado en los encabezados de la tabla de Creación de planes.
 - Tablas: columnas ajustadas al contenido y tecla Supr para vaciar las celdas seleccionadas.
 - Atajo Ctrl+Enter para generar la receta en los formularios.
+- Barra de estado con la versión, el usuario y la ruta de la base de datos.
+- Ícono de la aplicación (SVG provisional con la paleta del tema) en la ventana y la barra de
+  tareas.
+- Cursor de espera mientras se genera, escribe o registra una receta.
+
 
 ### Corregido
 - Scoring modelado como dos listas independientes (SCORING_PLAN y CPL_SCORING_PLAN).
