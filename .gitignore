@@ -11,7 +11,7 @@ htmlcov/
 # Empaquetado
 build/
 dist/
-*.spec
+/*.spec
 *.egg-info/
 logs/
 

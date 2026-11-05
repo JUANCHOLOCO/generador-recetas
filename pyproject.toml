@@ -25,6 +25,10 @@ dev = [
     "mypy>=1.11",
 ]
 
+build = [
+    "pyinstaller>=6.11",
+]
+
 [project.gui-scripts]
 generador-recetas = "recetas.main:main"
 
