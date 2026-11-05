@@ -1,9 +1,11 @@
 import pytest
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QItemSelectionModel, Qt
 from PySide6.QtGui import QBrush
+from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication
+from pytestqt.qtbot import QtBot
 
-from recetas.ui.widgets.tabla_editable import TablaEditableModel
+from recetas.ui.widgets.tabla_editable import TablaEditable, TablaEditableModel
 
 pytestmark = pytest.mark.ui
 
@@ -69,3 +71,20 @@ def test_cargar_cambia_columnas_y_conserva_claves_al_editar(qapp: QApplication) 
     assert modelo.headerData(1, Qt.Orientation.Horizontal, Qt.ItemDataRole.ToolTipRole) == (
         "Valores: a, b"
     )
+
+
+def test_supr_vacia_las_celdas_seleccionadas_y_solo_sus_errores(qtbot: QtBot) -> None:
+    modelo = _modelo()
+    modelo.cargar(["A", "B", "C"], [["1", "2", "3"]])
+    modelo.marcar_errores({(0, 0): "mal", (0, 2): "mal"})
+    tabla = TablaEditable(modelo)
+    qtbot.addWidget(tabla)
+    seleccion = tabla.selectionModel()
+    for columna in (0, 1):
+        seleccion.select(modelo.index(0, columna), QItemSelectionModel.SelectionFlag.Select)
+
+    QTest.keyClick(tabla, Qt.Key.Key_Delete)
+
+    assert modelo.filas() == [["", "", "3"]]
+    assert modelo.data(modelo.index(0, 0), Qt.ItemDataRole.ToolTipRole) is None
+    assert modelo.data(modelo.index(0, 2), Qt.ItemDataRole.ToolTipRole) == "mal"

@@ -1,6 +1,7 @@
 """Lógica del formulario de alza de tarifas, común a los dos tipos (patrón MVP, sin Qt)."""
 
 from collections.abc import Sequence
+from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
@@ -56,6 +57,7 @@ class VistaAlza(Protocol):
     def confirmar_limpieza(self) -> bool: ...
     def limpiar(self) -> None: ...
     def mostrar_receta_generada(self, raiz: Path) -> None: ...
+    def trabajando(self) -> AbstractContextManager[None]: ...
 
 
 class CasoGenerarAlza[S: BaseModel](Protocol):
@@ -86,7 +88,8 @@ class FormularioAlzaPresenter[S: BaseModel]:
         solicitud, filas_usadas = validada
 
         try:
-            alza = self._generar_alza.ejecutar(solicitud)
+            with self._vista.trabajando():
+                alza = self._generar_alza.ejecutar(solicitud)
         except RecetasError as error:
             self._vista.mostrar_error(str(error))
             return
@@ -148,11 +151,13 @@ class FormularioAlzaPresenter[S: BaseModel]:
 
     def _escribir(self, bundle: RecipeBundle, carpeta: Path) -> Path | None:
         try:
-            return self._escritor.escribir(bundle, carpeta)
+            with self._vista.trabajando():
+                return self._escritor.escribir(bundle, carpeta)
         except RecetaExistenteError as error:
             if not self._vista.confirmar_sobrescritura(error.rutas):
                 return None
-            return self._escritor.escribir(bundle, carpeta, sobrescribir=True)
+            with self._vista.trabajando():
+                return self._escritor.escribir(bundle, carpeta, sobrescribir=True)
         except OSError as error:
             self._vista.mostrar_error(f"No se pudo escribir la receta: {error}")
             return None

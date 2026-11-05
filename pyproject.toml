@@ -35,6 +35,7 @@ where = ["src"]
 recetas = [
     "**/*.j2",
     "**/*.qss",
+    "**/*.svg",
     "**/*.csv",
     "migrations/*.py",
     "migrations/*.mako",

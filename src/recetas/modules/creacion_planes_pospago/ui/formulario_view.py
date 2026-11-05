@@ -1,6 +1,7 @@
 """Formulario de creación de planes Pospago (vista pasiva del patrón MVP)."""
 
 from collections.abc import Sequence
+from contextlib import AbstractContextManager
 from pathlib import Path
 
 from PySide6.QtCore import QUrl, Signal
@@ -31,9 +32,13 @@ from recetas.modules.creacion_planes_pospago.ui.formulario_presenter import (
     ErrorCampo,
 )
 from recetas.modules.creacion_planes_pospago.ui.propiedades_dialog import PropiedadesDialog
+from recetas.ui.widgets.atajos import conectar_generar
+from recetas.ui.widgets.cursor import cursor_de_espera
 from recetas.ui.widgets.tabla_editable import TablaEditable, TablaEditableModel
 
 TITULO = "Creación de planes Pospago"
+_TITULOS = [c.titulo for c in COLUMNAS]
+_AYUDAS = [c.ayuda for c in COLUMNAS]
 
 
 class FormularioView(QWidget):
@@ -60,7 +65,6 @@ class FormularioView(QWidget):
         self._corriente = QRadioButton(BillingType.CORRIENTE.label)
         self._anticipada = QRadioButton(BillingType.ANTICIPADA.label)
         self._tipos = QButtonGroup(self)
-        QButtonGroup(self)
         self._tipos.addButton(self._corriente)
         self._tipos.addButton(self._anticipada)
         self._tipos.buttonClicked.connect(lambda _boton: self.tipo_cambiado.emit())
@@ -84,9 +88,9 @@ class FormularioView(QWidget):
         cabecera.addRow("Tipo de facturación:", fila_tipos)
         cabecera.addRow("Carpeta de salida:", fila_carpeta)
 
-        self._modelo = TablaEditableModel([c.titulo for c in COLUMNAS], self)
-        self._modelo.agregar_fila()
+        self._modelo = TablaEditableModel(_TITULOS, self)
         self._tabla = TablaEditable(self._modelo)
+        self.cargar_planes([[""] * len(COLUMNAS)])
 
         agregar = QPushButton("Agregar fila")
         agregar.setProperty("variante", "secundario")
@@ -97,6 +101,7 @@ class FormularioView(QWidget):
         generar = QPushButton("Generar receta")
         generar.setProperty("variante", "primario")
         generar.setDefault(True)
+        generar.setToolTip("Ctrl+Enter")
         generar.clicked.connect(self.generar_solicitado)
         importar = QPushButton("Importar Excel…")
         importar.setProperty("variante", "secundario")
@@ -134,6 +139,7 @@ class FormularioView(QWidget):
         layout.addLayout(botones)
         layout.addWidget(self._avisos)
         layout.addWidget(self._errores)
+        conectar_generar(self, self._tabla, self.generar_solicitado.emit)
 
     # ---------- Lo que el presenter lee ----------
 
@@ -200,7 +206,7 @@ class FormularioView(QWidget):
         )
 
     def cargar_planes(self, filas: Sequence[Sequence[str]]) -> None:
-        self._modelo.cargar([c.titulo for c in COLUMNAS], filas)
+        self._modelo.cargar(_TITULOS, filas, ayudas=_AYUDAS)
 
     def mostrar_avisos(self, avisos: Sequence[str]) -> None:
         self._avisos.setText("\n".join(avisos))
@@ -233,6 +239,9 @@ class FormularioView(QWidget):
         caja.exec()
         if caja.clickedButton() is abrir:
             QDesktopServices.openUrl(QUrl.fromLocalFile(str(raiz)))
+
+    def trabajando(self) -> AbstractContextManager[None]:
+        return cursor_de_espera()
 
     # ---------- Internos ----------
 

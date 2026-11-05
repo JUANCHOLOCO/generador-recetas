@@ -1,6 +1,7 @@
 """Formulario del alza de tarifas, uno por pestaña (vista pasiva del patrón MVP)."""
 
 from collections.abc import Sequence
+from contextlib import AbstractContextManager
 from pathlib import Path
 from typing import Any
 
@@ -23,6 +24,8 @@ from recetas.core.domain.ambiente import Ambiente
 from recetas.modules.alza_tarifas.domain.valores import MAX_AUTOR, MAX_REQUERIMIENTO
 from recetas.modules.alza_tarifas.ui.formulario_presenter import DatosAlza, ErrorCampo
 from recetas.modules.alza_tarifas.ui.tipos_formulario import TipoFormulario
+from recetas.ui.widgets.atajos import conectar_generar
+from recetas.ui.widgets.cursor import cursor_de_espera
 from recetas.ui.widgets.tabla_editable import TablaEditable, TablaEditableModel
 
 
@@ -87,6 +90,7 @@ class FormularioAlzaView(QWidget):
         generar = QPushButton("Generar receta")
         generar.setProperty("variante", "primario")
         generar.setDefault(True)
+        generar.setToolTip("Ctrl+Enter")
         generar.clicked.connect(self.generar_solicitado)
         botones = QHBoxLayout()
         botones.addWidget(importar)
@@ -116,6 +120,7 @@ class FormularioAlzaView(QWidget):
         layout.addWidget(self._tabla, stretch=1)
         layout.addLayout(botones)
         layout.addWidget(self._errores)
+        conectar_generar(self, self._tabla, self.generar_solicitado.emit)
 
     # ---------- Lo que el presenter lee ----------
 
@@ -189,6 +194,9 @@ class FormularioAlzaView(QWidget):
         caja.exec()
         if caja.clickedButton() is abrir:
             QDesktopServices.openUrl(QUrl.fromLocalFile(str(raiz)))
+
+    def trabajando(self) -> AbstractContextManager[None]:
+        return cursor_de_espera()
 
     # ---------- Internos ----------
 

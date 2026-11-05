@@ -1,5 +1,7 @@
 """Ventana principal: menú lateral con los módulos registrados y área de trabajo."""
 
+from pathlib import Path
+
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QFrame,
@@ -19,8 +21,13 @@ from recetas.core.plugins import ModuleRegistry
 APP_NAME = "Generador de Recetas"
 
 
+def texto_de_estado(usuario: str, base_datos: Path) -> str:
+    """Versión, usuario y BD: saber en qué app y con qué datos se está trabajando."""
+    return f"Versión {__version__}   ·   Usuario: {usuario}   ·   BD: {base_datos}"
+
+
 class MainWindow(QMainWindow):
-    def __init__(self, registry: ModuleRegistry) -> None:
+    def __init__(self, registry: ModuleRegistry, estado: str = "") -> None:
         super().__init__()
         self._registry = registry
         self._widgets: dict[str, QWidget] = {}
@@ -69,6 +76,11 @@ class MainWindow(QMainWindow):
         capa.addWidget(subtitulo)
         capa.addLayout(cuerpo, stretch=1)
         self.setCentralWidget(fondo)
+
+        if estado:
+            etiqueta = QLabel(estado)
+            etiqueta.setObjectName("Estado")
+            self.statusBar().addPermanentWidget(etiqueta, stretch=1)
 
         self._menu.currentItemChanged.connect(self._on_item_changed)
 

@@ -1,6 +1,7 @@
 """Lógica del formulario de creación de planes (patrón MVP, sin Qt)."""
 
 from collections.abc import Sequence
+from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
@@ -23,23 +24,24 @@ from recetas.modules.creacion_planes_pospago.domain.propiedades import ArchivoPr
 class Columna:
     campo: str  # ruta del campo en PlanNuevo; "datos.svall" = campo svall del paquete de datos
     titulo: str
+    ayuda: str
 
 
 COLUMNAS = (
-    Columna("id_plan", "Id_Plan"),
-    Columna("part_num", "Part_num"),
-    Columna("nombre", "Nombre del producto"),
-    Columna("valor_con_iva", "Valor con IVA"),
-    Columna("valor_sin_iva", "Valor sin IVA"),
-    Columna("codigo_pcrf", "Código perfil PCRF"),
-    Columna("tarif_group", "Tarif group"),
-    Columna("es_53", "Es 5.3 (S/N)"),
-    Columna("datos.nombre", "Nombre paquete Datos"),
-    Columna("datos.svall", "Svall Datos"),
-    Columna("datos.poid", "POID Datos"),
-    Columna("sms.nombre", "Nombre paquete SMS"),
-    Columna("sms.svall", "Svall SMS"),
-    Columna("sms.poid", "POID SMS"),
+    Columna("id_plan", "Id_Plan", "Numérico, máx. 10 dígitos (ej. 7751)"),
+    Columna("part_num", "Part_num", "PLCON#### (ej. PLCON0454)"),
+    Columna("nombre", "Nombre del producto", "Máx. 100 caracteres, sin comas"),
+    Columna("valor_con_iva", "Valor con IVA", "Entero mayor que 0"),
+    Columna("valor_sin_iva", "Valor sin IVA", "Entero mayor que 0 y menor que el valor con IVA"),
+    Columna("codigo_pcrf", "Código perfil PCRF", "Sin espacios, máx. 50 (ej. Conectados_51_FC)"),
+    Columna("tarif_group", "Tarif group", "Numérico, máx. 10 dígitos (ej. 120617)"),
+    Columna("es_53", "Es 5.3 (S/N)", "S, SI o X si es plan 5.3; vacío o N si no"),
+    Columna("datos.nombre", "Nombre paquete Datos", "Máx. 100 caracteres"),
+    Columna("datos.svall", "Svall Datos", "SVALL#### (ej. SVALL2632)"),
+    Columna("datos.poid", "POID Datos", "Numérico, máx. 20 dígitos (ej. 990000885)"),
+    Columna("sms.nombre", "Nombre paquete SMS", "Máx. 100 caracteres"),
+    Columna("sms.svall", "Svall SMS", "SVALL#### (ej. SVALL2632)"),
+    Columna("sms.poid", "POID SMS", "Numérico, máx. 20 dígitos (ej. 990000885)"),
 )
 _INDICE_COLUMNA = {c.campo: i for i, c in enumerate(COLUMNAS)}
 _ETIQUETAS = {
@@ -116,6 +118,7 @@ class VistaFormulario(Protocol):
     def confirmar_limpieza(self) -> bool: ...
     def limpiar(self) -> None: ...
     def mostrar_receta_generada(self, raiz: Path) -> None: ...
+    def trabajando(self) -> AbstractContextManager[None]: ...
 
 
 class CasoGenerarReceta(Protocol):
@@ -145,7 +148,8 @@ class FormularioPresenter:
             return
 
         try:
-            receta = self._generar_receta.ejecutar(solicitud)
+            with self._vista.trabajando():
+                receta = self._generar_receta.ejecutar(solicitud)
         except RecetasError as error:
             self._vista.mostrar_error(str(error))
             return
@@ -162,7 +166,8 @@ class FormularioPresenter:
         self._vista.mostrar_propiedades(receta.propiedades)
         if self._vista.confirmar_registro(len(solicitud.planes)):
             try:
-                registrados = self._registro.registrar(solicitud)
+                with self._vista.trabajando():
+                    registrados = self._registro.registrar(solicitud)
             except RecetasError as error:
                 self._vista.mostrar_error(
                     f"La receta se generó, pero no se pudieron registrar los planes: {error}"
@@ -217,11 +222,13 @@ class FormularioPresenter:
 
     def _escribir(self, receta: RecetaGenerada, carpeta: Path) -> Path | None:
         try:
-            return self._escritor.escribir(receta.bundle, carpeta)
+            with self._vista.trabajando():
+                return self._escritor.escribir(receta.bundle, carpeta)
         except RecetaExistenteError as error:
             if not self._vista.confirmar_sobrescritura(error.rutas):
                 return None
-            return self._escritor.escribir(receta.bundle, carpeta, sobrescribir=True)
+            with self._vista.trabajando():
+                return self._escritor.escribir(receta.bundle, carpeta, sobrescribir=True)
         except OSError as error:
             self._vista.mostrar_error(f"No se pudo escribir la receta: {error}")
             return None

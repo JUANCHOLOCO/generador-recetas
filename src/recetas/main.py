@@ -1,5 +1,6 @@
 """Punto de entrada y composition root de la aplicación."""
 
+import ctypes
 import logging
 import sys
 
@@ -15,7 +16,7 @@ from recetas.core.infrastructure.sistema import RelojSistema, UsuarioSistemaOper
 from recetas.core.plugins import AppContext, ModuleRegistry
 from recetas.modules import installed_modules
 from recetas.ui.errores import instalar_manejador_global
-from recetas.ui.main_window import MainWindow
+from recetas.ui.main_window import MainWindow, texto_de_estado
 from recetas.ui.tema import aplicar_tema
 
 logger = logging.getLogger(__name__)
@@ -40,7 +41,14 @@ def build_registry(context: AppContext) -> ModuleRegistry:
     return registry
 
 
+def _identificar_en_windows() -> None:
+    """Sin esto Windows agrupa la ventana con python.exe y muestra su ícono en la barra de tareas"""
+    if sys.platform == "win32":
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("GeneradorRecetas")
+
+
 def main() -> int:
+    _identificar_en_windows()
     app = QApplication(sys.argv)
     aplicar_tema(app)
     paths = AppPaths.default()
@@ -52,7 +60,7 @@ def main() -> int:
     for module in registry.modules():
         module.initialize()
 
-    window = MainWindow(registry)
+    window = MainWindow(registry, texto_de_estado(context.usuario.nombre(), paths.database))
     window.show()
     return app.exec()
 

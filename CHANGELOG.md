@@ -56,10 +56,23 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
 - Módulo "Alza de tarifas", pestaña "Planes pospago": aplica y rollback de `ACTIVATOR.PLANS` con
   los valores que ingresa el usuario (formulario o Excel), sin cálculos, con advertencias de
   precio menor que el actual o en 0, y golden contra TPFB-1726 (Fase 8A).
+- Alza de tarifas, pestaña "Paquetes": aplica y rollback de `ACTIVATOR.SERVICES` y
+  `ATP_CORP_PRECIOS_SERVICE`, con `SERVICES.ITEM_PRICE` siempre con IVA; golden de los 283
+  paquetes de TPFB-1726 con la corrección declarada del aplica real.
+- Formulario del alza configurable por tipo (`TipoFormulario`): planes y paquetes comparten
+  presenter y vista.
+- Tooltips con el formato esperado en los encabezados de la tabla de Creación de planes.
+- Tablas: columnas ajustadas al contenido y tecla Supr para vaciar las celdas seleccionadas.
+- Atajo Ctrl+Enter para generar la receta en los formularios.
+- Barra de estado con la versión, el usuario y la ruta de la base de datos.
+- Ícono de la aplicación (SVG provisional con la paleta del tema) en la ventana y la barra de
+  tareas.
+- Cursor de espera mientras se genera, escribe o registra una receta.
 
 ### Corregido
 - Scoring modelado como dos listas independientes (SCORING_PLAN y CPL_SCORING_PLAN).
 - Los códigos no numéricos de CONTROL (C01…P238) se incluyen en la parametrización.
+- Formulario de Creación de planes: se quitó un `QButtonGroup` que se creaba sin uso.
 
 ### Cambiado
 - PROMOTIONS inserta el POID real directamente y la fila PLAN_TYPE solo si no existe (decisiones B y C).

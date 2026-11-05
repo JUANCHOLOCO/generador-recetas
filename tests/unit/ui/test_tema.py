@@ -1,7 +1,7 @@
 import pytest
 from PySide6.QtWidgets import QApplication
 
-from recetas.ui.tema import aplicar_tema, hoja_de_estilos
+from recetas.ui.tema import aplicar_tema, hoja_de_estilos, icono_app
 
 pytestmark = pytest.mark.ui
 
@@ -20,6 +20,7 @@ def test_aplicar_tema_configura_la_aplicacion(qapp: QApplication) -> None:
         aplicar_tema(qapp)
 
         assert qapp.styleSheet() == hoja_de_estilos()
+        assert not qapp.windowIcon().isNull()
         # Con una hoja activa, style() devuelve el envoltorio QStyleSheetStyle (sin nombre);
         # al quitarla se ve el estilo base que configuró aplicar_tema.
         qapp.setStyleSheet("")
@@ -27,3 +28,7 @@ def test_aplicar_tema_configura_la_aplicacion(qapp: QApplication) -> None:
     finally:
         qapp.setStyle(estilo_anterior)
         qapp.setStyleSheet(hoja_anterior)
+
+
+def test_el_icono_viaja_con_el_paquete(qapp: QApplication) -> None:
+    assert not icono_app().isNull()

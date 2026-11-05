@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Ícono provisional del Generador de Recetas: paleta de docs/diseno-visual.md -->
+  <defs>
+    <linearGradient id="fondo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#00C83C"/>
+      <stop offset="0.40" stop-color="#0A8F8A"/>
+      <stop offset="0.65" stop-color="#0A25D1"/>
+      <stop offset="1" stop-color="#08137A"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="48" fill="url(#fondo)"/>
+  <!-- Hoja del script con la esquina doblada -->
+  <path d="M72 44 H152 L192 84 V212 H72 Z" fill="#FFFFFF"/>
+  <path d="M152 44 V84 H192 Z" fill="#D2F5A0"/>
+  <!-- Líneas de SQL -->
+  <rect x="92" y="104" width="80" height="14" rx="7" fill="#0A25D1"/>
+  <rect x="92" y="130" width="60" height="14" rx="7" fill="#0A8F8A"/>
+  <rect x="92" y="156" width="80" height="14" rx="7" fill="#0A25D1"/>
+  <rect x="92" y="182" width="44" height="14" rx="7" fill="#0A8F8A"/>
+</svg>

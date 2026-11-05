@@ -1,5 +1,6 @@
 import pytest
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QShortcut
 from pytestqt.qtbot import QtBot
 
 from recetas.modules.alza_tarifas.ui.formulario_presenter import ErrorCampo
@@ -25,6 +26,7 @@ def test_lee_lo_escrito_y_marca_errores_en_la_tabla(qtbot: QtBot) -> None:
     assert datos.filas == [[""] * len(PLANES.columnas)]
     celda = vista._modelo.index(0, 1)
     assert vista._modelo.data(celda, Qt.ItemDataRole.ToolTipRole) == "Fila 1 › Part_num: formato"
+    assert len(vista.findChildren(QShortcut)) == 2  # Ctrl+Enter
 
 
 def test_los_encabezados_explican_el_formato(qtbot: QtBot) -> None:
