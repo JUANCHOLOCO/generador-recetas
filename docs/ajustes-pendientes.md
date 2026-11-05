@@ -49,9 +49,9 @@ Ordenados por impacto para el usuario / esfuerzo. Recomendados primero: **1, 2, 
 |---|---|---|---|---|
 | 1 | Botón **"Abrir carpeta"** al terminar de generar | Hoy hay que buscar la receta en el Explorador | Bajo | ✅ Resuelto (entrega B) |
 | 2 | **Recordar la última carpeta y el autor** (`preferencias.json` en la carpeta de la app, no el registro de Windows, para que la app siga siendo portable) | No escribirlos cada vez | Bajo | ✅ Resuelto (entrega B) |
-| 3 | **Tooltip en cada encabezado** de la tabla con el formato esperado (`PLCON####`, `SVALL####`…) | Evita errores antes de validar | Bajo | Pendiente |
-| 4 | **Columnas ajustadas al contenido** y primera columna fija al desplazarse | 14 columnas no caben en pantalla | Bajo | Pendiente |
-| 5 | Atajo **Ctrl+Enter** para generar y **Supr** para vaciar celdas | Más rápido con teclado | Bajo | Pendiente |
+| 3 | **Tooltip en cada encabezado** de la tabla con el formato esperado (`PLCON####`, `SVALL####`…) | Evita errores antes de validar | Bajo | ✅ Resuelto (entrega C) |
+| 4 | **Columnas ajustadas al contenido** y primera columna fija al desplazarse | 14 columnas no caben en pantalla | Bajo | ✅ Columnas ajustadas (entrega C). Primera columna fija pospuesta: Qt no la trae y requiere una tabla superpuesta (esfuerzo medio) |
+| 5 | Atajo **Ctrl+Enter** para generar y **Supr** para vaciar celdas | Más rápido con teclado | Bajo | ✅ Resuelto (entrega C) |
 | 6 | **Barra de estado** con versión, usuario y ruta de la BD | Saber en qué app y entorno se está | Bajo | Pendiente |
 | 7 | **Ícono de la aplicación** (`.ico`) para la ventana y el `.exe` | Identificación en la barra de tareas; necesario en la Fase 7 | Bajo | Pendiente |
 | 8 | **Panel de resultado** dentro de la tarjeta en vez de varios `QMessageBox` seguidos | Menos ventanas emergentes; resumen de lo generado, advertencias y registro | Medio | Pendiente |
@@ -110,6 +110,6 @@ Recibidos el 2026-10-27 (el usuario puede agregar más).
 |---|---|
 | Uso de la imagen `coloresDiseno.jpeg` en la pantalla de bienvenida | Solo si el área de comunicaciones/marca lo aprueba (docs/diseno-visual.md) |
 | Extraer al núcleo los validadores de texto que repiten los dos módulos (`Requerimiento`, `Autor`, `Nombre`, texto sin caracteres de control) | Fase 8A: se copiaron en `alza_tarifas/domain/valores.py` para cumplir la guía de módulos nuevos (sin tocar `core/`). Si aparece un tercer módulo, se mueven a `core/domain/` con un ADR |
-| Quitar la línea suelta `QButtonGroup(self)` en `creacion_planes_pospago/ui/formulario_view.py` (crea un grupo que no se usa) | Revisión de la Fase 8A; va con la entrega C |
+| Quitar la línea suelta `QButtonGroup(self)` en `creacion_planes_pospago/ui/formulario_view.py` (crea un grupo que no se usa) | Revisión de la Fase 8A. ✅ Resuelto (entrega C) |
 | Login de usuario (el autor pasaría a ser el usuario logueado) | Opcional; el diseño ya lo soporta con el puerto `UsuarioActual` |
 | **Generar el MOP desde una plantilla Excel** según la receta o el alza de tarifas | Pedido del usuario (2026-10-29), para analizar más adelante. Ojo: openpyxl elimina extensiones que no soporta (validaciones de datos) al guardar una plantilla existente |

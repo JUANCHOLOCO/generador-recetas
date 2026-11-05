@@ -33,3 +33,13 @@ No se incluye la imagen como fondo: contiene una fotografía de una persona, log
 una campaña publicitaria. Su uso en una herramienta interna debe validarlo el área de
 comunicaciones o de marca. El degradado reproduce su estética sin esos riesgos. Si se aprueba,
 puede mostrarse en la pantalla de bienvenida (cuando no hay módulo seleccionado).
+
+## Ícono
+
+`src/recetas/ui/resources/icono.svg` es un ícono **provisional**: una hoja de script con líneas de
+SQL sobre el degradado de la paleta. No usa logotipos ni imágenes de campañas. Si el área de marca
+entrega un ícono oficial, basta con reemplazar ese archivo.
+
+- La app lo carga desde el paquete (`recetas.ui.tema.icono_app`) para la ventana y la barra de
+  tareas.
+- En la Fase 7 se convierte a `.ico` (varios tamaños) para el `.exe` de PyInstaller.

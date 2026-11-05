@@ -93,3 +93,7 @@ QHeaderView::section {
 /* ---------- Ayudas y diálogos ---------- */
 QToolTip { background: #08137A; color: #FFFFFF; border: none; padding: 6px; }
 QMessageBox QLabel { color: #0B1660; }
+
+/* ---------- Barra de estado ---------- */
+QStatusBar { background: #08137A; }
+QStatusBar QLabel#Estado { color: #FFFFFF; padding: 2px 8px; }

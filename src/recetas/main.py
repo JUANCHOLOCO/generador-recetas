@@ -15,7 +15,7 @@ from recetas.core.infrastructure.sistema import RelojSistema, UsuarioSistemaOper
 from recetas.core.plugins import AppContext, ModuleRegistry
 from recetas.modules import installed_modules
 from recetas.ui.errores import instalar_manejador_global
-from recetas.ui.main_window import MainWindow
+from recetas.ui.main_window import MainWindow, texto_de_estado
 from recetas.ui.tema import aplicar_tema
 
 logger = logging.getLogger(__name__)
@@ -52,7 +52,7 @@ def main() -> int:
     for module in registry.modules():
         module.initialize()
 
-    window = MainWindow(registry)
+    window = MainWindow(registry, texto_de_estado(context.usuario.nombre(), paths.database))
     window.show()
     return app.exec()
 
