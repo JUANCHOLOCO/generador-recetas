@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "generador-recetas"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Generador de instaladores SQL para cambios de catálogo"
 requires-python = ">=3.13"
 dependencies = [
@@ -23,6 +23,11 @@ dev = [
     "pytest-qt>=4.4",
     "ruff>=0.6",
     "mypy>=1.11",
+    "pip-audit>=2.7",
+]
+
+build = [
+    "pyinstaller>=6.11",
 ]
 
 [project.gui-scripts]
@@ -30,6 +35,9 @@ generador-recetas = "recetas.main:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.dynamic]
+version = { attr = "recetas.__version__" }
 
 [tool.setuptools.package-data]
 recetas = [

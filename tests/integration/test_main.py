@@ -21,3 +21,12 @@ def test_los_modulos_quedan_registrados_en_orden(tmp_path: Path) -> None:
         "Creación de planes Pospago",
         "Alza de tarifas",
     ]
+
+
+def test_al_iniciar_respalda_la_base_existente(tmp_path: Path) -> None:
+    paths = AppPaths(base=tmp_path)
+
+    build_context(paths)  # primer arranque: no hay nada que respaldar
+    build_context(paths)
+
+    assert len(list(paths.backups.glob("recetas_*.db"))) == 1

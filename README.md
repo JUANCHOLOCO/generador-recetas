@@ -85,14 +85,15 @@ pytest tests\unit --cov=recetas --cov-report=term-missing
 
 ## Versión portable
 
-> Pendiente de la Fase 7: el script `build_portable.ps1` todavía no existe.
-
 ```powershell
+pip install -e ".[dev,build]"
 .\scripts\build_portable.ps1
 ```
 
-Genera `dist\GeneradorRecetas\` con `GeneradorRecetas.exe`, la base `recetas.db` y la carpeta
-`output\`. Se copia la carpeta completa al equipo destino; no requiere instalar Python.
+Genera `dist\GeneradorRecetas\` con `GeneradorRecetas.exe` y la carpeta `output\`. Se copia la
+carpeta completa al equipo destino; no requiere instalar Python. La base `recetas.db` se crea en
+el primer arranque. Instalación, actualización y lista de verificación en
+[docs/portable.md](docs/portable.md).
 
 ## Convenciones
 
