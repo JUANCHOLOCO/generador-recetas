@@ -46,20 +46,67 @@ versión anterior.
 
 ## 4. Construir la versión portable (desarrolladores)
 
-Requisitos: el entorno de desarrollo de la [guía de incorporación](guia-incorporacion.md) y las
-herramientas de empaquetado:
+Requisitos: Python 3.13 (`py -3.13`), conexión a internet y el entorno de desarrollo de la
+[guía de incorporación](guia-incorporacion.md) activo (incluye `pip-audit`).
 
 ```powershell
-pip install -e ".[dev,build]"
 .\scripts\build_portable.ps1
 ```
 
 El script:
 
-1. Genera `build\icono.ico` a partir de `src/recetas/ui/resources/icono.svg`
+1. Revisa con `pip-audit` que ninguna versión de `requirements-build.lock` tenga
+   vulnerabilidades conocidas. Si encuentra alguna, se detiene (ver "Actualizar dependencias").
+2. Crea un entorno **limpio** `.venv-build` e instala exactamente las versiones del lock, más la app.
+   Así el `.exe` no depende de lo que haya en el entorno de desarrollo.
+3. Genera `build\icono.ico` a partir de `src/recetas/ui/resources/icono.svg`
    (`scripts/generar_icono.py`, con Qt; no requiere más librerías).
-2. Ejecuta PyInstaller con `packaging/recetas.spec` (modo carpeta, sin consola).
-3. Crea `output\` vacía dentro de `dist\GeneradorRecetas\`.
+4. Ejecuta PyInstaller con `packaging/recetas.spec` (modo carpeta, sin consola).
+5. Deja `dist\GeneradorRecetas\` y el comprimido `dist\GeneradorRecetas_<versión>.zip` para
+   entregar. Comprime con .NET y reintenta hasta 3 veces si el antivirus tiene un archivo
+   abierto (lo revisa justo después de que PyInstaller lo crea).
+
+`-SinAuditoria` omite el paso 1. Úsalo solo sin conexión a internet y repite la auditoría antes de
+entregar.
+
+### Versiones de las dependencias
+
+`requirements-build.lock` fija la versión **exacta** de todo lo que entra en el `.exe` (PySide6,
+SQLAlchemy, Pydantic…) y de PyInstaller. Dos construcciones con el mismo lock producen la misma app.
+`pyproject.toml` solo declara versiones mínimas, para el desarrollo.
+
+**Actualizar dependencias** (a propósito, no en cada versión):
+
+```powershell
+.\scripts\actualizar_lock.ps1
+git diff requirements-build.lock
+pytest
+.\scripts\build_portable.ps1
+```
+
+El script instala en un entorno temporal las últimas versiones que permite `pyproject.toml` y
+reescribe el lock. Revisa el diff (sobre todo los saltos de versión mayor), corre las pruebas y la
+lista de verificación antes de hacer commit.
+
+### Número de versión
+
+Una sola fuente: `__version__` en `src/recetas/__init__.py` (el `pyproject.toml` la lee de ahí).
+Sigue [Versionado Semántico](https://semver.org/lang/es/):
+
+| Cambio | Ejemplo |
+|---|---|
+| Corrección sin cambios visibles en la salida | 1.0.0 → 1.0.1 |
+| Funcionalidad nueva o cambio compatible en los scripts | 1.0.0 → 1.1.0 |
+| Cambio que obliga a cambiar la forma de trabajar o rompe recetas anteriores | 1.0.0 → 2.0.0 |
+
+### Publicar una versión
+
+1. Sube `__version__` y mueve las entradas de `[Sin publicar]` del CHANGELOG a una sección
+   `[x.y.z] - AAAA-MM-DD`.
+2. `ruff check .`, `mypy`, `pytest`.
+3. `.\scripts\build_portable.ps1` y la lista de verificación de abajo.
+4. Merge a `main`, etiqueta `git tag -a vx.y.z -m "Versión x.y.z"` y `git push --tags`.
+5. Entrega el `.zip` con las instrucciones de la sección 2.
 
 ### Qué empaqueta la receta de PyInstaller y por qué
 

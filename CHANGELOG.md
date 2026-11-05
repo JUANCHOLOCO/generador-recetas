@@ -3,7 +3,7 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
 [Versionado Semántico](https://semver.org/lang/es/).
 
-## [Sin publicar]
+## [1.0.0] - 2026-11-05
 
 ### Añadido
 - Documentación inicial: README, arquitectura, ADR 0001–0004 y especificación del módulo
@@ -75,7 +75,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
   recientes en `backups/`).
 - Versión portable: receta de PyInstaller, ícono `.ico` generado desde el SVG y
   `scripts/build_portable.ps1` (ver docs/portable.md).
-  
+- Versiones exactas de las dependencias (`requirements-build.lock`), construcción en un entorno
+  limpio y auditoría de vulnerabilidades con `pip-audit`.
+    
 ### Corregido
 - Scoring modelado como dos listas independientes (SCORING_PLAN y CPL_SCORING_PLAN).
 - Los códigos no numéricos de CONTROL (C01…P238) se incluyen en la parametrización.
