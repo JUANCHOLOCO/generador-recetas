@@ -10,7 +10,7 @@ Orden acordado (actualizado 2026-10-29):
 → P1 propiedades (.properties en Conf/) ✅ → P2 panel "Propiedades para el MOP" ✅
 → Ajustes B (importador Excel genérico + uso diario) ✅
 → Análisis de Alza de tarifas ✅ → 8A Alza de tarifas: planes pospago ✅
-→ 8B Alza de tarifas: paquetes ✅ → Ajustes C (pulido) ✅ → S5 (cp1252) → 7 portable
+→ 8B Alza de tarifas: paquetes ✅ → Ajustes C (pulido) ✅ → S5 (cp1252) ✅ → 7 portable
 ```
 
 **Actualización (2026-11-03):** el alza queda en **un módulo con dos tipos** (planes pospago y
@@ -102,7 +102,7 @@ Recibidos el 2026-10-27 (el usuario puede agregar más).
 | S3 | **Capturar errores de BD** al registrar planes y en la pestaña Parametrización (BD bloqueada, disco lleno) | Hoy solo se capturan los errores de validación; un `OperationalError` caería en el caso de S2 | ✅ Resuelto (entrega A) |
 | S4 | **Fijar versiones de dependencias** (archivo de bloqueo) y revisarlas con `pip-audit` | Reproducibilidad del `.exe` y detección de vulnerabilidades conocidas. Encaja en la Fase 7 | Media (Fase 7) |
 | D1 | **Glosario** (RQ, FC, POID, Svall, PLCON, Nintendo, 5.3…) y **guía de incorporación** para otro desarrollador | Facilita explicar y mantener el proyecto | ✅ Resuelto (entrega C: [glosario.md](glosario.md) y [guia-incorporacion.md](guia-incorporacion.md)) |
-| S5 | **Rechazar caracteres que no existen en Windows-1252** (comillas tipográficas “ ”, emojis) en los campos de texto, con el mismo mensaje por celda que S1 | Detectado al escribir la guía (entrega C): hoy fallan al escribir el script con `UnicodeEncodeError`, que no se captura y cae en el manejador global. Es fácil que lleguen al copiar nombres desde Word u Outlook | Alta (antes de la Fase 7) |
+| S5 | **Rechazar caracteres que no existen en Windows-1252** (emojis, flechas `→`, `≥`, espacio invisible U+200B) en los campos de texto del formulario y de la parametrización, con un mensaje por celda como el de S1 | Detectado al escribir la guía (entrega C): hoy fallan al escribir el script con `UnicodeEncodeError`, que no se captura y cae en el manejador global. Pueden llegar al copiar nombres desde Teams, correos o páginas web. Las tildes, la ñ, `€` y las comillas tipográficas sí existen en cp1252 | ✅ Resuelto (2026-11-04, `caracteres_fuera_de_cp1252` en `core/domain/texto.py`) |
 
 
 ## Otros pendientes acordados
@@ -112,5 +112,6 @@ Recibidos el 2026-10-27 (el usuario puede agregar más).
 | Uso de la imagen `coloresDiseno.jpeg` en la pantalla de bienvenida | Solo si el área de comunicaciones/marca lo aprueba (docs/diseno-visual.md) |
 | Extraer al núcleo los validadores de texto que repiten los dos módulos (`Requerimiento`, `Autor`, `Nombre`, texto sin caracteres de control) | Fase 8A: se copiaron en `alza_tarifas/domain/valores.py` para cumplir la guía de módulos nuevos (sin tocar `core/`). Si aparece un tercer módulo, se mueven a `core/domain/` con un ADR |
 | Quitar la línea suelta `QButtonGroup(self)` en `creacion_planes_pospago/ui/formulario_view.py` (crea un grupo que no se usa) | Revisión de la Fase 8A. ✅ Resuelto (entrega C) |
+| Respaldo automático de `recetas.db` al iniciar: documentado en `arquitectura.md` desde la Fase 2 pero nunca implementado. Necesario antes de la portable, porque cada versión nueva migra la BD del usuario | Revisión previa a la Fase 7. Se implementa en la Fase 7, parte 1 |
 | Login de usuario (el autor pasaría a ser el usuario logueado) | Opcional; el diseño ya lo soporta con el puerto `UsuarioActual` |
 | **Generar el MOP desde una plantilla Excel** según la receta o el alza de tarifas | Pedido del usuario (2026-10-29), para analizar más adelante. Ojo: openpyxl elimina extensiones que no soporta (validaciones de datos) al guardar una plantilla existente |

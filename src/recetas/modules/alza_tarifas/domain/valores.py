@@ -7,7 +7,7 @@ from typing import Annotated
 from pydantic import AfterValidator, BeforeValidator, StringConstraints
 from pydantic_core import PydanticCustomError
 
-from recetas.core.domain.texto import tiene_caracteres_de_control
+from recetas.core.domain.texto import caracteres_fuera_de_cp1252, tiene_caracteres_de_control
 
 MAX_REQUERIMIENTO = 30
 MAX_AUTOR = 100
@@ -50,6 +50,16 @@ def _sin_caracteres_de_control(valor: str) -> str:
     return valor
 
 
+def _solo_windows_1252(valor: str) -> str:
+    if caracteres := caracteres_fuera_de_cp1252(valor):
+        raise PydanticCustomError(
+            "fuera_de_windows_1252",
+            "Tiene caracteres que el script no admite: {caracteres}. Bórrelos o reemplácelos.",
+            {"caracteres": caracteres},
+        )
+    return valor
+
+
 def _obligatorio(valor: str) -> str:
     if not valor:
         raise PydanticCustomError("obligatorio", "Es obligatorio.")
@@ -72,7 +82,10 @@ def _a_precio(valor: object) -> object:
 
 
 _Texto = Annotated[
-    str, StringConstraints(strip_whitespace=True), AfterValidator(_sin_caracteres_de_control)
+    str,
+    StringConstraints(strip_whitespace=True),
+    AfterValidator(_sin_caracteres_de_control),
+    AfterValidator(_solo_windows_1252),
 ]
 TextoObligatorio = Annotated[_Texto, AfterValidator(_obligatorio)]
 

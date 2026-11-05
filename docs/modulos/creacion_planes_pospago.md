@@ -311,6 +311,8 @@ pone esas líneas en el portapapeles.
 - El nombre del plan y el código PCRF no tienen comas (separan los valores en los `.properties`).
 - Ningún texto tiene saltos de línea ni tabuladores, y cada campo respeta su longitud máxima
   provisional (`domain/valores.py`).
+- Ningún texto tiene caracteres que no existen en Windows-1252 (emojis, `→`, espacio invisible
+  U+200B); el mensaje muestra cuáles son y su código Unicode (S5).
 
 **Advertencias (no bloquean; el usuario decide).** Implementadas en `domain/advertencias.py`:
 

@@ -141,7 +141,8 @@ lanzadores (`aplica-cambio.sql`, `rollback-cambio.sql`) usan la plantilla común
 - Al menos una fila.
 - Formato de cada columna (tabla de la sección 2); todas las columnas son obligatorias.
 - No se repite el `Part_num` ni el `Id` dentro del formulario.
-- Ningún texto tiene saltos de línea ni tabuladores (S1).
+- Ningún texto tiene saltos de línea ni tabuladores (S1), ni caracteres que no existen en
+  Windows-1252, como emojis o el espacio invisible U+200B (S5).
 
 **Advertencias (no bloquean; el usuario decide):**
 

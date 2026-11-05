@@ -145,9 +145,11 @@ mensajes, `trabajos`…). No abren ventanas.
   pasar al depurar con breakpoints código que toca la BD.
 - **Teclas en tests:** usa `QTest.keyClick` y no `qtbot.keyClick`; el segundo no tiene tipos y
   mypy estricto lo rechaza.
-- **Caracteres fuera de cp1252** (comillas tipográficas “ ”, emojis) en un nombre hacen fallar la
-  escritura del script con `UnicodeEncodeError`. Hoy no se validan antes (pendiente S5 en
-  [ajustes-pendientes.md](ajustes-pendientes.md)).
+- **Caracteres fuera de cp1252** (emojis, flechas `→`, `≥`, el espacio invisible U+200B que llega
+  al copiar desde Teams o la web) no se pueden escribir en el script. Todo texto del formulario y
+  de la parametrización se valida con `caracteres_fuera_de_cp1252` (`core/domain/texto.py`); si
+  agregas un campo de texto, usa los tipos de `valores.py` para heredar esa regla. Las tildes, la
+  ñ, `€` y las comillas tipográficas “ ” sí existen en cp1252.
 - **Saltos de línea en los datos:** se rechazan (S1). En SQL*Plus, una línea con solo `/` o que
   empiece por `@` podría ejecutar código.
 - **Los originales de los RQ de referencia tienen errores** (ej. 265 precios sin IVA en el aplica

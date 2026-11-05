@@ -6,7 +6,7 @@ from typing import Annotated
 from pydantic import AfterValidator, StringConstraints
 from pydantic_core import PydanticCustomError
 
-from recetas.core.domain.texto import tiene_caracteres_de_control
+from recetas.core.domain.texto import caracteres_fuera_de_cp1252, tiene_caracteres_de_control
 
 # Límites provisionales (docs/ajustes-pendientes.md, U3) hasta conocer las columnas de Oracle.
 MAX_REQUERIMIENTO = 30
@@ -52,6 +52,16 @@ def _sin_caracteres_de_control(valor: str) -> str:
     return valor
 
 
+def _solo_windows_1252(valor: str) -> str:
+    if caracteres := caracteres_fuera_de_cp1252(valor):
+        raise PydanticCustomError(
+            "fuera_de_windows_1252",
+            "Tiene caracteres que el script no admite: {caracteres}. Bórrelos o reemplácelos.",
+            {"caracteres": caracteres},
+        )
+    return valor
+
+
 def _sin_comas(valor: str) -> str:
     if "," in valor:
         raise PydanticCustomError(
@@ -74,7 +84,10 @@ def _positivo(valor: int) -> int:
 
 # Todo texto del formulario: sin espacios en los extremos y sin caracteres de control.
 _Texto = Annotated[
-    str, StringConstraints(strip_whitespace=True), AfterValidator(_sin_caracteres_de_control)
+    str,
+    StringConstraints(strip_whitespace=True),
+    AfterValidator(_sin_caracteres_de_control),
+    AfterValidator(_solo_windows_1252),
 ]
 
 TextoObligatorio = Annotated[_Texto, AfterValidator(_obligatorio)]
