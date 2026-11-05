@@ -1,5 +1,6 @@
-import pytest
 from typing import Any
+
+import pytest
 from pydantic import TypeAdapter, ValidationError
 
 from recetas.modules.alza_tarifas.domain.valores import (
