@@ -102,7 +102,7 @@ Recibidos el 2026-10-27 (el usuario puede agregar más).
 | S3 | **Capturar errores de BD** al registrar planes y en la pestaña Parametrización (BD bloqueada, disco lleno) | Hoy solo se capturan los errores de validación; un `OperationalError` caería en el caso de S2 | ✅ Resuelto (entrega A) |
 | S4 | **Fijar versiones de dependencias** (archivo de bloqueo) y revisarlas con `pip-audit` | Reproducibilidad del `.exe` y detección de vulnerabilidades conocidas. Encaja en la Fase 7 | Media (Fase 7) |
 | D1 | **Glosario** (RQ, FC, POID, Svall, PLCON, Nintendo, 5.3…) y **guía de incorporación** para otro desarrollador | Facilita explicar y mantener el proyecto | ✅ Resuelto (entrega C: [glosario.md](glosario.md) y [guia-incorporacion.md](guia-incorporacion.md)) |
-| S5 | **Rechazar caracteres que no existen en Windows-1252** (comillas tipográficas “ ”, emojis) en los campos de texto, con el mismo mensaje por celda que S1 | Detectado al escribir la guía (entrega C): hoy fallan al escribir el script con `UnicodeEncodeError`, que no se captura y cae en el manejador global. Es fácil que lleguen al copiar nombres desde Word u Outlook | Alta (antes de la Fase 7) |
+| S5 | **Rechazar caracteres que no existen en Windows-1252** (emojis, flechas `→`, `≥`, espacio invisible U+200B) en los campos de texto del formulario y de la parametrización, con un mensaje por celda como el de S1 | Detectado al escribir la guía (entrega C): hoy fallan al escribir el script con `UnicodeEncodeError`, que no se captura y cae en el manejador global. Pueden llegar al copiar nombres desde Teams, correos o páginas web. Las tildes, la ñ, `€` y las comillas tipográficas sí existen en cp1252 | Alta (antes de la Fase 7) |
 
 
 ## Otros pendientes acordados

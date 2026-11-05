@@ -68,6 +68,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
 - Ícono de la aplicación (SVG provisional con la paleta del tema) en la ventana y la barra de
   tareas.
 - Cursor de espera mientras se genera, escribe o registra una receta.
+- Los textos con caracteres que no existen en Windows-1252 (emojis, flechas, espacios invisibles
+  copiados de la web) se rechazan con un mensaje en la celda, en el formulario y en la
+  parametrización, en lugar de fallar al escribir la receta.
 
 ### Corregido
 - Scoring modelado como dos listas independientes (SCORING_PLAN y CPL_SCORING_PLAN).
