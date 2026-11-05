@@ -1,4 +1,5 @@
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
+from contextlib import contextmanager
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
@@ -33,6 +34,7 @@ class VistaFalsa:
         self.advertencias: list[str] = []
         self.cargadas: list[list[str]] | None = None
         self.limpiado = False
+        self.trabajos = 0
 
     def mostrar_errores(self, errores: Sequence[ErrorCampo]) -> None:
         self.errores = list(errores)
@@ -68,6 +70,11 @@ class VistaFalsa:
 
     def mostrar_receta_generada(self, raiz: Path) -> None:
         self.mensajes.append(f"Receta generada en:\n{raiz}")
+
+    @contextmanager
+    def trabajando(self) -> Iterator[None]:
+        self.trabajos += 1
+        yield
 
 
 class GeneradorFalso:
@@ -216,6 +223,7 @@ def test_camino_feliz_escribe_la_receta_y_recuerda_autor_y_carpeta() -> None:
     assert escritor.escrituras == [False]
     assert vista.mensajes[0].startswith("Receta generada en")
     assert preferencias.valores == {CLAVE_AUTOR: "Equipo Tecnico", CLAVE_CARPETA: "C:/recetas"}
+    assert vista.trabajos == 2  # generar y escribir
 
 
 def test_advertencia_senala_la_fila_de_la_tabla_y_si_cancela_no_escribe() -> None:

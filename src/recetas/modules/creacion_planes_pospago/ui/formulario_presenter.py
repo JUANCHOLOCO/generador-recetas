@@ -1,6 +1,7 @@
 """Lógica del formulario de creación de planes (patrón MVP, sin Qt)."""
 
 from collections.abc import Sequence
+from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
@@ -117,6 +118,7 @@ class VistaFormulario(Protocol):
     def confirmar_limpieza(self) -> bool: ...
     def limpiar(self) -> None: ...
     def mostrar_receta_generada(self, raiz: Path) -> None: ...
+    def trabajando(self) -> AbstractContextManager[None]: ...
 
 
 class CasoGenerarReceta(Protocol):
@@ -146,7 +148,8 @@ class FormularioPresenter:
             return
 
         try:
-            receta = self._generar_receta.ejecutar(solicitud)
+            with self._vista.trabajando():
+                receta = self._generar_receta.ejecutar(solicitud)
         except RecetasError as error:
             self._vista.mostrar_error(str(error))
             return
@@ -163,7 +166,8 @@ class FormularioPresenter:
         self._vista.mostrar_propiedades(receta.propiedades)
         if self._vista.confirmar_registro(len(solicitud.planes)):
             try:
-                registrados = self._registro.registrar(solicitud)
+                with self._vista.trabajando():
+                    registrados = self._registro.registrar(solicitud)
             except RecetasError as error:
                 self._vista.mostrar_error(
                     f"La receta se generó, pero no se pudieron registrar los planes: {error}"
@@ -218,11 +222,13 @@ class FormularioPresenter:
 
     def _escribir(self, receta: RecetaGenerada, carpeta: Path) -> Path | None:
         try:
-            return self._escritor.escribir(receta.bundle, carpeta)
+            with self._vista.trabajando():
+                return self._escritor.escribir(receta.bundle, carpeta)
         except RecetaExistenteError as error:
             if not self._vista.confirmar_sobrescritura(error.rutas):
                 return None
-            return self._escritor.escribir(receta.bundle, carpeta, sobrescribir=True)
+            with self._vista.trabajando():
+                return self._escritor.escribir(receta.bundle, carpeta, sobrescribir=True)
         except OSError as error:
             self._vista.mostrar_error(f"No se pudo escribir la receta: {error}")
             return None

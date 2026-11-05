@@ -1,6 +1,7 @@
 """Formulario de creación de planes Pospago (vista pasiva del patrón MVP)."""
 
 from collections.abc import Sequence
+from contextlib import AbstractContextManager
 from pathlib import Path
 
 from PySide6.QtCore import QUrl, Signal
@@ -32,6 +33,7 @@ from recetas.modules.creacion_planes_pospago.ui.formulario_presenter import (
 )
 from recetas.modules.creacion_planes_pospago.ui.propiedades_dialog import PropiedadesDialog
 from recetas.ui.widgets.atajos import conectar_generar
+from recetas.ui.widgets.cursor import cursor_de_espera
 from recetas.ui.widgets.tabla_editable import TablaEditable, TablaEditableModel
 
 TITULO = "Creación de planes Pospago"
@@ -237,6 +239,9 @@ class FormularioView(QWidget):
         caja.exec()
         if caja.clickedButton() is abrir:
             QDesktopServices.openUrl(QUrl.fromLocalFile(str(raiz)))
+
+    def trabajando(self) -> AbstractContextManager[None]:
+        return cursor_de_espera()
 
     # ---------- Internos ----------
 

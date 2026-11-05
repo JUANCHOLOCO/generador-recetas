@@ -1,6 +1,7 @@
 """Formulario del alza de tarifas, uno por pestaña (vista pasiva del patrón MVP)."""
 
 from collections.abc import Sequence
+from contextlib import AbstractContextManager
 from pathlib import Path
 from typing import Any
 
@@ -24,6 +25,7 @@ from recetas.modules.alza_tarifas.domain.valores import MAX_AUTOR, MAX_REQUERIMI
 from recetas.modules.alza_tarifas.ui.formulario_presenter import DatosAlza, ErrorCampo
 from recetas.modules.alza_tarifas.ui.tipos_formulario import TipoFormulario
 from recetas.ui.widgets.atajos import conectar_generar
+from recetas.ui.widgets.cursor import cursor_de_espera
 from recetas.ui.widgets.tabla_editable import TablaEditable, TablaEditableModel
 
 
@@ -192,6 +194,9 @@ class FormularioAlzaView(QWidget):
         caja.exec()
         if caja.clickedButton() is abrir:
             QDesktopServices.openUrl(QUrl.fromLocalFile(str(raiz)))
+
+    def trabajando(self) -> AbstractContextManager[None]:
+        return cursor_de_espera()
 
     # ---------- Internos ----------
 
