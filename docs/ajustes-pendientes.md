@@ -10,7 +10,7 @@ Orden acordado (actualizado 2026-10-29):
 → P1 propiedades (.properties en Conf/) ✅ → P2 panel "Propiedades para el MOP" ✅
 → Ajustes B (importador Excel genérico + uso diario) ✅
 → Análisis de Alza de tarifas ✅ → 8A Alza de tarifas: planes pospago ✅
-→ 8B Alza de tarifas: paquetes ✅ → Ajustes C (pulido) → 7 portable
+→ 8B Alza de tarifas: paquetes ✅ → Ajustes C (pulido) ✅ → S5 (cp1252) → 7 portable
 ```
 
 **Actualización (2026-11-03):** el alza queda en **un módulo con dos tipos** (planes pospago y
@@ -39,7 +39,7 @@ paquetes), sin cálculos: los scripts llevan los valores que ingresa el usuario.
 |---|---|---|
 | **A. Robustez y datos** | S1, U3, S2, S3, T1 | ✅ Resuelto (2026-10-28) |
 | **B. Uso diario** | U1 importar Excel, U4 limpiar formulario, U2 aviso FC al elegir el tipo, visuales 1 (abrir carpeta) y 2 (recordar carpeta y autor) | ✅ Resuelto (2026-11-03) |
-| **C. Pulido** | Visuales 3, 4, 5, 6, 7 y 11; D1 glosario y guía de incorporación | Pendiente |
+| **C. Pulido** | Visuales 3, 4, 5, 6, 7 y 11; D1 glosario y guía de incorporación | ✅ Resuelto (2026-11-04) |
 
 ## Ajustes visuales recomendados
 
@@ -52,12 +52,12 @@ Ordenados por impacto para el usuario / esfuerzo. Recomendados primero: **1, 2, 
 | 3 | **Tooltip en cada encabezado** de la tabla con el formato esperado (`PLCON####`, `SVALL####`…) | Evita errores antes de validar | Bajo | ✅ Resuelto (entrega C) |
 | 4 | **Columnas ajustadas al contenido** y primera columna fija al desplazarse | 14 columnas no caben en pantalla | Bajo | ✅ Columnas ajustadas (entrega C). Primera columna fija pospuesta: Qt no la trae y requiere una tabla superpuesta (esfuerzo medio) |
 | 5 | Atajo **Ctrl+Enter** para generar y **Supr** para vaciar celdas | Más rápido con teclado | Bajo | ✅ Resuelto (entrega C) |
-| 6 | **Barra de estado** con versión, usuario y ruta de la BD | Saber en qué app y entorno se está | Bajo | Pendiente |
-| 7 | **Ícono de la aplicación** (`.ico`) para la ventana y el `.exe` | Identificación en la barra de tareas; necesario en la Fase 7 | Bajo | Pendiente |
+| 6 | **Barra de estado** con versión, usuario y ruta de la BD | Saber en qué app y entorno se está | Bajo | ✅ Resuelto (entrega C) |
+| 7 | **Ícono de la aplicación** (`.ico`) para la ventana y el `.exe` | Identificación en la barra de tareas; necesario en la Fase 7 | Bajo | ✅ SVG en la ventana y la barra de tareas (entrega C). El `.ico` del `.exe` se genera en la Fase 7 |
 | 8 | **Panel de resultado** dentro de la tarjeta en vez de varios `QMessageBox` seguidos | Menos ventanas emergentes; resumen de lo generado, advertencias y registro | Medio | Pendiente |
 | 9 | **Validación mientras se escribe** (al salir de cada celda) | El error aparece en el momento | Medio | Pendiente |
 | 10 | **Vista previa** del script antes de escribir (pestaña con el SQL) | Revisar lo que se va a desplegar | Medio | Pendiente |
-| 11 | **Indicador de progreso** (cursor de espera) mientras genera | Evita el doble clic en recetas grandes | Bajo | Pendiente |
+| 11 | **Indicador de progreso** (cursor de espera) mientras genera | Evita el doble clic en recetas grandes | Bajo | ✅ Resuelto (entrega C) |
 | 12 | **Fuente corporativa**, solo si marca entrega una con licencia de uso | Coherencia de marca | Bajo | Pendiente |
 
 ## Mejoras técnicas
@@ -101,7 +101,8 @@ Recibidos el 2026-10-27 (el usuario puede agregar más).
 | S2 | **Manejador global de errores inesperados** con mensaje al usuario y archivo de log | Hoy un error no previsto (un bug) solo se imprime en la consola: el usuario no ve nada y no queda registro | ✅ Resuelto (entrega A, `logs/recetas.log`) |
 | S3 | **Capturar errores de BD** al registrar planes y en la pestaña Parametrización (BD bloqueada, disco lleno) | Hoy solo se capturan los errores de validación; un `OperationalError` caería en el caso de S2 | ✅ Resuelto (entrega A) |
 | S4 | **Fijar versiones de dependencias** (archivo de bloqueo) y revisarlas con `pip-audit` | Reproducibilidad del `.exe` y detección de vulnerabilidades conocidas. Encaja en la Fase 7 | Media (Fase 7) |
-| D1 | **Glosario** (RQ, FC, POID, Svall, PLCON, Nintendo, 5.3…) y **guía de incorporación** para otro desarrollador | Facilita explicar y mantener el proyecto | Media |
+| D1 | **Glosario** (RQ, FC, POID, Svall, PLCON, Nintendo, 5.3…) y **guía de incorporación** para otro desarrollador | Facilita explicar y mantener el proyecto | ✅ Resuelto (entrega C: [glosario.md](glosario.md) y [guia-incorporacion.md](guia-incorporacion.md)) |
+| S5 | **Rechazar caracteres que no existen en Windows-1252** (comillas tipográficas “ ”, emojis) en los campos de texto, con el mismo mensaje por celda que S1 | Detectado al escribir la guía (entrega C): hoy fallan al escribir el script con `UnicodeEncodeError`, que no se captura y cae en el manejador global. Es fácil que lleguen al copiar nombres desde Word u Outlook | Alta (antes de la Fase 7) |
 
 
 ## Otros pendientes acordados

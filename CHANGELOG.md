@@ -69,7 +69,6 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y
   tareas.
 - Cursor de espera mientras se genera, escribe o registra una receta.
 
-
 ### Corregido
 - Scoring modelado como dos listas independientes (SCORING_PLAN y CPL_SCORING_PLAN).
 - Los códigos no numéricos de CONTROL (C01…P238) se incluyen en la parametrización.

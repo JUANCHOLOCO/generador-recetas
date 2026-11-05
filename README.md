@@ -12,9 +12,12 @@ formulario, la app combina esos datos con las **tablas de parametrización** (an
 
 | Módulo | Estado | Documentación |
 |---|---|---|
-| Creación de planes Pospago | En construcción | [docs/modulos/creacion_planes_pospago.md](docs/modulos/creacion_planes_pospago.md) |
-| Alza de tarifas | Planeado | — |
+| Creación de planes Pospago | Disponible | [docs/modulos/creacion_planes_pospago.md](docs/modulos/creacion_planes_pospago.md) |
+| Alza de tarifas (planes pospago y paquetes) | Disponible | [docs/modulos/alza_tarifas.md](docs/modulos/alza_tarifas.md) |
 | Limpieza de líneas | Planeado | — |
+
+¿Nuevo en el proyecto? Empieza por la [guía de incorporación](docs/guia-incorporacion.md) y el
+[glosario](docs/glosario.md).
 
 ## Stack
 
@@ -81,6 +84,8 @@ pytest tests\unit --cov=recetas --cov-report=term-missing
 > depurador también instala un rastreador.
 
 ## Versión portable
+
+> Pendiente de la Fase 7: el script `build_portable.ps1` todavía no existe.
 
 ```powershell
 .\scripts\build_portable.ps1
